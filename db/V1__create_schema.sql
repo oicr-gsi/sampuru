@@ -12,6 +12,7 @@ CREATE TABLE donor_case (
  
 CREATE TABLE qcable (
     id SERIAL PRIMARY KEY,
+    qcable_type text NOT NULL,
     project_id integer NOT NULL,
     case_id integer NOT NULL,
     oicr_alias text UNIQUE NOT NULL,
