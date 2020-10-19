@@ -1,4 +1,4 @@
-package ca.on.oicr.gsi.sampuru.server.type;
+package type;
 
 public class ProjectInfoItem extends SampuruType {
     public String entryType;
