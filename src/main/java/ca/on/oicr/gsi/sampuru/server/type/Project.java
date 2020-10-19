@@ -1,4 +1,4 @@
-package ca.on.oicr.gsi.sampuru.server.type;
+package type;
 
 import java.time.Instant;
 import java.util.List;

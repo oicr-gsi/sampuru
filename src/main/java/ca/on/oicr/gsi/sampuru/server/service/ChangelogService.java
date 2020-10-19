@@ -1,6 +1,6 @@
-package ca.on.oicr.gsi.sampuru.server.service;
+package service;
 
-import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
+import type.ChangelogEntry;
 
 public class ChangelogService extends Service  {
 
