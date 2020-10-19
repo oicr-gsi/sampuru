@@ -37,7 +37,7 @@ CREATE TABLE notification (
     id SERIAL PRIMARY KEY,
     user_id integer NOT NULL,
     issue_date timestamp NOT NULL,
-    receipt_date timestamp,
+    resolved_date timestamp,
     content text NOT NULL);
  
 CREATE TABLE project_info_item (
