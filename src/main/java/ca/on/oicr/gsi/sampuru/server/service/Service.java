@@ -1,6 +1,6 @@
-package service;
+package ca.on.oicr.gsi.sampuru.server.service;
 
-import type.SampuruType;
+import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import java.util.List;
 
 public class Service<T extends SampuruType> {

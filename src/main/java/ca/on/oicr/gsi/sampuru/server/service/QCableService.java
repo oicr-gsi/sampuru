@@ -1,6 +1,6 @@
-package service;
+package ca.on.oicr.gsi.sampuru.server.service;
 
-import type.QCable;
+import ca.on.oicr.gsi.sampuru.server.type.QCable;
 
 public class QCableService extends Service {
 

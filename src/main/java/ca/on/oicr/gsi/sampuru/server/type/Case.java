@@ -1,4 +1,4 @@
-package type;
+package ca.on.oicr.gsi.sampuru.server.type;
 
 import java.util.List;
 
