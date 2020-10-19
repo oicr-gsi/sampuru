@@ -1,6 +1,6 @@
-package service;
+package ca.on.oicr.gsi.sampuru.server.service;
 
-import type.Case;
+import ca.on.oicr.gsi.sampuru.server.type.Case;
 
 public class CaseService extends Service {
 

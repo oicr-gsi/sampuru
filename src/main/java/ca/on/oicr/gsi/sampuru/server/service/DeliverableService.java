@@ -1,6 +1,6 @@
-package service;
+package ca.on.oicr.gsi.sampuru.server.service;
 
-import type.Deliverable;
+import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 
 public class DeliverableService extends Service {
 
