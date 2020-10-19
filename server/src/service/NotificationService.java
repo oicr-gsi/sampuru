@@ -1,4 +1,10 @@
 package service;
 
-public class NotificationService extends Service  {
+import type.Notification;
+
+public class NotificationService extends Service {
+
+    public NotificationService(){
+        super(Notification.class);
+    }
 }
