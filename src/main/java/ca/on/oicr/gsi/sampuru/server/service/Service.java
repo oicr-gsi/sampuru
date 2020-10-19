@@ -1,10 +1,12 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
+import io.undertow.server.HttpServerExchange;
+
 import java.util.List;
 
 public class Service<T extends SampuruType> {
-    Class<T> targetClass;
+    private Class<T> targetClass;
 
     public Service(Class<T> newTarget){
         targetClass = newTarget;
