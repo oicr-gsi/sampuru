@@ -15,7 +15,10 @@
         <filtering>true</filtering>
       </resource>
     </resources>
+
+    <!-- These do not execute in order. See https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference -->
     <plugins>
+      <!-- Compiles project. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -25,6 +28,7 @@
           <target>14</target>
         </configuration>
       </plugin>
+      <!-- Imports fields from sampuru.properties file. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
@@ -43,25 +47,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.3</version>
-        <executions>
-          <execution>
-            <id>entering-module</id>
-            <phase>validate</phase>
-            <configuration>
-              <tasks>
-                <echo>Here's your properties!: ${basedir}, ${dbUrl}, ${dbUser}, ${dbPassword}</echo>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+      <!-- Uses fields from properties to connect to database and autogenerate code based on db schema. -->
       <plugin>
         <groupId>org.jooq</groupId>
         <artifactId>jooq-codegen-maven</artifactId>
