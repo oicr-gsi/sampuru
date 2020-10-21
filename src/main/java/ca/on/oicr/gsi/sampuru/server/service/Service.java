@@ -1,7 +1,6 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
-import io.undertow.server.HttpServerExchange;
 
 import java.util.List;
 

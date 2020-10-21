@@ -25,3 +25,7 @@ hs_err_pid*
 # IntelliJ
 *.idea*
 *.iml
+
+# Generated files
+*tables_generated*
+target/
