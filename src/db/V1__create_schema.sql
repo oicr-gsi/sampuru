@@ -17,7 +17,8 @@ CREATE TABLE qcable (
     case_id integer NOT NULL,
     oicr_alias text UNIQUE NOT NULL,
     status text NOT NULL,
-    failure_reason text);
+    failure_reason text,
+    library_design text);
  
 CREATE TABLE deliverable_file (
     id SERIAL PRIMARY KEY,
