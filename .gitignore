@@ -29,3 +29,6 @@ hs_err_pid*
 # Generated files
 *tables_generated*
 target/
+
+# Config
+src/main/resources/sampuru.properties
