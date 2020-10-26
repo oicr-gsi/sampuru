@@ -1,9 +1,11 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
+import org.jooq.Table;
+
 import java.util.List;
 
-public class SampuruType {
-    protected String TABLE_NAME;
+public abstract class SampuruType<T> {
+    public static Table TABLE_NAME;
     public int id;
 
     public static List<? extends SampuruType> getAll(){
