@@ -27,6 +27,18 @@ public class Project extends SampuruType {
         getProjectFromDb(PROJECT.NAME, newName);
     }
 
+    public static List<Project> getAll() throws Exception {
+        DBConnector dbConnector = new DBConnector();
+        List<Integer> ids = dbConnector.getAllIds(PROJECT);
+        List<Project> newList = new LinkedList<>();
+
+        for (Integer id: ids){
+            newList.add(new Project(id));
+        }
+
+        return newList;
+    }
+
     private void getProjectFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);

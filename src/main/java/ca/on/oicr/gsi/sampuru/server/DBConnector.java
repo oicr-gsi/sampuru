@@ -53,7 +53,7 @@ public class DBConnector {
     }
 
     /**
-     *
+     * TODO: convert to get idField like getAll does
      * @param idField Table's own ID field, eg DONOR_CASE.ID
      * @param matchField Field on which to match to toMatch, eg DONOR_CASE.PROJECT_ID
      * @param toMatch Actual id value to match
@@ -74,6 +74,19 @@ public class DBConnector {
 
         for(Record1 r: applicableIds){
             newList.add(toCreate.getDeclaredConstructor(Integer.class).newInstance(r.getValue(idField)));
+        }
+
+        return newList;
+    }
+
+    public List<Integer> getAllIds(Table getFrom){
+        List<Integer> newList = new LinkedList<>();
+        Field<Integer> idField = getFrom.field("ID", Integer.class);
+
+        Result<Record1<Integer>> idsFromDb = getContext().select(idField).from(getFrom).fetch();
+
+        for(Record r: idsFromDb){
+            newList.add(r.getValue(idField));
         }
 
         return newList;
