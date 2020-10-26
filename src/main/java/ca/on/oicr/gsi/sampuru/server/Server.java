@@ -16,8 +16,6 @@ public class Server {
             .get("/", Server::helloWorld);
 
     public static void main(String[] args){
-        DBConnector dbc = new DBConnector();
-        dbc.connect();
         server = Undertow.builder()
                 .addHttpListener(8088, "localhost") // TODO: get these from config file
                 .setHandler(ROUTES)

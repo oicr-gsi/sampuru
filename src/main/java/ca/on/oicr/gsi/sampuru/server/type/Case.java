@@ -1,18 +1,36 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
+import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import org.jooq.Record;
+import org.jooq.TableField;
+
+import java.util.LinkedList;
 import java.util.List;
+
+import static tables_generated.Tables.*;
 
 public class Case extends SampuruType {
     public String name;
-    public List<Deliverable> deliverables;
-    public List<QCable> qcables;
-    public List<ChangelogEntry> changelog;
+    public List<Deliverable> deliverables = new LinkedList<>();
+    public List<QCable> qcables = new LinkedList<>();
+    public List<ChangelogEntry> changelog = new LinkedList<>();
 
-    public Case(int id){
-        throw new UnsupportedOperationException("Not implemented yet");
+    public Case(int id) throws Exception {
+        getCaseFromDb(DONOR_CASE.ID, id);
     }
 
-    public Case(String name){
-        throw new UnsupportedOperationException("Not implemented yet");
+    public Case(String name) throws Exception {
+        getCaseFromDb(DONOR_CASE.NAME, name);
+    }
+
+    private void getCaseFromDb(TableField field, Object toMatch) throws Exception {
+        DBConnector dbConnector = new DBConnector();
+        Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
+        id = dbRecord.getValue(DONOR_CASE.ID);
+        name = dbRecord.getValue(DONOR_CASE.NAME);
+
+        deliverables = dbConnector.getMany(DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CASE_ID, id, Deliverable.class);
+        qcables = dbConnector.getMany(QCABLE.ID, QCABLE.CASE_ID, id, QCable.class);
+        changelog = dbConnector.getMany(CHANGELOG.ID, CHANGELOG.CASE_ID, id, ChangelogEntry.class);
     }
 }
