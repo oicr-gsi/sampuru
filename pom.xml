@@ -3,16 +3,150 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ca.on.oicr.gsi.sampuru</groupId>
   <artifactId>sampuru</artifactId>
-  <packaging>jar</packaging>
+  <packaging>jar</packaging> <!-- TODO: miso uses 'pom', should this change? -->
   <version>0.1-SNAPSHOT</version>
-  <name>sampuru</name>
-  <url>http://maven.apache.org</url>
+  <name>Sampuru</name>
+
+  <!-- TODO: url, licence, developers -->
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <!-- These do not execute in order. See https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference -->
+    <plugins>
+      <!-- Compiles project. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>14</source>
+          <target>14</target>
+        </configuration>
+      </plugin>
+      <!-- Imports fields from sampuru.properties file. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>${basedir}/src/main/resources/sampuru.properties</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Uses fields from properties to connect to database and autogenerate code based on db schema. -->
+      <plugin>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq-codegen-maven</artifactId>
+        <version>3.14.0</version>
+        <executions>
+          <execution>
+            <id>jooq-codegen</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <!-- Configure the database connection here -->
+              <jdbc>
+                <driver>org.postgresql.Driver</driver>
+                <url>${dbUrl}</url>
+                <user>${dbUser}</user>
+                <password>${dbPassword}</password>
+              </jdbc>
+
+              <generator>
+                <!-- The default code generator. You can override this one, to generate your own code style.
+                     Supported generators:
+                     - org.jooq.codegen.JavaGenerator
+                     - org.jooq.codegen.KotlinGenerator
+                     - org.jooq.codegen.ScalaGenerator
+                     Defaults to org.jooq.codegen.JavaGenerator -->
+                <name>org.jooq.codegen.JavaGenerator</name>
+
+                <database>
+                  <!-- The database type. The format here is:
+                       org.jooq.meta.[database].[database]Database -->
+                  <name>org.jooq.meta.postgres.PostgresDatabase</name>
+
+                  <!-- The database schema (or in the absence of schema support, in your RDBMS this
+                       can be the owner, user, database name) to be generated -->
+                  <inputSchema>public</inputSchema>
+
+                  <!-- All elements that are generated from your schema
+                       (A Java regular expression. Use the pipe to separate several expressions)
+                       Watch out for case-sensitivity. Depending on your database, this might be important! -->
+                  <includes>.*</includes>
+
+                  <!-- All elements that are excluded from your schema
+                       (A Java regular expression. Use the pipe to separate several expressions).
+                       Excludes match before includes, i.e. excludes have a higher priority -->
+                  <excludes></excludes>
+                </database>
+
+                <target>
+                  <!-- The destination package of your generated classes (within the destination directory) -->
+                  <packageName>tables_generated</packageName>
+
+                  <!-- The destination directory of your generated classes. Using Maven directory layout here -->
+                  <directory>./src/main/java</directory>
+                </target>
+              </generator>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-core</artifactId>
+      <version>2.1.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>3.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-meta</artifactId>
+      <version>3.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-codegen</artifactId>
+      <version>3.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-codegen-maven</artifactId>
+      <version>3.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.18</version>
     </dependency>
   </dependencies>
 </project>
