@@ -45,14 +45,14 @@ public class ProjectService extends Service {
     }
 
     // TODO: it can only handle 1 id
-    public static void getIdParams(HttpServerExchange hse){
+    public static void getIdParams(HttpServerExchange hse) throws Exception {
         ProjectService ps = new ProjectService();
         Deque<String> idparams = hse.getQueryParameters().get("id"); // Why is this in query parameters when it's clearly in the URL? bug?
-        Set<Integer> ids = new HashSet<>();
+        Set<Project> ids = new HashSet<>();
         for(String id: idparams){
-            ids.add(Integer.valueOf(id));
+            ids.add(new Project(id));
         }
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-        hse.getResponseSender().send("hey " + ids);
+        hse.getResponseSender().send(ids.toString());
     }
 }
