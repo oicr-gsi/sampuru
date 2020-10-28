@@ -23,6 +23,10 @@ public class Case extends SampuruType {
         getCaseFromDb(DONOR_CASE.NAME, name);
     }
 
+    public static List<Case> getAll() throws Exception {
+        return getAll(DONOR_CASE, Case.class);
+    }
+
     private void getCaseFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
