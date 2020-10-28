@@ -21,7 +21,7 @@ public class Service<T extends SampuruType> {
     }
 
     public T get(int id) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return targetClass.getDeclaredConstructor(Integer.class).newInstance(id);
+        return targetClass.getDeclaredConstructor(int.class).newInstance(id);
     }
 
     // TODO: it can only handle 1 id, how to get >1 id?

@@ -73,7 +73,7 @@ public class DBConnector {
                 .fetch();
 
         for(Record1 r: applicableIds){
-            newList.add(toCreate.getDeclaredConstructor(Integer.class).newInstance(r.getValue(idField)));
+            newList.add(toCreate.getDeclaredConstructor(int.class).newInstance(r.getValue(idField)));
         }
 
         return newList;
@@ -81,7 +81,7 @@ public class DBConnector {
 
     public List<Integer> getAllIds(Table getFrom){
         List<Integer> newList = new LinkedList<>();
-        Field<Integer> idField = getFrom.field("ID", Integer.class);
+        Field<Integer> idField = getFrom.field("id");
 
         Result<Record1<Integer>> idsFromDb = getContext().select(idField).from(getFrom).fetch();
 
