@@ -5,6 +5,7 @@ import org.jooq.Record;
 import org.jooq.TableField;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static tables_generated.Tables.*;
 
@@ -16,6 +17,10 @@ public class Notification extends SampuruType {
 
     public Notification(int newId) throws Exception {
         getNotificationFromDb(NOTIFICATION.ID, newId);
+    }
+
+    public static List<Notification> getAll() throws Exception {
+        return getAll(NOTIFICATION, Notification.class);
     }
 
     private void getNotificationFromDb(TableField field, Object toMatch) throws Exception {

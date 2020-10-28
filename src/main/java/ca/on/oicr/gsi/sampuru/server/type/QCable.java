@@ -24,6 +24,10 @@ public class QCable extends SampuruType {
         getQCableFromDb(QCABLE.OICR_ALIAS, alias);
     }
 
+    public static List<QCable> getAll() throws Exception {
+        return getAll(QCABLE, QCable.class);
+    }
+
     private void getQCableFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
