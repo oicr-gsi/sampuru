@@ -5,7 +5,6 @@ import org.jooq.Record;
 import org.jooq.TableField;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static tables_generated.Tables.*;
 
