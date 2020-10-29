@@ -18,7 +18,7 @@ public class Server {
             .get("/project/{id}", ProjectService::getIdParams)
             .get("/cases", CaseService::getAllParams)
             .get("/case/{id}", CaseService::getIdParams)
-            .get("/notifications", NotificationService::getAllParams) //TODO this is unrealistic past alpha, get all _for user_
+            .get("/notifications", NotificationService::getAllParams) //TODO most of these are unrealistic past alpha, get all _for user_
             .get("/notification/{id}", NotificationService::getIdParams)
             .get("/qcables", QCableService::getAllParams)
             .get("/qcable/{id}", QCableService::getIdParams)
