@@ -53,7 +53,6 @@ public class DBConnector {
     }
 
     /**
-     * TODO: convert to get idField like getAll does
      * @param idField Table's own ID field, eg DONOR_CASE.ID
      * @param matchField Field on which to match to toMatch, eg DONOR_CASE.PROJECT_ID
      * @param toMatch Actual id value to match
