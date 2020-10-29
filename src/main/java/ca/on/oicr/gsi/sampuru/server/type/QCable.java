@@ -33,13 +33,13 @@ public class QCable extends SampuruType {
     private void getQCableFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
-        id = dbRecord.getValue(QCABLE.ID);
-        OICRAlias = dbRecord.getValue(QCABLE.OICR_ALIAS);
-        status = dbRecord.getValue(QCABLE.STATUS);
-        failureReason = dbRecord.getValue(QCABLE.FAILURE_REASON);
-        libraryDesign = dbRecord.getValue(QCABLE.LIBRARY_DESIGN);
-        type = dbRecord.getValue(QCABLE.QCABLE_TYPE);
-        parentId = dbRecord.getValue(QCABLE.PARENT_ID);
+        id = dbRecord.get(QCABLE.ID);
+        OICRAlias = dbRecord.get(QCABLE.OICR_ALIAS);
+        status = dbRecord.get(QCABLE.STATUS);
+        failureReason = dbRecord.get(QCABLE.FAILURE_REASON);
+        libraryDesign = dbRecord.get(QCABLE.LIBRARY_DESIGN);
+        type = dbRecord.get(QCABLE.QCABLE_TYPE);
+        parentId = dbRecord.get(QCABLE.PARENT_ID);
 
         changelog = dbConnector.getMany(CHANGELOG.ID, CHANGELOG.QCABLE_ID, id, ChangelogEntry.class);
     }

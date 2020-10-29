@@ -13,7 +13,7 @@ public class ChangelogService extends Service  {
         getIdParams(new ChangelogService(), hse);
     }
 
-    public static void getAllParams(HttpServerExchange hse){
+    public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new ChangelogService(), hse);
     }
 }

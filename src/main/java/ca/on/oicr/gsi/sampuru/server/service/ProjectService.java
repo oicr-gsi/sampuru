@@ -17,7 +17,7 @@ public class ProjectService extends Service {
         getIdParams(new ProjectService(), hse);
     }
 
-    public static void getAllParams(HttpServerExchange hse){
+    public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new ProjectService(), hse);
     }
 }
