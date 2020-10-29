@@ -14,10 +14,10 @@ public class CaseService extends Service {
     }
 
     public static void getIdParams(HttpServerExchange hse){
-        getAllParams(new CaseService(), hse);
+        getIdParams(hse);
     }
 
-    public static void getAllParams(HttpServerExchange hse){
+    public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new CaseService(), hse);
     }
 }

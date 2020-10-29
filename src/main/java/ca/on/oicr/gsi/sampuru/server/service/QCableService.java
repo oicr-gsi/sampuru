@@ -3,6 +3,8 @@ package ca.on.oicr.gsi.sampuru.server.service;
 import ca.on.oicr.gsi.sampuru.server.type.QCable;
 import io.undertow.server.HttpServerExchange;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class QCableService extends Service {
 
     public QCableService(){
@@ -17,7 +19,7 @@ public class QCableService extends Service {
         getIdParams(new QCableService(), hse);
     }
 
-    public static void getAllParams(HttpServerExchange hse){
+    public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new QCableService(), hse);
     }
 

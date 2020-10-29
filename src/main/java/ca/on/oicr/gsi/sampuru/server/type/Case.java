@@ -30,8 +30,8 @@ public class Case extends SampuruType {
     private void getCaseFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
-        id = dbRecord.getValue(DONOR_CASE.ID);
-        name = dbRecord.getValue(DONOR_CASE.NAME);
+        id = dbRecord.get(DONOR_CASE.ID);
+        name = dbRecord.get(DONOR_CASE.NAME);
 
         deliverables = dbConnector.getMany(DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CASE_ID, id, Deliverable.class);
         qcables = dbConnector.getMany(QCABLE.ID, QCABLE.CASE_ID, id, QCable.class);

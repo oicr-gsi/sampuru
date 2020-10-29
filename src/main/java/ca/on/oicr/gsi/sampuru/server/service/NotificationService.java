@@ -13,7 +13,7 @@ public class NotificationService extends Service {
         getIdParams(new NotificationService(), hse);
     }
 
-    public static void getAllParams(HttpServerExchange hse){
+    public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new NotificationService(), hse);
     }
 }

@@ -34,11 +34,11 @@ public class Project extends SampuruType {
     private void getProjectFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
-        id = dbRecord.getValue(PROJECT.ID);
-        name = dbRecord.getValue(PROJECT.NAME);
-        contactName = dbRecord.getValue(PROJECT.CONTACT_NAME);
-        contactEmail = dbRecord.getValue(PROJECT.CONTACT_EMAIL);
-        completionDate = dbRecord.getValue(PROJECT.COMPLETION_DATE);
+        id = dbRecord.get(PROJECT.ID);
+        name = dbRecord.get(PROJECT.NAME);
+        contactName = dbRecord.get(PROJECT.CONTACT_NAME);
+        contactEmail = dbRecord.get(PROJECT.CONTACT_EMAIL);
+        completionDate = dbRecord.get(PROJECT.COMPLETION_DATE);
 
         infoItems = dbConnector.getMany(PROJECT_INFO_ITEM.ID, PROJECT_INFO_ITEM.PROJECT_ID, id, ProjectInfoItem.class);
         donorCases = dbConnector.getMany(DONOR_CASE.ID, DONOR_CASE.PROJECT_ID, id, Case.class);

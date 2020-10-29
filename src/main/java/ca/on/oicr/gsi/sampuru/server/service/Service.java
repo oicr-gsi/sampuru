@@ -39,27 +39,14 @@ public class Service<T extends SampuruType> {
         return (List<T>)targetClass.getDeclaredMethod("getAll").invoke(null);
     }
 
-    public static void getAllParams(Service targetService, HttpServerExchange hse){
+    public static void getAllParams(Service targetService, HttpServerExchange hse) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-        try {
-            hse.getResponseSender().send(targetService.getAll().toString()); // TODO: JSON, not string
-        } catch (NoSuchMethodException e) {
-            handleException(e, hse);
-        } catch (InvocationTargetException e) {
-            handleException(e, hse);
-        } catch (IllegalAccessException e) {
-            handleException(e, hse);
-        }
+        hse.getResponseSender().send(targetService.getAll().toString()); // TODO: JSON, not string
     }
 
     public List<T> search(String term){
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    protected static void handleException (Exception e, HttpServerExchange hse){
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        hse.getResponseSender().send(sw.toString());
-    }
+
 }

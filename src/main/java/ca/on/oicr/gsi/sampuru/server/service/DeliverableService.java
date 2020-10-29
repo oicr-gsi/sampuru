@@ -13,7 +13,7 @@ public class DeliverableService extends Service {
         getIdParams(new DeliverableService(), hse);
     }
 
-    public static void getAllParams(HttpServerExchange hse){
+    public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new DeliverableService(), hse);
     }
 }

@@ -20,8 +20,8 @@ public class Deliverable extends SampuruType {
     private void getDeliverableFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
-        id = dbRecord.getValue(DELIVERABLE_FILE.ID);
-        content = dbRecord.getValue(DELIVERABLE_FILE.CONTENT);
-        expiryDate = dbRecord.getValue(DELIVERABLE_FILE.EXPIRY_DATE);
+        id = dbRecord.get(DELIVERABLE_FILE.ID);
+        content = dbRecord.get(DELIVERABLE_FILE.CONTENT);
+        expiryDate = dbRecord.get(DELIVERABLE_FILE.EXPIRY_DATE);
     }
 }

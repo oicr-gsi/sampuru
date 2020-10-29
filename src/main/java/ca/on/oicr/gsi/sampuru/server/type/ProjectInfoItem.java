@@ -19,10 +19,10 @@ public class ProjectInfoItem extends SampuruType {
     private void getProjectInfoItemFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
-        id = dbRecord.getValue(PROJECT_INFO_ITEM.ID);
-        entryType = dbRecord.getValue(PROJECT_INFO_ITEM.TYPE);
-        content = dbRecord.getValue(PROJECT_INFO_ITEM.CONTENT);
-        expected = dbRecord.getValue(PROJECT_INFO_ITEM.EXPECTED);
-        received = dbRecord.getValue(PROJECT_INFO_ITEM.RECEIVED);
+        id = dbRecord.get(PROJECT_INFO_ITEM.ID);
+        entryType = dbRecord.get(PROJECT_INFO_ITEM.TYPE);
+        content = dbRecord.get(PROJECT_INFO_ITEM.CONTENT);
+        expected = dbRecord.get(PROJECT_INFO_ITEM.EXPECTED);
+        received = dbRecord.get(PROJECT_INFO_ITEM.RECEIVED);
     }
 }

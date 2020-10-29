@@ -26,9 +26,9 @@ public class Notification extends SampuruType {
     private void getNotificationFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
-        id = dbRecord.getValue(NOTIFICATION.ID);
-        issueDate = dbRecord.getValue(NOTIFICATION.ISSUE_DATE);
-        resolvedDate = dbRecord.getValue(NOTIFICATION.RESOLVED_DATE);
-        content = dbRecord.getValue(NOTIFICATION.CONTENT);
+        id = dbRecord.get(NOTIFICATION.ID);
+        issueDate = dbRecord.get(NOTIFICATION.ISSUE_DATE);
+        resolvedDate = dbRecord.get(NOTIFICATION.RESOLVED_DATE);
+        content = dbRecord.get(NOTIFICATION.CONTENT);
     }
 }
