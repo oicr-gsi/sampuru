@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ca.on.oicr.gsi.sampuru</groupId>
   <artifactId>sampuru</artifactId>
-  <packaging>jar</packaging> <!-- TODO: miso uses 'pom', should this change? -->
+  <packaging>jar</packaging>
   <version>0.1-SNAPSHOT</version>
   <name>Sampuru</name>
 
