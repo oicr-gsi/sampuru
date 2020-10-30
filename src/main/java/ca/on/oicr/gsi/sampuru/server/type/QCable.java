@@ -53,6 +53,6 @@ public class QCable extends SampuruType {
                 + "\n libraryDesign: " + libraryDesign
                 + "\n type: " + type
                 + "\n parentId: " + parentId
-                + "\n changelog: " + changelog;
+                + "\n changelog: " + changelog + "\n";
     }
 }

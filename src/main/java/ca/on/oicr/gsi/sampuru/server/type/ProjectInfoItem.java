@@ -32,6 +32,6 @@ public class ProjectInfoItem extends SampuruType {
                 + "\n entryType: " + entryType
                 + "\n content: " + content
                 + "\n expected: " + expected
-                + "\n received: " + received;
+                + "\n received: " + received + "\n";
     }
 }
