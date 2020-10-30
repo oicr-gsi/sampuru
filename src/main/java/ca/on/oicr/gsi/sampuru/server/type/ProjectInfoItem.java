@@ -9,8 +9,8 @@ import static tables_generated.Tables.*;
 public class ProjectInfoItem extends SampuruType {
     public String entryType;
     public String content;
-    public int expected;
-    public int received;
+    public Integer expected;
+    public Integer received;
 
     public ProjectInfoItem(int newId) throws Exception {
         getProjectInfoItemFromDb(PROJECT_INFO_ITEM.ID, newId);

@@ -15,7 +15,7 @@ public class QCable extends SampuruType {
     public String failureReason;
     public String libraryDesign;
     public String type;
-    public int parentId;
+    public Integer parentId;
     public List<ChangelogEntry> changelog;
 
     public QCable(int newId) throws Exception {
