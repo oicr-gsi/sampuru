@@ -55,12 +55,4 @@ public class QCable extends SampuruType {
                 + "\n parentId: " + parentId
                 + "\n changelog: " + changelog;
     }
-
-//    public String OICRAlias;
-//    public String status;
-//    public String failureReason;
-//    public String libraryDesign;
-//    public String type;
-//    public Integer parentId;
-//    public List<Integer> changelog;
 }
