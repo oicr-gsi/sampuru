@@ -91,6 +91,24 @@ public class DBConnector {
         return newList;
     }
 
+    // TODO: this is just getAllIds with a WHERE clause, can we refactor this
+    public List<Integer> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
+        List<Integer> newList = new LinkedList<>();
+        Field<Integer> idField = getFrom.field("id");
+
+        Result<Record1<Integer>> idsFromDb = getContext()
+                .select(idField)
+                .from(getFrom)
+                .where(matchField.eq(toMatch))
+                .fetch();
+
+        for(Record r: idsFromDb){
+            newList.add(r.get(idField));
+        }
+
+        return newList;
+    }
+
     private Properties readProperties() {
         try{
             FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/sampuru.properties");

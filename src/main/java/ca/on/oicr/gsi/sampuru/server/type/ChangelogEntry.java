@@ -23,4 +23,11 @@ public class ChangelogEntry extends SampuruType {
         changeDate = dbRecord.get(CHANGELOG.CHANGE_DATE);
         content = dbRecord.get(CHANGELOG.CONTENT);
     }
+
+    @Override
+    public String toString(){
+        return "ChangelogEntry id: " + id
+                + "\n changeDate: " + changeDate
+                + "\n content: " + content;
+    }
 }

@@ -31,4 +31,12 @@ public class Notification extends SampuruType {
         resolvedDate = dbRecord.get(NOTIFICATION.RESOLVED_DATE);
         content = dbRecord.get(NOTIFICATION.CONTENT);
     }
+
+    @Override
+    public String toString(){
+        return "Notification id: " + id
+                + "\n issueDate: " + issueDate
+                + "\n resolvedDate: " + resolvedDate
+                + "\n content: " + content;
+    }
 }

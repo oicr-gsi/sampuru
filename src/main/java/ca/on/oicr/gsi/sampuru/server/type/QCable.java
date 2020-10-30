@@ -16,7 +16,7 @@ public class QCable extends SampuruType {
     public String libraryDesign;
     public String type;
     public Integer parentId;
-    public List<ChangelogEntry> changelog;
+    public List<Integer> changelog;
 
     public QCable(int newId) throws Exception {
         getQCableFromDb(QCABLE.ID, newId);
@@ -41,6 +41,26 @@ public class QCable extends SampuruType {
         type = dbRecord.get(QCABLE.QCABLE_TYPE);
         parentId = dbRecord.get(QCABLE.PARENT_ID);
 
-        changelog = dbConnector.getMany(CHANGELOG.ID, CHANGELOG.QCABLE_ID, id, ChangelogEntry.class);
+        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.QCABLE_ID, id);
     }
+
+    @Override
+    public String toString(){
+        return "QCable id: " + id
+                + "\n OICRAlias: " + OICRAlias
+                + "\n status: " + status
+                + "\n failureReason: " + failureReason
+                + "\n libraryDesign: " + libraryDesign
+                + "\n type: " + type
+                + "\n parentId: " + parentId
+                + "\n changelog: " + changelog;
+    }
+
+//    public String OICRAlias;
+//    public String status;
+//    public String failureReason;
+//    public String libraryDesign;
+//    public String type;
+//    public Integer parentId;
+//    public List<Integer> changelog;
 }

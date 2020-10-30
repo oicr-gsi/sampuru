@@ -24,4 +24,11 @@ public class Deliverable extends SampuruType {
         content = dbRecord.get(DELIVERABLE_FILE.CONTENT);
         expiryDate = dbRecord.get(DELIVERABLE_FILE.EXPIRY_DATE);
     }
+
+    @Override
+    public String toString(){
+        return "Deliverable id: " + id
+                + "\n content: " + content
+                + "\n expiryDate: " + expiryDate;
+    }
 }
