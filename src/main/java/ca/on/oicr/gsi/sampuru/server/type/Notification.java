@@ -37,6 +37,6 @@ public class Notification extends SampuruType {
         return "Notification id: " + id
                 + "\n issueDate: " + issueDate
                 + "\n resolvedDate: " + resolvedDate
-                + "\n content: " + content;
+                + "\n content: " + content + "\n";
     }
 }

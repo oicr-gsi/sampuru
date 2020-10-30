@@ -29,6 +29,6 @@ public class Deliverable extends SampuruType {
     public String toString(){
         return "Deliverable id: " + id
                 + "\n content: " + content
-                + "\n expiryDate: " + expiryDate;
+                + "\n expiryDate: " + expiryDate + "\n";
     }
 }

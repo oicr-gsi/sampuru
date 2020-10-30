@@ -28,6 +28,6 @@ public class ChangelogEntry extends SampuruType {
     public String toString(){
         return "ChangelogEntry id: " + id
                 + "\n changeDate: " + changeDate
-                + "\n content: " + content;
+                + "\n content: " + content + "\n";
     }
 }

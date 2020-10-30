@@ -54,6 +54,6 @@ public class Project extends SampuruType {
                 + "\n completionDate: " + completionDate
                 + "\n infoItems: " + infoItems
                 + "\n donorCases: " + donorCases
-                + "\n deliverables: " + deliverables;
+                + "\n deliverables: " + deliverables + "\n";
     }
 }

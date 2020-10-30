@@ -44,6 +44,6 @@ public class Case extends SampuruType {
                 + "\n name: " + name
                 + "\n deliverables: " + deliverables
                 + "\n qcables: " + qcables
-                + "\n changelog: " + changelog;
+                + "\n changelog: " + changelog + "\n";
     }
 }
