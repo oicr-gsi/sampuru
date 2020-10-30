@@ -11,9 +11,9 @@ import static tables_generated.Tables.*;
 
 public class Case extends SampuruType {
     public String name;
-    public List<Deliverable> deliverables = new LinkedList<>();
-    public List<QCable> qcables = new LinkedList<>();
-    public List<ChangelogEntry> changelog = new LinkedList<>();
+    public List<Integer> deliverables = new LinkedList<>();
+    public List<Integer> qcables = new LinkedList<>();
+    public List<Integer> changelog = new LinkedList<>();
 
     public Case(int id) throws Exception {
         getCaseFromDb(DONOR_CASE.ID, id);
@@ -33,8 +33,17 @@ public class Case extends SampuruType {
         id = dbRecord.get(DONOR_CASE.ID);
         name = dbRecord.get(DONOR_CASE.NAME);
 
-        deliverables = dbConnector.getMany(DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CASE_ID, id, Deliverable.class);
-        qcables = dbConnector.getMany(QCABLE.ID, QCABLE.CASE_ID, id, QCable.class);
-        changelog = dbConnector.getMany(CHANGELOG.ID, CHANGELOG.CASE_ID, id, ChangelogEntry.class);
+        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.CASE_ID, id);
+        qcables = dbConnector.getChildIdList(QCABLE, QCABLE.CASE_ID, id);
+        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.CASE_ID, id);
+    }
+
+    @Override
+    public String toString(){
+        return "Case id: " + id
+                + "\n name: " + name
+                + "\n deliverables: " + deliverables
+                + "\n qcables: " + qcables
+                + "\n changelog: " + changelog;
     }
 }

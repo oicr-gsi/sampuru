@@ -15,9 +15,9 @@ public class Project extends SampuruType {
     public String contactName;
     public String contactEmail;
     public LocalDateTime completionDate;
-    public List<ProjectInfoItem> infoItems = new LinkedList<>();
-    public List<Case> donorCases = new LinkedList<>();
-    public List<Deliverable> deliverables = new LinkedList<>();
+    public List<Integer> infoItems = new LinkedList<>();
+    public List<Integer> donorCases = new LinkedList<>();
+    public List<Integer> deliverables = new LinkedList<>();
 
     public Project(int newId) throws Exception {
         getProjectFromDb(PROJECT.ID, newId);
@@ -40,8 +40,20 @@ public class Project extends SampuruType {
         contactEmail = dbRecord.get(PROJECT.CONTACT_EMAIL);
         completionDate = dbRecord.get(PROJECT.COMPLETION_DATE);
 
-        infoItems = dbConnector.getMany(PROJECT_INFO_ITEM.ID, PROJECT_INFO_ITEM.PROJECT_ID, id, ProjectInfoItem.class);
-        donorCases = dbConnector.getMany(DONOR_CASE.ID, DONOR_CASE.PROJECT_ID, id, Case.class);
-        deliverables = dbConnector.getMany(DELIVERABLE_FILE.ID, DELIVERABLE_FILE.PROJECT_ID, id, Deliverable.class);
+        infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id);
+        donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id);
+        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id);
+    }
+
+    @Override
+    public String toString(){
+        return "Project id: " + id
+                + "\n name: " + name
+                + "\n contactName: " + contactName
+                + "\n contactEmail: " + contactEmail
+                + "\n completionDate: " + completionDate
+                + "\n infoItems: " + infoItems
+                + "\n donorCases: " + donorCases
+                + "\n deliverables: " + deliverables;
     }
 }

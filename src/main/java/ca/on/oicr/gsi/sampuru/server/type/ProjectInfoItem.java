@@ -25,4 +25,13 @@ public class ProjectInfoItem extends SampuruType {
         expected = dbRecord.get(PROJECT_INFO_ITEM.EXPECTED);
         received = dbRecord.get(PROJECT_INFO_ITEM.RECEIVED);
     }
+
+    @Override
+    public String toString(){
+        return "ProjectInfoItem id: " + id
+                + "\n entryType: " + entryType
+                + "\n content: " + content
+                + "\n expected: " + expected
+                + "\n received: " + received;
+    }
 }
