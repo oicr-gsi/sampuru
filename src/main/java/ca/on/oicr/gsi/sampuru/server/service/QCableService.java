@@ -33,6 +33,7 @@ public class QCableService extends Service<QCable> {
         getAllParams(new QCableService(), hse);
     }
 
+    // TODO implement
     public String toJson(Collection<? extends SampuruType> toWrite) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
