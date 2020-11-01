@@ -21,7 +21,8 @@ import java.util.Properties;
 
 import static tables_generated.Tables.*;
 
-// TODO: Later, let's not just have 1 connection, but a pool of them. Methods would probably be static.
+// TODO: jOOQ's claim is that it closes connections automatically, no need for connection pool. But aren't there still resource issues?
+// https://blog.jooq.org/tag/connection-pool/
 public class DBConnector {
     private Properties properties = readProperties();
     private String userName = properties.getProperty("dbUser");
