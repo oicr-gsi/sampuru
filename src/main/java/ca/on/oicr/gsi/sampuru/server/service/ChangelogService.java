@@ -20,6 +20,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
         getAllParams(new ChangelogService(), hse);
     }
 
+    // TODO implement
     public String toJson(Collection<? extends SampuruType> toWrite){
         throw new UnsupportedOperationException("Not implemented yet");
     }

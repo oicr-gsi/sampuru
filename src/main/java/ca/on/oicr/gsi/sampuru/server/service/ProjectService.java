@@ -78,6 +78,7 @@ public class ProjectService extends Service<Project> {
         return jsonArray.toJSONString();
     }
 
+    // TODO implement
     public String toJson(Collection<? extends SampuruType> toWrite){
         throw new UnsupportedOperationException("Not implemented yet");
     }

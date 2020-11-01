@@ -20,6 +20,7 @@ public class DeliverableService extends Service<Deliverable> {
         getAllParams(new DeliverableService(), hse);
     }
 
+    // TODO implement
     public String toJson(Collection<? extends SampuruType> toWrite){
         throw new UnsupportedOperationException("Not implemented yet");
     }

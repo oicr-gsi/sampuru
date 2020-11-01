@@ -62,6 +62,7 @@ public class CaseService extends Service<Case> {
         return jsonArray.toJSONString();
     }
 
+    // TODO implement
     public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
         throw new UnsupportedOperationException("Not implemented yet");
     }
