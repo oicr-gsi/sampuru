@@ -4,6 +4,7 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import org.jooq.Record;
 import org.jooq.TableField;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static tables_generated.Tables.*;
@@ -28,6 +29,14 @@ public class QCable extends SampuruType {
 
     public static List<QCable> getAll() throws Exception {
         return getAll(QCABLE, QCable.class);
+    }
+
+    public List<ChangelogEntry> getChangelog() throws Exception {
+        List<ChangelogEntry> newList = new LinkedList<>();
+        for(Integer changelogId: changelog){
+            newList.add(new ChangelogEntry(changelogId));
+        }
+        return newList;
     }
 
     private void getQCableFromDb(TableField field, Object toMatch) throws Exception {
