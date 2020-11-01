@@ -3,6 +3,7 @@ package ca.on.oicr.gsi.sampuru.server.type;
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import org.jooq.Record;
 import org.jooq.TableField;
+import tables_generated.tables.Qcable;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -31,6 +32,75 @@ public class Project extends SampuruType {
         return getAll(PROJECT, Project.class);
     }
 
+    public static List<Project> getCompleted() throws Exception {
+        DBConnector dbConnector = new DBConnector();
+        List<Integer> ids = dbConnector.getCompletedProjectIds();
+        List<Project> newList = new LinkedList<>();
+
+        for (Integer id: ids) {
+            newList.add(new Project(id));
+        }
+
+        return newList;
+    }
+
+    //TODO make this a little more not repeated
+    public static List<Project> getActive() throws Exception {
+        DBConnector dbConnector = new DBConnector();
+        List<Integer> ids = dbConnector.getActiveProjectIds();
+        List<Project> newList = new LinkedList<>();
+
+        for (Integer id: ids) {
+            newList.add(new Project(id));
+        }
+
+        return newList;
+    }
+
+    public List<ProjectInfoItem> getInfoItems() throws Exception {
+        List<ProjectInfoItem> projectInfoItems = new LinkedList<>();
+        for(Integer i: infoItems){
+            projectInfoItems.add(new ProjectInfoItem(i));
+        }
+        return projectInfoItems;
+    }
+
+    public List<Case> getCases() throws Exception {
+        List<Case> caseList = new LinkedList<>();
+        for (Integer i: donorCases){
+            caseList.add(new Case(i));
+        }
+        return caseList;
+    }
+
+    public List<Deliverable> getDeliverables() throws Exception {
+        List<Deliverable> deliverableList = new LinkedList<>();
+        for (Integer i: deliverables){
+            deliverableList.add(new Deliverable(i));
+        }
+        return deliverableList;
+    }
+
+    public Integer getCasesTotal(){
+        return new DBConnector().getCasesTotal(this);
+    }
+
+    public Integer getCasesCompleted(){
+        return new DBConnector().getCasesCompleted(this);
+    }
+
+    public Integer getQCablesTotal(){
+        return new DBConnector().getQCablesTotal(this);
+    }
+
+    public Integer getQCablesCompleted(){
+        return new DBConnector().getQCablesCompleted(this);
+    }
+
+    public LocalDateTime getLastUpdate(){
+        return new DBConnector().getLastUpdate(this);
+    }
+
     private void getProjectFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
@@ -43,6 +113,17 @@ public class Project extends SampuruType {
         infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id);
         donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id);
         deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id);
+    }
+
+    public List<QCable> getFailedQCables() throws Exception {
+        List<Integer> failedQCablesIds = new DBConnector().getFailedQCablesForProject(this.id);
+        List<QCable> failedQCables = new LinkedList<>();
+
+        for(Integer failureId: failedQCablesIds){
+            failedQCables.add(new QCable(failureId));
+        }
+
+        return failedQCables;
     }
 
     @Override

@@ -3,6 +3,7 @@ package ca.on.oicr.gsi.sampuru.server.type;
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import org.jooq.Record;
 import org.jooq.TableField;
+import tables_generated.tables.Changelog;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +26,30 @@ public class Case extends SampuruType {
 
     public static List<Case> getAll() throws Exception {
         return getAll(DONOR_CASE, Case.class);
+    }
+
+    public List<QCable> getQcables() throws Exception {
+        List<QCable> newList = new LinkedList<>();
+        for (Integer qcId: qcables){
+            newList.add(new QCable(qcId));
+        }
+        return newList;
+    }
+
+    public List<Deliverable> getDeliverables() throws Exception {
+        List<Deliverable> newList = new LinkedList<>();
+        for (Integer deliverableId: deliverables){
+            newList.add(new Deliverable(deliverableId));
+        }
+        return newList;
+    }
+
+    public List<ChangelogEntry> getChangelog() throws Exception {
+        List<ChangelogEntry> newList = new LinkedList<>();
+        for(Integer changelogId: changelog){
+            newList.add(new ChangelogEntry(changelogId));
+        }
+        return newList;
     }
 
     private void getCaseFromDb(TableField field, Object toMatch) throws Exception {

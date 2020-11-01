@@ -17,8 +17,10 @@ public class Server {
 
     /**
      * Handles REST requests. Endpoints not included should realistically never be needed.
+     * TODO Specialized endpoints for frontend
      */
     private final static HttpHandler ROUTES = new RoutingHandler()
+            // Normal REST endpoints
             .get("/projects", ProjectService::getAllParams)
             .get("/project/{id}", ProjectService::getIdParams)
             .get("/cases", CaseService::getAllParams)
@@ -27,6 +29,13 @@ public class Server {
             .get("/notification/{id}", NotificationService::getIdParams)
             .get("/qcables", QCableService::getAllParams)
             .get("/qcable/{id}", QCableService::getIdParams)
+
+            // Special frontend endpoints
+            .get("/active_projects", ProjectService::getActiveProjectsParams)
+            .get("/completed_projects", ProjectService::getCompletedProjectsParams)
+            .get("/cases_cards", CaseService::getCardsParams)
+            .get("/qcables_table", QCableService::getAllQcablesTableParams)
+            .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
             .get("/", Server::helloWorld); //TODO: login?
 
     private final static HttpHandler ROOT = Handlers.exceptionHandler(ROUTES)

@@ -1,9 +1,12 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
+import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 
-public class DeliverableService extends Service {
+import java.util.Collection;
+
+public class DeliverableService extends Service<Deliverable> {
 
     public DeliverableService(){
         super(Deliverable.class);
@@ -15,5 +18,9 @@ public class DeliverableService extends Service {
 
     public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new DeliverableService(), hse);
+    }
+
+    public String toJson(Collection<? extends SampuruType> toWrite){
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }
