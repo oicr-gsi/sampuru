@@ -9,7 +9,6 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
-import java.util.Set;
 
 public class ProjectService extends Service<Project> {
 
@@ -78,9 +77,49 @@ public class ProjectService extends Service<Project> {
         return jsonArray.toJSONString();
     }
 
-    // TODO implement
-    public String toJson(Collection<? extends SampuruType> toWrite){
-        throw new UnsupportedOperationException("Not implemented yet");
+    @Override
+    public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
+        return toJson(toWrite, false);
+    }
+
+    public String toJson(Collection<? extends SampuruType> toWrite, boolean expand) throws Exception {
+        JSONArray jsonArray = new JSONArray();
+
+        for(SampuruType item: toWrite){
+            Project project = (Project)item;
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put("id", project.id);
+            jsonObject.put("name", project.name);
+            jsonObject.put("contact_name", project.contactName);
+            jsonObject.put("contact_email", project.contactEmail);
+            jsonObject.put("completion_date", project.completionDate);
+
+            if(expand){
+                JSONArray infoItemsArray = new JSONArray();
+                for (ProjectInfoItem infoItem: project.getInfoItems()){
+                    JSONObject infoItemObj = new JSONObject();
+                    infoItemObj.put("id", infoItem.id);
+                    infoItemObj.put("entry_type", infoItem.entryType);
+                    infoItemObj.put("content", infoItem.content);
+                    infoItemObj.put("expected", infoItem.expected);
+                    infoItemObj.put("received", infoItem.received);
+                    infoItemsArray.add(infoItemObj);
+                }
+                jsonObject.put("info_items", infoItemsArray);
+
+                jsonObject.put("donor_cases", new CaseService().toJson(project.getCases(), true));
+                jsonObject.put("deliverables", new DeliverableService().toJson(project.getDeliverables()));
+            } else {
+                jsonObject.put("info_items", project.infoItems);
+                jsonObject.put("donor_cases", project.donorCases);
+                jsonObject.put("deliverables", project.deliverables);
+            }
+
+            jsonArray.add(jsonObject);
+        }
+
+        return jsonArray.toJSONString();
     }
 
     public String getProjectOverviewJson(Project subject) throws Exception {

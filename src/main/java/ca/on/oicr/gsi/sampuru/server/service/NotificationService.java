@@ -22,7 +22,6 @@ public class NotificationService extends Service<Notification> {
         getAllParams(new NotificationService(), hse);
     }
 
-    // TODO implement
     @Override
     public String toJson(Collection<? extends SampuruType> toWrite){
         JSONArray jsonArray = new JSONArray();

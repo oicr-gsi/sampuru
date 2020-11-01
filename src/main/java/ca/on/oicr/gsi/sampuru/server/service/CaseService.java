@@ -62,8 +62,34 @@ public class CaseService extends Service<Case> {
         return jsonArray.toJSONString();
     }
 
-    // TODO implement
+    @Override
     public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return toJson(toWrite, false);
+    }
+
+    public String toJson(Collection<? extends SampuruType> toWrite, boolean expand) throws Exception {
+        JSONArray jsonArray = new JSONArray();
+
+        for(SampuruType item: toWrite){
+            JSONObject jsonObject = new JSONObject();
+            Case caseItem = (Case) item;
+
+            jsonObject.put("id", caseItem.id);
+            jsonObject.put("name", caseItem.name);
+
+            if(expand){
+                jsonObject.put("deliverables", new DeliverableService().toJson(caseItem.getDeliverables()));
+                jsonObject.put("qcables", new QCableService().toJson(caseItem.getQcables(), true));
+                jsonObject.put("changelog", new ChangelogService().toJson(caseItem.getChangelog()));
+            } else {
+                jsonObject.put("deliverables", caseItem.deliverables);
+                jsonObject.put("qcables", caseItem.qcables);
+                jsonObject.put("changelog", caseItem.changelog);
+            }
+
+            jsonArray.add(jsonObject);
+        }
+
+        return jsonArray.toJSONString();
     }
 }

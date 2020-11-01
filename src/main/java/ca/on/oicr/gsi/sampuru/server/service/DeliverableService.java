@@ -3,6 +3,8 @@ package ca.on.oicr.gsi.sampuru.server.service;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.Collection;
 
@@ -20,8 +22,21 @@ public class DeliverableService extends Service<Deliverable> {
         getAllParams(new DeliverableService(), hse);
     }
 
-    // TODO implement
+    @Override
     public String toJson(Collection<? extends SampuruType> toWrite){
-        throw new UnsupportedOperationException("Not implemented yet");
+        JSONArray jsonArray = new JSONArray();
+
+        for(SampuruType item: toWrite){
+            JSONObject jsonObject = new JSONObject();
+            Deliverable deliverable = (Deliverable)item;
+
+            jsonObject.put("id", deliverable.id);
+            jsonObject.put("content", deliverable.content);
+            jsonObject.put("expiry_date", deliverable.expiryDate);
+
+            jsonArray.add(jsonObject);
+        }
+
+        return jsonArray.toJSONString();
     }
 }

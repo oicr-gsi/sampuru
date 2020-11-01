@@ -1,9 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
-import ca.on.oicr.gsi.sampuru.server.type.Case;
-import ca.on.oicr.gsi.sampuru.server.type.QCable;
-import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
+import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.jooq.Result;
@@ -33,9 +31,36 @@ public class QCableService extends Service<QCable> {
         getAllParams(new QCableService(), hse);
     }
 
-    // TODO implement
-    public String toJson(Collection<? extends SampuruType> toWrite) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    @Override
+    public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
+        return toJson(toWrite, false);
+    }
+
+    public String toJson(Collection<? extends SampuruType> toWrite, boolean expand) throws Exception {
+        JSONArray jsonArray = new JSONArray();
+
+        for(SampuruType item: toWrite){
+            JSONObject jsonObject = new JSONObject();
+            QCable qcable = (QCable)item;
+
+            jsonObject.put("id", qcable.id);
+            jsonObject.put("status", qcable.status);
+            jsonObject.put("failure_reason", qcable.failureReason);
+            jsonObject.put("library_design", qcable.libraryDesign);
+            jsonObject.put("type", qcable.type);
+            jsonObject.put("parent_id", qcable.parentId);
+
+            if(expand){
+                List<ChangelogEntry> changelogEntries = qcable.getChangelog();
+                jsonObject.put("changelog", new ChangelogService().toJson(changelogEntries));
+            } else {
+                jsonObject.put("changelog", qcable.changelog);
+            }
+
+            jsonArray.add(jsonObject);
+        }
+
+        return jsonArray.toJSONString();
     }
 
     public static void getCaseQcablesTableParams(HttpServerExchange hse) throws Exception {
