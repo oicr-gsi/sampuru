@@ -17,7 +17,6 @@ public class Server {
 
     /**
      * Handles REST requests. Endpoints not included should realistically never be needed.
-     * TODO Specialized endpoints for frontend
      */
     private final static HttpHandler ROUTES = new RoutingHandler()
             // Normal REST endpoints
