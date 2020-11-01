@@ -38,7 +38,7 @@ public abstract class Service<T extends SampuruType> {
 
     public static void getAllParams(Service targetService, HttpServerExchange hse) throws Exception {
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(targetService.toJson(targetService.getAll())); // TODO: JSON, not string
+        hse.getResponseSender().send(targetService.toJson(targetService.getAll())); 
     }
 
     public List<T> search(String term){

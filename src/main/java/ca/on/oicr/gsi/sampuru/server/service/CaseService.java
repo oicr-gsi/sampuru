@@ -54,7 +54,6 @@ public class CaseService extends Service<Case> {
             }
             jsonObject.put("changelog", changelogArray);
 
-            //TODO 'bars'
             jsonObject.put("bars", new DBConnector().buildCaseBars(caseItem));
 
             jsonArray.add(jsonObject);
