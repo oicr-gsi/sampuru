@@ -30,7 +30,7 @@ public class Server {
             .get("/qcable/{id}", QCableService::getIdParams)
 
             // Special frontend endpoints
-            .get("/active_projects", ProjectService::getActiveProjectsParams)
+            .get("/active_projects", ProjectService::getActiveProjectsParams) //TODO IndexOutOfBoundsException
             .get("/completed_projects", ProjectService::getCompletedProjectsParams)
             .get("/cases_cards", CaseService::getCardsParams)
             .get("/qcables_table", QCableService::getAllQcablesTableParams)

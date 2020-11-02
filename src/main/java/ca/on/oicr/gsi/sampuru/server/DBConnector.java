@@ -2,10 +2,9 @@ package ca.on.oicr.gsi.sampuru.server;
 
 import ca.on.oicr.gsi.sampuru.server.type.Case;
 import ca.on.oicr.gsi.sampuru.server.type.Project;
-import ca.on.oicr.gsi.sampuru.server.type.QCable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
-import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -13,7 +12,9 @@ import org.json.simple.JSONObject;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -160,10 +161,15 @@ public class DBConnector {
     }
 
     public Integer getCasesCompleted(Project project) {
-        Result<Record1<Integer>> result = getContext()
+        DSLContext context = getContext();
+        Result<Record1<Integer>> result = context
                 .selectCount()
                 .from(DONOR_CASE)
-                .where(DONOR_CASE.PROJECT_ID.eq(project.id).and(true)) //TODO oh god how do i calculate whether it's complete
+                .where(DONOR_CASE.PROJECT_ID.eq(project.id)
+                        .and(context.select(PROJECT.COMPLETION_DATE)
+                                .from(PROJECT)
+                                .where(PROJECT.ID.eq(project.id))
+                                .isNotNull()))
                 .fetch();
         return result.get(0).value1();
     }
