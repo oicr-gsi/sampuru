@@ -170,7 +170,16 @@ public class DBConnector {
                         .where(QCABLE.CASE_ID
                                 .in(project.donorCases)
                                 .and(QCABLE.QCABLE_TYPE.eq("final_report"))
-                                .and(QCABLE.STATUS.eq("passed")))
+                                .and(QCABLE.STATUS.eq("passed"))
+                                .andExists(context
+                                        .select(DELIVERABLE_FILE.ID)
+                                        .from(DELIVERABLE_FILE)
+                                        .where(DELIVERABLE_FILE.CASE_ID
+                                                .in(context.select(QCABLE.CASE_ID)
+                                                        .from(QCABLE)
+                                                        .where(QCABLE.CASE_ID
+                                                                .in(project.donorCases)
+                                                                .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))
                 )
                 .fetch();
         return result.get(0).value1();
