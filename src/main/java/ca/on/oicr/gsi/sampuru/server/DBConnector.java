@@ -166,10 +166,7 @@ public class DBConnector {
                 .selectCount()
                 .from(DONOR_CASE)
                 .where(DONOR_CASE.PROJECT_ID.eq(project.id)
-                        .and(context.select(PROJECT.COMPLETION_DATE)
-                                .from(PROJECT)
-                                .where(PROJECT.ID.eq(project.id))
-                                .isNotNull()))
+                        .and(true)) //TODO oh god how do i calculate whether it's complete
                 .fetch();
         return result.get(0).value1();
     }
