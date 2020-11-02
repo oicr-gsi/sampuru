@@ -32,7 +32,7 @@ public class DeliverableService extends Service<Deliverable> {
 
             jsonObject.put("id", deliverable.id);
             jsonObject.put("content", deliverable.content);
-            jsonObject.put("expiry_date", deliverable.expiryDate);
+            jsonObject.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
 
             jsonArray.add(jsonObject);
         }

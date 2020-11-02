@@ -43,12 +43,13 @@ public class CaseService extends Service<Case> {
             jsonObject.put("id", caseItem.id);
             jsonObject.put("name", caseItem.name);
 
+            //TODO: just get the JSON from the changelog itself
             List<ChangelogEntry> changelogForItem = caseItem.getChangelog();
             JSONArray changelogArray = new JSONArray();
             for (ChangelogEntry changelog: changelogForItem){
                 JSONObject changelogJsonObject = new JSONObject();
                 changelogJsonObject.put("id", changelog.id);
-                changelogJsonObject.put("change_date", changelog.changeDate);
+                changelogJsonObject.put("change_date", JSONObject.escape(changelog.changeDate.toString()));
                 changelogJsonObject.put("content", changelog.content);
                 changelogArray.add(changelogJsonObject);
             }

@@ -33,7 +33,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
 
             jsonObject.put("id", changelogEntry.id);
             jsonObject.put("content", changelogEntry.content);
-            jsonObject.put("change_date", changelogEntry.changeDate);
+            jsonObject.put("change_date", JSONObject.escape(changelogEntry.changeDate.toString()));
 
             jsonArray.add(jsonObject);
         }
