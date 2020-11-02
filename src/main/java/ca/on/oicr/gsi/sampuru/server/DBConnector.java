@@ -164,12 +164,18 @@ public class DBConnector {
         DSLContext context = getContext();
         Result<Record1<Integer>> result = context
                 .selectCount()
-                .from(DONOR_CASE)
-                .where(DONOR_CASE.PROJECT_ID.eq(project.id)
-                        .and(true)) //TODO oh god how do i calculate whether it's complete
+                .from(
+                        context.selectDistinct(QCABLE.CASE_ID)
+                        .from(QCABLE)
+                        .where(QCABLE.CASE_ID
+                                .in(project.donorCases)
+                                .and(QCABLE.QCABLE_TYPE.eq("final_report"))
+                                .and(QCABLE.STATUS.eq("passed")))
+                )
                 .fetch();
         return result.get(0).value1();
     }
+
 
     public Integer getQCablesTotal(Project project) {
         Result<Record1<Integer>> result = getContext()
