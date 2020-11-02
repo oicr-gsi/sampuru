@@ -67,7 +67,7 @@ public class ProjectService extends Service<Project> {
             JSONObject projectObject = new JSONObject();
             projectObject.put("id", activeProject.id);
             projectObject.put("name", activeProject.name);
-            projectObject.put("last_update", activeProject.getLastUpdate());
+            projectObject.put("last_update", JSONObject.escape(activeProject.getLastUpdate().toString()));
             projectObject.put("cases_total", activeProject.getCasesTotal());
             projectObject.put("cases_completed", activeProject.getCasesCompleted());
             projectObject.put("qcables_total", activeProject.getQCablesTotal());

@@ -301,18 +301,20 @@ public class DBConnector {
 
 
     public LocalDateTime getLastUpdate(Project project) {
-        DSLContext context = getContext();
-        Result<Record1<LocalDateTime>> result = context
-                .selectDistinct(CHANGELOG.CHANGE_DATE)
-                .from(CHANGELOG)
-                .where(
-                        CHANGELOG.CASE_ID.in(
-                                context.select(DONOR_CASE.ID)
-                                        .from(DONOR_CASE)
-                                        .where(DONOR_CASE.PROJECT_ID.eq(project.id))))
-                .orderBy(CHANGELOG.CHANGE_DATE.desc())
-                .fetch();
-        return result.get(0).value1();
+        //TODO: this is a placeholder value
+        return LocalDateTime.now();
+//        DSLContext context = getContext();
+//        Result<Record1<LocalDateTime>> result = context
+//                .selectDistinct(CHANGELOG.CHANGE_DATE)
+//                .from(CHANGELOG)
+//                .where(
+//                        CHANGELOG.CASE_ID.in(
+//                                context.select(DONOR_CASE.ID)
+//                                        .from(DONOR_CASE)
+//                                        .where(DONOR_CASE.PROJECT_ID.eq(project.id))))
+//                .orderBy(CHANGELOG.CHANGE_DATE.desc())
+//                .fetch();
+//        return result.get(0).value1();
     }
 
     public List<Integer> getFailedQCablesForProject(int id) {
