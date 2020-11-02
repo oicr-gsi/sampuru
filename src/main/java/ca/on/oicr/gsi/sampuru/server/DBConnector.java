@@ -250,7 +250,7 @@ public class DBConnector {
                                 .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
                                         QCABLE.CASE_ID.eq(toExpand.id)).and(
                                         QCABLE.QCABLE_TYPE.eq((currentType))
-                                ).and(QCABLE.STATUS.eq("Passed"))).fetch().get(0).value1());
+                                ).and(QCABLE.STATUS.eq("passed"))).fetch().get(0).value1());
 
                 // aggregate status
                 Result<Record1<String>> statusResult = context
@@ -265,12 +265,12 @@ public class DBConnector {
                     statuses.add(statusRecord.value1());
                 }
                 String stepObjStatus = "";
-                if(statuses.contains("Failed")){
-                    stepObjStatus = "Failed";
+                if(statuses.contains("failed")){
+                    stepObjStatus = "failed";
                 } else if (statuses.contains("Not Ready")) { // TODO: Is that the correct term? check ETL
-                    stepObjStatus = "Pending";
-                } else if (statuses.contains("Passed")){
-                    stepObjStatus = "Passed";
+                    stepObjStatus = "pending";
+                } else if (statuses.contains("passed")){
+                    stepObjStatus = "passed";
                 } else {
                     stepObjStatus = "UNKNOWN!";
                 }

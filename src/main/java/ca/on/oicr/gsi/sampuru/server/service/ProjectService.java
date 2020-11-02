@@ -45,7 +45,7 @@ public class ProjectService extends Service<Project> {
             JSONObject projectObject = new JSONObject();
             projectObject.put("id", completedProject.id);
             projectObject.put("name", completedProject.name);
-            projectObject.put("completion_date", completedProject.completionDate);
+            projectObject.put("completion_date", JSONObject.escape(completedProject.completionDate.toString()));
             jsonArray.add(projectObject);
         }
         return jsonArray.toJSONString();
@@ -93,7 +93,7 @@ public class ProjectService extends Service<Project> {
             jsonObject.put("name", project.name);
             jsonObject.put("contact_name", project.contactName);
             jsonObject.put("contact_email", project.contactEmail);
-            jsonObject.put("completion_date", project.completionDate);
+            jsonObject.put("completion_date", JSONObject.escape(project.completionDate.toString()));
 
             if(expand){
                 JSONArray infoItemsArray = new JSONArray();
@@ -128,7 +128,7 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("name", subject.name);
         jsonObject.put("contact_name", subject.contactName);
         jsonObject.put("contact_email", subject.contactEmail);
-        jsonObject.put("completion_date", subject.completionDate);
+        jsonObject.put("completion_date", JSONObject.escape(subject.completionDate.toString()));
         jsonObject.put("cases_total", subject.getCasesTotal());
         jsonObject.put("cases_completed", subject.getCasesCompleted());
         jsonObject.put("qcables_total", subject.getQCablesTotal());
@@ -150,7 +150,7 @@ public class ProjectService extends Service<Project> {
         for (Deliverable deliverable: subject.getDeliverables()){
             JSONObject deliverableObj = new JSONObject();
             deliverableObj.put("id", deliverable.id);
-            deliverableObj.put("expiry_date", deliverable.expiryDate);
+            deliverableObj.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
             deliverableObj.put("content", deliverable.content);
             infoItemsArray.add(deliverableObj);
         }
