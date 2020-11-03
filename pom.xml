@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ca.on.oicr.gsi.sampuru</groupId>
   <artifactId>sampuru</artifactId>
-  <packaging>jar</packaging> <!-- TODO: miso uses 'pom', should this change? -->
+  <packaging>jar</packaging>
   <version>0.1-SNAPSHOT</version>
   <name>Sampuru</name>
 
@@ -147,6 +147,11 @@
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>42.2.18</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+      <version>1.1.1</version>
     </dependency>
   </dependencies>
 </project>
