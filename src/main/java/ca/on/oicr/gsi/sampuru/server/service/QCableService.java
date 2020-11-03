@@ -82,6 +82,7 @@ public class QCableService extends Service<QCable> {
         hse.getResponseSender().send(qs.getTableJson(cs.getAll()));
     }
 
+    // TODO use qcable_table once that's merged
     public String getTableJson(List<Case> cases) throws Exception {
         JSONArray jsonArray = new JSONArray();
 

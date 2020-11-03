@@ -166,7 +166,7 @@ public class ProjectService extends Service<Project> {
         }
         jsonObject.put("failures", failureArray);
 
-        //TODO: sankey_rows array
+        //TODO: sankey_rows array - probably use qcable_table once that's merged?
 
 
 
