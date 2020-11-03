@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true, /* Parse in strict mode and emit "use strict" for each source file. */
+    "esModuleInterop": false, /* Disables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "forceConsistentCasingInFileNames": true,
+    "lib": [ /* Library files to be included in the compilation. */
+      "es2020",
+      "dom"
+    ],
+    "module": "es2020",
+    "noImplicitAny": true, /* Raise error on expressions and declarations with an implied 'any' type. */
+    "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+    "noImplicitThis": true, /* Raise error on 'this' expressions with an implied 'any' type. */
+    "outDir": "", /* Redirect output structure to the directory. */
+    "rootDir": "./src/",
+    "strict": true, /* Enable all strict type-checking options. */
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "es2020"
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

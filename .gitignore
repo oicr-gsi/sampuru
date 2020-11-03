@@ -32,3 +32,8 @@ target/
 
 # Config
 src/main/resources/sampuru.properties
+
+# Downloads from npm
+node_modules
+yarn-error.log
+yarn.lock
