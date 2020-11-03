@@ -1,5 +1,6 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
+import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
@@ -166,9 +167,7 @@ public class ProjectService extends Service<Project> {
         }
         jsonObject.put("failures", failureArray);
 
-        //TODO: sankey_rows array - probably use qcable_table once that's merged?
-
-
+        jsonObject.put("sankey_transitions", new DBConnector().buildSankeyTransitions(subject));
 
         return jsonObject.toJSONString();
     }

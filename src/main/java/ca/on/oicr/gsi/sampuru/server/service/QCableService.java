@@ -82,32 +82,11 @@ public class QCableService extends Service<QCable> {
         hse.getResponseSender().send(qs.getTableJson(cs.getAll()));
     }
 
-    // TODO use qcable_table once that's merged
     public String getTableJson(List<Case> cases) throws Exception {
-        JSONArray jsonArray = new JSONArray();
-
-        // Each row in table is a Case
-        for (Case tableRow: cases){
-            JSONObject row = new JSONObject();
-            row.put("case_id", tableRow.id);
-            row.put("case_name", tableRow.name);
-
-            // All the qcables
-            List<QCable> qcables = tableRow.getQcables();
-            JSONArray qcableArray = new JSONArray();
-            for (QCable qcable: qcables){
-                JSONObject qcableObj = new JSONObject();
-                qcableObj.put("id", qcable.id);
-                qcableObj.put("alias", qcable.OICRAlias);
-                qcableObj.put("status", qcable.status);
-                qcableObj.put("failure_reason", qcable.failureReason);
-                qcableObj.put("library_design", qcable.libraryDesign);
-                qcableObj.put("type", qcable.type);
-                qcableArray.add(qcableObj);
-            }
-            row.put("qcables", qcableArray);
-            jsonArray.add(row);
+        List<Integer> ids = new LinkedList<>();
+        for (Case donorCase: cases){
+            ids.add(donorCase.id);
         }
-        return jsonArray.toJSONString();
+        return new DBConnector().getQcableTable(ids).toJSONString();
     }
 }

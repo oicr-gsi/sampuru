@@ -16,9 +16,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static tables_generated.Tables.*;
 
@@ -331,5 +329,71 @@ public class DBConnector {
         }
 
         return ids;
+    }
+
+    public JSONArray buildSankeyTransitions(Project project) {
+        JSONArray jsonArray = new JSONArray();
+        List<String> gates = Arrays.asList(
+                "receipt_inspection",
+                "extraction",
+                "library_preparation",
+                "low_pass_sequencing",
+                "full_depth_sequencing",
+                "informatics_interpretation",
+                "final_report");
+        Map<String, String> columns = new HashMap<>();
+        columns.put("receipt_inspection", "tissue_qcable");
+        columns.put("extraction", "extraction_qcable");
+        columns.put("library_preparation", "library_preparation_qcable");
+        columns.put("low_pass_sequencing", "low_pass_sequencing_qcable");
+        columns.put("full_depth_sequencing", "full_depth_sequencing_qcable");
+        columns.put("informatics_interpretation", "informatics_interpretation_qcable");
+        columns.put("final_report", "final_report_qcable");
+        Result<Record> result = getContext()
+                .select()
+                .from(QCABLE_TABLE)
+                .where(QCABLE_TABLE.PROJECT_ID.eq(project.id))
+                .fetch();
+
+        for(int i = 0; i < gates.size(); i++){
+            //TODO: how do i actually translate this to json
+
+        }
+
+
+        return jsonArray;
+    }
+
+    public JSONArray getQcableTable(List<Integer> caseIds){
+        JSONArray jsonArray = new JSONArray();
+        Result<Record> result = getContext()
+                .select()
+                .from(QCABLE_TABLE)
+                .where(QCABLE_TABLE.CASE_ID.in(caseIds))
+                .fetch();
+
+        for(Record row: result){
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put("project_id", row.get(QCABLE_TABLE.PROJECT_ID));
+            jsonObject.put("case_id", row.get(QCABLE_TABLE.CASE_ID));
+            jsonObject.put("tissue_qcable_alias", row.get(QCABLE_TABLE.TISSUE_QCABLE_ALIAS));
+            jsonObject.put("tissue_qcable_status", row.get(QCABLE_TABLE.TISSUE_QCABLE_STATUS));
+            jsonObject.put("extraction_qcable_alias", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_ALIAS));
+            jsonObject.put("extraction_qcable_status", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_STATUS));
+            jsonObject.put("library_preparation_qcable_alias", row.get(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_ALIAS));
+            jsonObject.put("library_preparation_qcable_status", row.get(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_STATUS));
+            jsonObject.put("low_pass_sequencing_qcable_alias", row.get(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_ALIAS));
+            jsonObject.put("low_pass_sequencing_qcable_status", row.get(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_STATUS));
+            jsonObject.put("full_depth_sequencing_qcable_alias", row.get(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_ALIAS));
+            jsonObject.put("full_depth_sequencing_qcable_status", row.get(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_STATUS));
+            jsonObject.put("informatics_interpretation_qcable_alias", row.get(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_ALIAS));
+            jsonObject.put("informatics_interpretation_qcable_status", row.get(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_STATUS));
+            jsonObject.put("final_report_qcable_alias", row.get(QCABLE_TABLE.FINAL_REPORT_QCABLE_ALIAS));
+            jsonObject.put("final_report_qcable_status", row.get(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS));
+
+            jsonArray.add(jsonObject);
+        }
+        return jsonArray;
     }
 }
