@@ -287,7 +287,7 @@ public class DBConnector {
 
     private Properties readProperties() {
         try{
-            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/sampuru.properties");
+            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/sampuru-server/src/main/resources/sampuru.properties");
             Properties properties = new Properties();
             properties.load(fis);
             return properties;

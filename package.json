@@ -15,6 +15,8 @@
     "bootstrap": "^4.5.3",
     "express": "^4.17.1",
     "html-webpack-plugin": "^4.5.0",
+    "jquery": "^3.5.1",
+    "popper.js": "^1.16.1",
     "ts-loader": "^8.0.7",
     "typescript": "^4.0.5",
     "webpack": "^4.32.2",
@@ -22,7 +24,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc",
+    "build": "npm run clean && tsc -p sampuru-ui",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack --mode development",
     "start": "webpack-dev-server --mode development --open"
