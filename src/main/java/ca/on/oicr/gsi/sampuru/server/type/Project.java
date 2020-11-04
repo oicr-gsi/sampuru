@@ -32,21 +32,14 @@ public class Project extends SampuruType {
     }
 
     public static List<Project> getCompleted() throws Exception {
-        DBConnector dbConnector = new DBConnector();
-        List<Integer> ids = dbConnector.getCompletedProjectIds();
-        List<Project> newList = new LinkedList<>();
-
-        for (Integer id: ids) {
-            newList.add(new Project(id));
-        }
-
-        return newList;
+        return getMany(new DBConnector().getCompletedProjectIds());
+    }
+    
+    public static List<Project> getActive() throws Exception {
+        return getMany(new DBConnector().getActiveProjectIds());
     }
 
-    //TODO make this a little more not repeated
-    public static List<Project> getActive() throws Exception {
-        DBConnector dbConnector = new DBConnector();
-        List<Integer> ids = dbConnector.getActiveProjectIds();
+    public static List<Project> getMany(List<Integer> ids) throws Exception {
         List<Project> newList = new LinkedList<>();
 
         for (Integer id: ids) {
