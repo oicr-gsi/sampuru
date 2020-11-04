@@ -1,7 +1,8 @@
 import {
   UIElement,
   Card,
-  staticCard
+  staticCard,
+  cardContainer,
 } from "./html";
 
 export type Project = {
@@ -15,9 +16,22 @@ export type Project = {
 }
 
 export function initialiseActiveProjects(projects: Project[]): HTMLElement {
-  const project = projects[0];
+  const cardContainer = document.createElement("div");
+  cardContainer.className = "container";
   const ui = document.createElement("p");
-  const card: Card = {contents: ui, header: project.name, title: project.name, tagId: project.name}
 
-  return staticCard(card);
+  const cards: HTMLElement[] = [];
+  projects
+    .forEach((project) => {
+      const card: Card = {contents: ui, header: project.name, title: project.name, tagId: project.name}
+      cards.push(staticCard(card));
+    })
+
+  // todo: move this out to a function
+  cards
+    .forEach((card) => {
+      cardContainer.appendChild(card);
+    })
+
+  return cardContainer;
 }

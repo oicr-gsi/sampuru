@@ -1,6 +1,17 @@
 import { initialiseActiveProjects, Project } from "./all-projects";
+import * as d3 from "d3";
 
 
+
+/*document.addEventListener("DOMContentLoaded", () => {
+
+  console.log("Hello world");
+
+  d3.select("body").append("span").text("Hello, world!");
+});*/
+
+
+document.body.appendChild(initialise());
 
 export function initialise() {
   const pcsi: Project = {id: 2, name: "PCSI", casesTotal: 12, casesCompleted: 2,

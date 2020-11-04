@@ -92,7 +92,6 @@ export function collapsibleCard(
   return card;
 }
 
-
 export function staticCard(
   content: Card
 ): HTMLElement {
@@ -115,3 +114,28 @@ export function staticCard(
 }
 
 // todo: function for paginated cards or infinite scroll cards
+export function cardContainer(
+  ...content: HTMLElement[]
+) {
+  const cardContainer = document.createElement("div");
+  cardContainer.className = "container";
+
+  content
+    .forEach((card) => {
+      cardContainer.appendChild(card);
+    } )
+
+  return cardContainer;
+}
+
+export function addCards(
+  target: HTMLElement,
+  ...content: HTMLElement[]
+): HTMLElement {
+  content
+    .forEach((card) => {
+      target.appendChild(card);
+    })
+
+  return target;
+}
