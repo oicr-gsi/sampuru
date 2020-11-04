@@ -127,9 +127,9 @@ public class ProjectService extends Service<Project> {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", subject.id);
         jsonObject.put("name", subject.name);
-        jsonObject.put("contact_name", subject.contactName);
-        jsonObject.put("contact_email", subject.contactEmail);
-        jsonObject.put("completion_date", JSONObject.escape(subject.completionDate.toString()));
+        jsonObject.put("contact_name", subject.contactName == null? "null": subject.contactName);
+        jsonObject.put("contact_email", subject.contactEmail == null? "null": subject.contactEmail);
+        jsonObject.put("completion_date", subject.completionDate  == null? "null": JSONObject.escape(subject.completionDate.toString()));
         jsonObject.put("cases_total", subject.getCasesTotal());
         jsonObject.put("cases_completed", subject.getCasesCompleted());
         jsonObject.put("qcables_total", subject.getQCablesTotal());

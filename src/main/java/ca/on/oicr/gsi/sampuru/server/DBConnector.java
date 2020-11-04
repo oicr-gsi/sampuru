@@ -331,37 +331,96 @@ public class DBConnector {
         return ids;
     }
 
-    public JSONArray buildSankeyTransitions(Project project) {
-        JSONArray jsonArray = new JSONArray();
-        List<String> gates = Arrays.asList(
-                "receipt_inspection",
-                "extraction",
-                "library_preparation",
-                "low_pass_sequencing",
-                "full_depth_sequencing",
-                "informatics_interpretation",
-                "final_report");
-        Map<String, String> columns = new HashMap<>();
-        columns.put("receipt_inspection", "tissue_qcable");
-        columns.put("extraction", "extraction_qcable");
-        columns.put("library_preparation", "library_preparation_qcable");
-        columns.put("low_pass_sequencing", "low_pass_sequencing_qcable");
-        columns.put("full_depth_sequencing", "full_depth_sequencing_qcable");
-        columns.put("informatics_interpretation", "informatics_interpretation_qcable");
-        columns.put("final_report", "final_report_qcable");
-        Result<Record> result = getContext()
-                .select()
-                .from(QCABLE_TABLE)
-                .where(QCABLE_TABLE.PROJECT_ID.eq(project.id))
-                .fetch();
+    // TODO: This could probably be a loop if I thought about it for a second
+    // Logic is kind of wonky because ETL currently sets lots of things to 'pending' regardless of their children
+    public JSONObject buildSankeyTransitions(Project project) {
+        Integer targetId = project.id;
+        JSONObject jsonObject = new JSONObject();
+        DSLContext context = getContext();
 
-        for(int i = 0; i < gates.size(); i++){
-            //TODO: how do i actually translate this to json
+        // RECEIPT -> EXTRACTION
+        JSONObject receiptObject = new JSONObject();
+        Integer tissuesCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.TISSUE_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        receiptObject.put("total", tissuesCount);
+        Integer tissuesPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.EXTRACTION_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        receiptObject.put("extraction", tissuesPassedCount);
+        Integer tissuesFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.TISSUE_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
+        receiptObject.put("failed", tissuesFailedCount);
+        jsonObject.put("receipt", receiptObject);
 
-        }
+        // EXTRACTION -> LIBRARY PREPARATION
+        JSONObject extractionObject = new JSONObject();
+        Integer extractionCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.EXTRACTION_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        extractionObject.put("total", extractionCount);
+        Integer extractionPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        extractionObject.put("library_preparation", extractionPassedCount);
+        Integer extractionFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.EXTRACTION_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
+        extractionObject.put("failed", extractionFailedCount);
+        Integer extractionPendingCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.EXTRACTION_QCABLE_STATUS.eq("pending"))).fetch().get(0).value1();
+        extractionObject.put("pending", extractionPendingCount);
+        jsonObject.put("extraction", extractionObject);
 
+        // LIBRARY PREPARATION -> LOW PASS SEQUENCING
+        JSONObject libPrepObject = new JSONObject();
+        Integer libPrepCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        libPrepObject.put("total", libPrepCount);
+        Integer libPrepPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        libPrepObject.put("low_pass_sequencing", libPrepPassedCount);
+        Integer libPrepFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
+        libPrepObject.put("failed", libPrepFailedCount);
+        Integer libPrepPendingCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_STATUS.eq("pending"))).fetch().get(0).value1();
+        libPrepObject.put("pending", libPrepPendingCount);
+        jsonObject.put("library_preparation", libPrepObject);
 
-        return jsonArray;
+        // LOW PASS SEQUENCING -> FULL DEPTH SEQUENCING
+        JSONObject lowPassObject = new JSONObject();
+        Integer lowPassCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        lowPassObject.put("total", lowPassCount);
+        Integer lowPassPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        lowPassObject.put("full_depth_sequencing", lowPassPassedCount);
+        Integer lowPassFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
+        lowPassObject.put("failed", lowPassFailedCount);
+        Integer lowPassPendingCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_STATUS.eq("pending"))).fetch().get(0).value1();
+        lowPassObject.put("pending", lowPassPendingCount);
+        jsonObject.put("lowPass", lowPassObject);
+
+        // FULL DEPTH SEQUENCING -> INFORMATICS INTERPRETATION
+        JSONObject fullDepthObject = new JSONObject();
+        Integer fullDepthCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        fullDepthObject.put("total", fullDepthCount);
+        Integer fullDepthPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        fullDepthObject.put("informatics_interpretation", fullDepthPassedCount);
+        Integer fullDepthFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
+        fullDepthObject.put("failed", fullDepthFailedCount);
+        Integer fullDepthPendingCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_STATUS.eq("pending"))).fetch().get(0).value1();
+        fullDepthObject.put("pending", fullDepthPendingCount);
+        jsonObject.put("fullDepth", fullDepthObject);
+
+        // INFORMATICS INTERPRETATION -> FINAL REPORT
+        JSONObject informaticsInterpretationObject = new JSONObject();
+        Integer informaticsInterpretationCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        informaticsInterpretationObject.put("total", informaticsInterpretationCount);
+        Integer informaticsInterpretationPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        informaticsInterpretationObject.put("informaticsInterpretation", informaticsInterpretationPassedCount);
+        Integer informaticsInterpretationFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
+        informaticsInterpretationObject.put("failed", informaticsInterpretationFailedCount);
+        Integer informaticsInterpretationPendingCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_STATUS.eq("pending"))).fetch().get(0).value1();
+        informaticsInterpretationObject.put("pending", informaticsInterpretationPendingCount);
+        jsonObject.put("informaticsInterpretation", informaticsInterpretationObject);
+
+        // FINAL REPORT -> COMPLETION
+        JSONObject finalReportObject = new JSONObject();
+        Integer finalReportCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
+        finalReportObject.put("total", finalReportCount);
+        Integer finalReportPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS.eq("passed"))).fetch().get(0).value1();
+        finalReportObject.put("complete", finalReportPassedCount);
+        Integer finalReportFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
+        finalReportObject.put("failed", finalReportFailedCount);
+        Integer finalReportPendingCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS.eq("pending"))).fetch().get(0).value1();
+        finalReportObject.put("pending", finalReportPendingCount);
+        jsonObject.put("finalReport", finalReportObject);
+
+        return jsonObject;
     }
 
     public JSONArray getQcableTable(List<Integer> caseIds){
