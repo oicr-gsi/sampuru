@@ -11,12 +11,12 @@ import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.*;
 
 public class Server {
     private static Undertow server;
+    public static Properties properties;
 
     /**
      * Handles REST requests. Endpoints not included should realistically never be needed.
@@ -81,8 +81,9 @@ public class Server {
 
     //TODO: No error handling for, eg, /qcable/10000000
     public static void main(String[] args){
+        readProperties();
         server = Undertow.builder()
-                .addHttpListener(8088, "0.0.0.0") // TODO: get these from config file
+                .addHttpListener(Integer.valueOf(properties.getProperty("hostPort")), properties.getProperty("hostAddress"))
                 .setHandler(ROOT)
                 .build();
         server.start();
@@ -100,5 +101,17 @@ public class Server {
         hse.setStatusCode(500); // TODO can probably set this more intelligently when we split this up by exception type
         e.printStackTrace(pw);
         hse.getResponseSender().send(sw.toString());
+    }
+
+    private static void readProperties() {
+        try{
+            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/sampuru.properties");
+            properties = new Properties();
+            properties.load(fis);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -20,10 +20,8 @@ import java.util.*;
 
 import static tables_generated.Tables.*;
 
-// TODO: jOOQ's claim is that it closes connections automatically, no need for connection pool. But aren't there still resource issues?
-// https://blog.jooq.org/tag/connection-pool/
 public class DBConnector {
-    private Properties properties = readProperties();
+    private Properties properties = Server.properties;
     private String userName = properties.getProperty("dbUser");
     private String pw = properties.getProperty("dbPassword");
     private String url = properties.getProperty("dbUrl");
@@ -105,7 +103,6 @@ public class DBConnector {
         return newList;
     }
 
-    // TODO: this is just getAllIds with a WHERE clause, can we refactor this
     public List<Integer> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
         List<Integer> newList = new LinkedList<>();
         Field<Integer> idField = getFrom.field("id");
@@ -271,7 +268,7 @@ public class DBConnector {
                 String stepObjStatus = "";
                 if(statuses.contains("failed")){
                     stepObjStatus = "failed";
-                } else if (statuses.contains("Not Ready")) { // TODO: Is that the correct term? check ETL
+                } else if (statuses.contains("pending")) {
                     stepObjStatus = "pending";
                 } else if (statuses.contains("passed")){
                     stepObjStatus = "passed";
@@ -289,19 +286,7 @@ public class DBConnector {
         return bars;
     }
 
-    private Properties readProperties() {
-        try{
-            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/sampuru.properties");
-            Properties properties = new Properties();
-            properties.load(fis);
-            return properties;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
 
     public LocalDateTime getLastUpdate(Project project) {

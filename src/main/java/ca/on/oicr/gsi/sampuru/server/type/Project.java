@@ -34,7 +34,7 @@ public class Project extends SampuruType {
     public static List<Project> getCompleted() throws Exception {
         return getMany(new DBConnector().getCompletedProjectIds());
     }
-    
+
     public static List<Project> getActive() throws Exception {
         return getMany(new DBConnector().getActiveProjectIds());
     }
