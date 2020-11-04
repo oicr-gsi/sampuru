@@ -1,6 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server;
 
 import ca.on.oicr.gsi.sampuru.server.service.*;
+import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -8,9 +9,12 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 public class Server {
     private static Undertow server;
@@ -30,12 +34,48 @@ public class Server {
             .get("/qcable/{id}", QCableService::getIdParams)
 
             // Special frontend endpoints
-            .get("/active_projects", ProjectService::getActiveProjectsParams) //TODO IndexOutOfBoundsException
+            .get("/active_projects", ProjectService::getActiveProjectsParams)
             .get("/completed_projects", ProjectService::getCompletedProjectsParams)
             .get("/cases_cards", CaseService::getCardsParams)
             .get("/qcables_table", QCableService::getAllQcablesTableParams)
             .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
+            .get("/search/{type}/{term}", Server::doSearch)
             .get("/", Server::helloWorld); //TODO: login?
+
+    // see https://stackoverflow.com/questions/39742014/routing-template-format-for-undertow
+    private static void doSearch(HttpServerExchange hse) throws Exception {
+        Service service = null;
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        String type = ptm.getParameters().get("type");
+        String term = ptm.getParameters().get("term");
+        List<? extends SampuruType> list = new LinkedList<>();
+
+        switch(type){
+            case "project":
+                service = new ProjectService();
+                break;
+            case "case":
+                service = new CaseService();
+                break;
+            case "changelog":
+                service = new ChangelogService();
+                break;
+            case "deliverable":
+                service = new DeliverableService();
+                break;
+            case "notification":
+                service = new NotificationService();
+                break;
+            case "qcable":
+                service = new QCableService();
+                break;
+            default:
+                throw new Exception("Invalid search type " + type);
+        }
+        list = service.search(term);
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        hse.getResponseSender().send(service.toJson(list));
+    }
 
     private final static HttpHandler ROOT = Handlers.exceptionHandler(ROUTES)
             .addExceptionHandler(Exception.class, Server::handleException);
