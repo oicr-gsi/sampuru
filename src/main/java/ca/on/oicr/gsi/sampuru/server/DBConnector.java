@@ -419,7 +419,7 @@ public class DBConnector {
         Integer finalReportCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_ALIAS.isNotNull())).fetch().get(0).value1();
         finalReportObject.put("total", finalReportCount);
         Integer finalReportPassedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS.eq("passed"))).fetch().get(0).value1();
-        finalReportObject.put("complete", finalReportPassedCount);
+        finalReportObject.put("passed", finalReportPassedCount);
         Integer finalReportFailedCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS.eq("failed"))).fetch().get(0).value1();
         finalReportObject.put("failed", finalReportFailedCount);
         Integer finalReportPendingCount = context.selectCount().from(QCABLE_TABLE).where(QCABLE_TABLE.PROJECT_ID.eq(targetId).and(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS.eq("pending"))).fetch().get(0).value1();
