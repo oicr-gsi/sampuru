@@ -46,7 +46,7 @@ public class ProjectService extends Service<Project> {
             JSONObject projectObject = new JSONObject();
             projectObject.put("id", completedProject.id);
             projectObject.put("name", completedProject.name);
-            projectObject.put("completion_date", JSONObject.escape(completedProject.completionDate.toString()));
+            projectObject.put("completion_date", completedProject.completionDate == null? "null": JSONObject.escape(completedProject.completionDate.toString()));
             jsonArray.add(projectObject);
         }
         return jsonArray.toJSONString();
@@ -92,8 +92,8 @@ public class ProjectService extends Service<Project> {
 
             jsonObject.put("id", project.id);
             jsonObject.put("name", project.name);
-            jsonObject.put("contact_name", project.contactName);
-            jsonObject.put("contact_email", project.contactEmail);
+            jsonObject.put("contact_name", project.contactName == null? "null": project.contactName);
+            jsonObject.put("contact_email", project.contactEmail == null? "null": project.contactEmail);
             jsonObject.put("completion_date", JSONObject.escape(project.completionDate.toString()));
 
             if(expand){
@@ -103,8 +103,8 @@ public class ProjectService extends Service<Project> {
                     infoItemObj.put("id", infoItem.id);
                     infoItemObj.put("entry_type", infoItem.entryType);
                     infoItemObj.put("content", infoItem.content);
-                    infoItemObj.put("expected", infoItem.expected);
-                    infoItemObj.put("received", infoItem.received);
+                    infoItemObj.put("expected", infoItem.expected == null? "null": infoItem.expected);
+                    infoItemObj.put("received", infoItem.received == null? "null": infoItem.received);
                     infoItemsArray.add(infoItemObj);
                 }
                 jsonObject.put("info_items", infoItemsArray);
@@ -141,8 +141,8 @@ public class ProjectService extends Service<Project> {
             infoItemObj.put("id", infoItem.id);
             infoItemObj.put("entry_type", infoItem.entryType);
             infoItemObj.put("content", infoItem.content);
-            infoItemObj.put("expected", infoItem.expected);
-            infoItemObj.put("received", infoItem.received);
+            infoItemObj.put("expected", infoItem.expected == null? "null": infoItem.expected);
+            infoItemObj.put("received", infoItem.received == null? "null": infoItem.expected);
             infoItemsArray.add(infoItemObj);
         }
         jsonObject.put("info_items", infoItemsArray);
@@ -162,7 +162,7 @@ public class ProjectService extends Service<Project> {
             JSONObject failureObj = new JSONObject();
             failureObj.put("id", failedQCable.id);
             failureObj.put("alias", failedQCable.OICRAlias);
-            failureObj.put("failure_reason", failedQCable.failureReason);
+            failureObj.put("failure_reason", failedQCable.failureReason == null? "null": failedQCable.failureReason);
             failureArray.add(failureObj);
         }
         jsonObject.put("failures", failureArray);

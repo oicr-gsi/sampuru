@@ -31,7 +31,7 @@ public class NotificationService extends Service<Notification> {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("id", notificationItem.id);
             jsonObject.put("issue_date", JSONObject.escape(notificationItem.issueDate.toString()));
-            jsonObject.put("resolved_date", JSONObject.escape(notificationItem.resolvedDate.toString()));
+            jsonObject.put("resolved_date", notificationItem.resolvedDate == null? "null": JSONObject.escape(notificationItem.resolvedDate.toString()));
             jsonObject.put("content", notificationItem.content);
             jsonArray.add(jsonObject);
         }

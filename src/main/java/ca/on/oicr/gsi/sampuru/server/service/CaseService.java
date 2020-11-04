@@ -49,7 +49,7 @@ public class CaseService extends Service<Case> {
             for (ChangelogEntry changelog: changelogForItem){
                 JSONObject changelogJsonObject = new JSONObject();
                 changelogJsonObject.put("id", changelog.id);
-                changelogJsonObject.put("change_date", JSONObject.escape(changelog.changeDate.toString()));
+                changelogJsonObject.put("change_date", changelog.changeDate == null? "null": JSONObject.escape(changelog.changeDate.toString()));
                 changelogJsonObject.put("content", changelog.content);
                 changelogArray.add(changelogJsonObject);
             }

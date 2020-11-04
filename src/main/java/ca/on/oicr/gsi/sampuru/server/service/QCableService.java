@@ -4,7 +4,6 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import org.jooq.Result;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -45,10 +44,10 @@ public class QCableService extends Service<QCable> {
 
             jsonObject.put("id", qcable.id);
             jsonObject.put("status", qcable.status);
-            jsonObject.put("failure_reason", qcable.failureReason);
-            jsonObject.put("library_design", qcable.libraryDesign);
+            jsonObject.put("failure_reason", qcable.failureReason  == null? "null": qcable.failureReason);
+            jsonObject.put("library_design", qcable.libraryDesign  == null? "null": qcable.libraryDesign);
             jsonObject.put("type", qcable.type);
-            jsonObject.put("parent_id", qcable.parentId);
+            jsonObject.put("parent_id", qcable.parentId  == null? "null": qcable.parentId);
 
             if(expand){
                 List<ChangelogEntry> changelogEntries = qcable.getChangelog();
