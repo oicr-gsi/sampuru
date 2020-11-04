@@ -77,7 +77,7 @@ public class QCableService extends Service<QCable> {
     }
 
     public static void getCaseQcablesTableParams(HttpServerExchange hse) throws Exception {
-        // TODO: get id, see Service TODO
+        // TODO: get id
         int id = 0;
         CaseService cs = new CaseService();
         QCableService qs = new QCableService();
