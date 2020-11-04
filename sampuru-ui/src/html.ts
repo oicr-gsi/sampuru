@@ -114,6 +114,7 @@ export function staticCard(
 }
 
 // todo: function for paginated cards or infinite scroll cards
+// todo: error not constructable for type HTMLDivElement
 export function cardContainer(
   ...content: HTMLElement[]
 ) {
