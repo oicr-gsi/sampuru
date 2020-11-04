@@ -37,3 +37,6 @@ sampuru-server/src/main/resources/sampuru.properties
 node_modules
 yarn-error.log
 yarn.lock
+
+# Transpiled js files
+sampuru-server/src/main/resources/ca/on/oicr/gsi/sampuru/*
