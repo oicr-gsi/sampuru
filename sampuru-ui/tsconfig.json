@@ -8,6 +8,7 @@
       "dom"
     ],
     "module": "es2020",
+    "moduleResolution": "node",
     "noImplicitAny": true, /* Raise error on expressions and declarations with an implied 'any' type. */
     "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     "noImplicitThis": true, /* Raise error on 'this' expressions with an implied 'any' type. */
