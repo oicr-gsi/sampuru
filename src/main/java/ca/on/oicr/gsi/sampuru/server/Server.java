@@ -43,7 +43,7 @@ public class Server {
     //TODO: No error handling for, eg, /qcable/10000000
     public static void main(String[] args){
         server = Undertow.builder()
-                .addHttpListener(8088, "localhost") // TODO: get these from config file
+                .addHttpListener(8088, "0.0.0.0") // TODO: get these from config file
                 .setHandler(ROOT)
                 .build();
         server.start();

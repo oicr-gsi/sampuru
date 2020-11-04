@@ -8,12 +8,12 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,21 +27,27 @@ public class DBConnector {
     private String userName = properties.getProperty("dbUser");
     private String pw = properties.getProperty("dbPassword");
     private String url = properties.getProperty("dbUrl");
-    private Connection connection;
+    private static PGConnectionPoolDataSource pgDataSource;
 
-    public DBConnector(){
-        try {
-            connection = DriverManager.getConnection(url, userName, pw);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+    public DBConnector() {
+        if (pgDataSource == null) {
+            PGConnectionPoolDataSource pgDataSource = new PGConnectionPoolDataSource();
+            pgDataSource.setUrl(url);
+            pgDataSource.setUser(userName);
+            pgDataSource.setPassword(pw);
+            this.pgDataSource = pgDataSource;
         }
     }
 
-    public Connection getConnection(){
-        return connection;
+    public Connection getConnection() {
+        try {
+            return pgDataSource.getConnection();
+        } catch (SQLException se) {
+            throw new RuntimeException(se);
+        }
     }
 
-    public DSLContext getContext(){
+    public DSLContext getContext() {
         return getContext(getConnection());
     }
 
