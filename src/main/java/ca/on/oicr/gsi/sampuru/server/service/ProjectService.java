@@ -9,7 +9,11 @@ import org.json.simple.JSONObject;
 
 import java.util.Collection;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+
+import static tables_generated.Tables.*;
+
 
 public class ProjectService extends Service<Project> {
 
@@ -76,6 +80,18 @@ public class ProjectService extends Service<Project> {
             jsonArray.add(projectObject);
         }
         return jsonArray.toJSONString();
+    }
+
+    @Override
+    public List<Project> search(String term) throws Exception {
+        List<Integer> ids = new DBConnector().search(PROJECT, PROJECT.ID, PROJECT.NAME, term);
+        List<Project> projects = new LinkedList<>();
+
+        for (Integer id: ids){
+            projects.add(get(id));
+        }
+
+        return projects;
     }
 
     @Override

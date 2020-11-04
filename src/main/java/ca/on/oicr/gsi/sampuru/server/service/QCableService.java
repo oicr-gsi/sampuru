@@ -7,10 +7,12 @@ import io.undertow.util.Headers;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static tables_generated.Tables.*;
+
 
 public class QCableService extends Service<QCable> {
 
@@ -28,6 +30,18 @@ public class QCableService extends Service<QCable> {
 
     public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new QCableService(), hse);
+    }
+
+    @Override
+    public List<QCable> search(String term) throws Exception {
+        List<Integer> ids = new DBConnector().search(QCABLE, QCABLE.ID, QCABLE.OICR_ALIAS, term);
+        List<QCable> qcables = new LinkedList<>();
+
+        for (Integer id: ids){
+            qcables.add(get(id));
+        }
+
+        return qcables;
     }
 
     @Override

@@ -8,7 +8,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+
+import static tables_generated.Tables.*;
+
 
 public class CaseService extends Service<Case> {
 
@@ -61,6 +65,18 @@ public class CaseService extends Service<Case> {
         }
 
         return jsonArray.toJSONString();
+    }
+
+    @Override
+    public List<Case> search(String term) throws Exception{
+        List<Integer> ids = new DBConnector().search(DONOR_CASE, DONOR_CASE.ID, DONOR_CASE.NAME, term);
+        List<Case> cases = new LinkedList<>();
+
+        for (Integer id: ids){
+            cases.add(get(id));
+        }
+
+        return cases;
     }
 
     @Override

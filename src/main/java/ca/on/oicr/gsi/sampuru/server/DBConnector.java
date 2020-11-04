@@ -455,4 +455,16 @@ public class DBConnector {
         }
         return jsonArray;
     }
+
+    public List<Integer> search(Table targetTable, TableField idField, TableField contentField, String term){
+        List<Integer> items = new LinkedList<>();
+        Result<Record> results = getContext()
+                .selectDistinct(idField)
+                .from(targetTable)
+                .where(contentField.like("%"+term+"%")).fetch();
+        for(Record record: results){
+            items.add((Integer)record.get(idField));
+        }
+        return items;
+    }
 }

@@ -1,5 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
+import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import ca.on.oicr.gsi.sampuru.server.type.Case;
 import ca.on.oicr.gsi.sampuru.server.type.Notification;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
@@ -7,6 +9,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+import static tables_generated.Tables.*;
+
 
 public class NotificationService extends Service<Notification> {
 
@@ -20,6 +27,18 @@ public class NotificationService extends Service<Notification> {
 
     public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new NotificationService(), hse);
+    }
+
+    @Override
+    public List<Notification> search(String term) throws Exception {
+        List<Integer> ids = new DBConnector().search(NOTIFICATION, NOTIFICATION.ID, NOTIFICATION.CONTENT, term);
+        List<Notification> notifications = new LinkedList<>();
+
+        for (Integer id: ids){
+            notifications.add(get(id));
+        }
+
+        return notifications;
     }
 
     @Override

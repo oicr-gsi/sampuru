@@ -1,12 +1,12 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
-import ca.on.oicr.gsi.sampuru.server.type.Project;
+import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.Result;
+import org.jooq.Record;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -41,9 +41,8 @@ public abstract class Service<T extends SampuruType> {
         hse.getResponseSender().send(targetService.toJson(targetService.getAll()));
     }
 
-    public List<T> search(String term){
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
+    // TODO this needs to not search everything
+    public abstract List<T> search(String term) throws Exception;
 
     public abstract String toJson(Collection<? extends  SampuruType> toWrite) throws Exception;
 
