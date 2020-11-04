@@ -13,7 +13,6 @@ import io.undertow.util.PathTemplateMatch;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Server {

@@ -3,7 +3,6 @@ package ca.on.oicr.gsi.sampuru.server.type;
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import org.jooq.Record;
 import org.jooq.TableField;
-import tables_generated.tables.Qcable;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;

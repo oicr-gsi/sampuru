@@ -7,8 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static tables_generated.Tables.PROJECT;
-
 public abstract class SampuruType {
     public int id;
 

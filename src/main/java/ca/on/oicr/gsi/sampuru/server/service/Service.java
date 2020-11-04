@@ -21,9 +21,8 @@ public abstract class Service<T extends SampuruType> {
         return targetClass.getDeclaredConstructor(int.class).newInstance(id);
     }
 
-    // TODO: it can only handle 1 id, how to get >1 id?
     public static void getIdParams(Service targetService, HttpServerExchange hse) throws Exception {
-        Deque<String> idparams = hse.getQueryParameters().get("id"); // Why is this in query parameters when it's clearly in the URL? bug?
+        Deque<String> idparams = hse.getQueryParameters().get("id");
         Set<SampuruType> items = new HashSet<>();
         for(String id: idparams){
             items.add(targetService.get(Integer.valueOf(id)));
