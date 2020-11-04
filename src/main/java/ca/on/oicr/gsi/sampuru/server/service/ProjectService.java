@@ -110,7 +110,7 @@ public class ProjectService extends Service<Project> {
             jsonObject.put("name", project.name);
             jsonObject.put("contact_name", project.contactName == null? "null": project.contactName);
             jsonObject.put("contact_email", project.contactEmail == null? "null": project.contactEmail);
-            jsonObject.put("completion_date", JSONObject.escape(project.completionDate.toString()));
+            jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
 
             if(expand){
                 JSONArray infoItemsArray = new JSONArray();
