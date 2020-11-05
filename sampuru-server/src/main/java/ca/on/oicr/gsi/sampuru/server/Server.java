@@ -11,16 +11,11 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
-import io.undertow.server.handlers.resource.FileResourceManager;
-import io.undertow.server.handlers.resource.ResourceHandler;
+import io.undertow.server.handlers.resource.Resource;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.util.Headers;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
+import java.io.*;
 
 public class Server {
     private static Undertow server;
@@ -41,7 +36,7 @@ public class Server {
             .get("/qcable/{id}", QCableService::getIdParams)
 
             // Special frontend endpoints
-            .get("/ui-test", resourceHandler1("", (int) TimeUnit.HOURS.toSeconds(4)))
+            .get("/ui-test", Server::handleResource)
             .get("/active_projects", ProjectService::getActiveProjectsParams) //TODO IndexOutOfBoundsException
             .get("/completed_projects", ProjectService::getCompletedProjectsParams)
             .get("/cases_cards", CaseService::getCardsParams)
@@ -53,20 +48,11 @@ public class Server {
             .addExceptionHandler(Exception.class, Server::handleException);
 
 
-    private final static HttpHandler ROOT2 = Handlers.path()
-            .addPrefixPath("/api", Handlers.exceptionHandler(ROUTES)
-                    .addExceptionHandler(Exception.class, Server::handleException))
-
-            .addExactPath("/", Handlers.redirect("/static"))
-
-            .addPrefixPath("/static", resourceHandler1("", (int) TimeUnit.HOURS.toSeconds(4)));
-
-
     //TODO: No error handling for, eg, /qcable/10000000
     public static void main(String[] args){
         server = Undertow.builder()
                 .addHttpListener(8088, "localhost") // TODO: get these from config file
-                .setHandler(ROOT2)
+                .setHandler(ROOT)
                 .build();
         server.start();
     }
@@ -76,31 +62,20 @@ public class Server {
         hse.getResponseSender().send("You found Sampuru!");
     }
 
-    /*
-    private static void handleResourceRequest(HttpServerExchange hse) throws IOException { //todo: handle exceptions
+    private static void handleResource(HttpServerExchange hse) throws IOException {
+        ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader());
+        Resource r = resourceManager.getResource("ca/on/oicr/gsi/sampuru/index.js");
+
         if(hse.isInIoThread()) {
-            hse.dispatch(ROOT2);
-            return;
+            hse.dispatch(ROOT);
         }
         hse.startBlocking();
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/javascript");
-        add("index.js", hse.getOutputStream());
-        //hse.getResponseSender().send(ByteBuffer.wrap(Files.readAllBytes(jsFile)));
-    }*/
-
-    private final static ResourceHandler resourceHandler() {
-        return new ResourceHandler(
-                new ClassPathResourceManager(Server.class.getClassLoader())
-        ).setWelcomeFiles("public/index.html");
-
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+        add(r, hse.getOutputStream());
     }
 
-    /** Add a file backed by a class resource*/ /*
-    private static void add(String resource, OutputStream output) throws IOException {
-        ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader());
-        String pathToResource = resourcesRoot + resource;
-        Resource r = resourceManager.getResource(pathToResource);
-
+    /** Add a file backed by a class resource*/
+    private static void add(Resource r, OutputStream output) throws IOException {
         // Writing the file to the OutputStream of the exchange object
         final byte[] buf = new byte[8192];
         try(InputStream input = r.getUrl().openStream()){
@@ -113,16 +88,6 @@ public class Server {
         } catch(final IOException e){
             e.printStackTrace();
         }
-    }*/
-
-    private static HttpHandler resourceHandler1(String prefix, int cacheTime) {
-        String path = Paths.get(resourcesRoot, prefix).toString();
-        ResourceManager resourceManager = new FileResourceManager(new File(path), 1024 * 1024);
-
-        ResourceHandler handler = new ResourceHandler(resourceManager);
-        handler.setWelcomeFiles("public/index.html");
-        handler.setCacheTime(cacheTime);
-        return handler;
     }
 
     protected static void handleException (HttpServerExchange hse){
