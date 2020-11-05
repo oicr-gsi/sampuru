@@ -11,12 +11,15 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
+import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.util.Headers;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 public class Server {
@@ -113,9 +116,8 @@ public class Server {
     }*/
 
     private static HttpHandler resourceHandler1(String prefix, int cacheTime) {
-        //String path = Paths.get(resourcesRoot, prefix).toString();
-        //ResourceManager resourceManager = new FileResourceManager(new File(path), 1024 * 1024);
-        ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader(), prefix);
+        String path = Paths.get(resourcesRoot, prefix).toString();
+        ResourceManager resourceManager = new FileResourceManager(new File(path), 1024 * 1024);
 
         ResourceHandler handler = new ResourceHandler(resourceManager);
         handler.setWelcomeFiles("public/index.html");
