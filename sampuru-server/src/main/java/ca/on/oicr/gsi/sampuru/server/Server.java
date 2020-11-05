@@ -6,6 +6,7 @@ import ca.on.oicr.gsi.sampuru.server.service.ProjectService;
 import ca.on.oicr.gsi.sampuru.server.service.QCableService;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.io.IoCallback;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
@@ -37,7 +38,7 @@ public class Server {
             .get("/qcable/{id}", QCableService::getIdParams)
 
             // Special frontend endpoints
-            .get("/ui-test", Server::sendResourceOutputStream)
+            .get("/ui-test", Server::sendResource)
             .get("/active_projects", ProjectService::getActiveProjectsParams) //TODO IndexOutOfBoundsException
             .get("/completed_projects", ProjectService::getCompletedProjectsParams)
             .get("/cases_cards", CaseService::getCardsParams)
@@ -67,9 +68,17 @@ public class Server {
         return new ResourceHandler(manager).addWelcomeFiles("public/index.html");
     }
 
+    private static void sendResource(HttpServerExchange hse) throws IOException {
+        ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader());
+        Resource r = resourceManager.getResource("ca/on/oicr/gsi/sampuru/index.js"); // todo: exception handling
+
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/javascript");
+        r.serve(hse.getResponseSender(), hse, IoCallback.END_EXCHANGE);
+    }
+
     private static void sendResourceOutputStream(HttpServerExchange hse) throws IOException {
         ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader());
-        Resource r = resourceManager.getResource("ca/on/oicr/gsi/sampuru/index.js");
+        Resource r = resourceManager.getResource("ca/on/oicr/gsi/sampuru/index.js"); // todo: exception handling
 
         if(hse.isInIoThread()) {
             hse.dispatch(ROOT);
