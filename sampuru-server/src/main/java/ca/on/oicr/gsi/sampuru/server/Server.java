@@ -64,7 +64,7 @@ public class Server {
     }
 
     private static HttpHandler resourceHandler(ResourceManager manager){
-        return new ResourceHandler(manager).addWelcomeFiles("public.html");
+        return new ResourceHandler(manager).addWelcomeFiles("public/index.html");
     }
 
     private static void sendResourceOutputStream(HttpServerExchange hse) throws IOException {
