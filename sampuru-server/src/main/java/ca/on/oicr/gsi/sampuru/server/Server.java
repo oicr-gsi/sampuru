@@ -12,6 +12,7 @@ import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.handlers.resource.Resource;
+import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.util.Headers;
 
@@ -36,7 +37,7 @@ public class Server {
             .get("/qcable/{id}", QCableService::getIdParams)
 
             // Special frontend endpoints
-            .get("/ui-test", Server::handleResource)
+            .get("/ui-test", Server::sendResourceOutputStream)
             .get("/active_projects", ProjectService::getActiveProjectsParams) //TODO IndexOutOfBoundsException
             .get("/completed_projects", ProjectService::getCompletedProjectsParams)
             .get("/cases_cards", CaseService::getCardsParams)
@@ -62,7 +63,11 @@ public class Server {
         hse.getResponseSender().send("You found Sampuru!");
     }
 
-    private static void handleResource(HttpServerExchange hse) throws IOException {
+    private static HttpHandler resourceHandler(ResourceManager manager){
+        return new ResourceHandler(manager).addWelcomeFiles("public.html");
+    }
+
+    private static void sendResourceOutputStream(HttpServerExchange hse) throws IOException {
         ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader());
         Resource r = resourceManager.getResource("ca/on/oicr/gsi/sampuru/index.js");
 
