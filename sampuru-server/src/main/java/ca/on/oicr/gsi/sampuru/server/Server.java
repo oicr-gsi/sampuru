@@ -6,18 +6,14 @@ import ca.on.oicr.gsi.sampuru.server.service.ProjectService;
 import ca.on.oicr.gsi.sampuru.server.service.QCableService;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
-import io.undertow.io.IoCallback;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.ExceptionHandler;
-import io.undertow.server.handlers.resource.ClassPathResourceManager;
-import io.undertow.server.handlers.resource.Resource;
-import io.undertow.server.handlers.resource.ResourceHandler;
-import io.undertow.server.handlers.resource.ResourceManager;
 import io.undertow.util.Headers;
 
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class Server {
     private static Undertow server;
@@ -38,7 +34,6 @@ public class Server {
             .get("/qcable/{id}", QCableService::getIdParams)
 
             // Special frontend endpoints
-            .get("/ui-test", Server::sendResource)
             .get("/active_projects", ProjectService::getActiveProjectsParams) //TODO IndexOutOfBoundsException
             .get("/completed_projects", ProjectService::getCompletedProjectsParams)
             .get("/cases_cards", CaseService::getCardsParams)
@@ -62,46 +57,6 @@ public class Server {
     private static void helloWorld(HttpServerExchange hse){
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         hse.getResponseSender().send("You found Sampuru!");
-    }
-
-    private static HttpHandler resourceHandler(ResourceManager manager){
-        return new ResourceHandler(manager).addWelcomeFiles("public/index.html");
-    }
-
-    private static void sendResource(HttpServerExchange hse) throws IOException {
-        ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader());
-        Resource r = resourceManager.getResource("ca/on/oicr/gsi/sampuru/index.js"); // todo: exception handling
-
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/javascript");
-        r.serve(hse.getResponseSender(), hse, IoCallback.END_EXCHANGE);
-    }
-
-    private static void sendResourceOutputStream(HttpServerExchange hse) throws IOException {
-        ResourceManager resourceManager = new ClassPathResourceManager(Server.class.getClassLoader());
-        Resource r = resourceManager.getResource("ca/on/oicr/gsi/sampuru/index.js"); // todo: exception handling
-
-        if(hse.isInIoThread()) {
-            hse.dispatch(ROOT);
-        }
-        hse.startBlocking();
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/javascript");
-        writeToOutputStream(r, hse.getOutputStream());
-    }
-
-    /** Add a file backed by a class resource*/
-    private static void writeToOutputStream(Resource r, OutputStream output) throws IOException {
-        // Writing the file to the OutputStream of the exchange object
-        final byte[] buf = new byte[8192];
-        try(InputStream input = r.getUrl().openStream()){
-            int count;
-            while((count = input.read(buf, 0, buf.length)) > 0){
-                output.write(buf, 0, count);
-                output.flush();
-            }
-            output.close();
-        } catch(final IOException e){
-            e.printStackTrace();
-        }
     }
 
     protected static void handleException (HttpServerExchange hse){
