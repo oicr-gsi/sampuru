@@ -28,7 +28,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc -p sampuru-ui",
+    "build": "tsc -p sampuru-ui",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack --mode development",
     "start": "webpack-dev-server --mode development --open"

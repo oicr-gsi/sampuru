@@ -43,7 +43,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./index.html"
+      template: "sampuru-server/src/main/resources/ca/on/oicr/gsi/sampuru/index.html"
     }),
     new MiniCssExtractPlugin({
       filename: 'index.css',
