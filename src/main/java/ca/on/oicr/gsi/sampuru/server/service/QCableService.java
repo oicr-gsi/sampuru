@@ -57,6 +57,7 @@ public class QCableService extends Service<QCable> {
             QCable qcable = (QCable)item;
 
             jsonObject.put("id", qcable.id);
+            jsonObject.put("alias", qcable.OICRAlias);
             jsonObject.put("status", qcable.status);
             jsonObject.put("failure_reason", qcable.failureReason  == null? "null": qcable.failureReason);
             jsonObject.put("library_design", qcable.libraryDesign  == null? "null": qcable.libraryDesign);
