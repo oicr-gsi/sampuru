@@ -76,11 +76,11 @@ public class Server {
         }
         hse.startBlocking();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-        add(r, hse.getOutputStream());
+        writeToOutputStream(r, hse.getOutputStream());
     }
 
     /** Add a file backed by a class resource*/
-    private static void add(Resource r, OutputStream output) throws IOException {
+    private static void writeToOutputStream(Resource r, OutputStream output) throws IOException {
         // Writing the file to the OutputStream of the exchange object
         final byte[] buf = new byte[8192];
         try(InputStream input = r.getUrl().openStream()){
