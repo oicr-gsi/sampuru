@@ -75,7 +75,7 @@ public class Server {
             hse.dispatch(ROOT);
         }
         hse.startBlocking();
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/javascript");
         writeToOutputStream(r, hse.getOutputStream());
     }
 
