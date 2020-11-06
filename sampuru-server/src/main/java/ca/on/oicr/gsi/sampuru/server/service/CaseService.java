@@ -4,11 +4,19 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+
+import static tables_generated.Tables.*;
+
 
 public class CaseService extends Service<Case> {
 
@@ -49,7 +57,7 @@ public class CaseService extends Service<Case> {
             for (ChangelogEntry changelog: changelogForItem){
                 JSONObject changelogJsonObject = new JSONObject();
                 changelogJsonObject.put("id", changelog.id);
-                changelogJsonObject.put("change_date", JSONObject.escape(changelog.changeDate.toString()));
+                changelogJsonObject.put("change_date", changelog.changeDate == null? "null": JSONObject.escape(changelog.changeDate.toString()));
                 changelogJsonObject.put("content", changelog.content);
                 changelogArray.add(changelogJsonObject);
             }
@@ -61,6 +69,51 @@ public class CaseService extends Service<Case> {
         }
 
         return jsonArray.toJSONString();
+    }
+
+    @Override
+    public List<Case> getAll() throws Exception {
+        DSLContext context = new DBConnector().getContext();
+        List<Case> cases = new LinkedList<>();
+
+        // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
+        Result<Record> results = context
+                .select(DONOR_CASE.asterisk(),
+                        PostgresDSL.array(context
+                                .select(QCABLE.ID)
+                                .from(QCABLE)
+                                .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.QCABLE_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.DELIVERABLE_IDS),
+                        PostgresDSL.array(context
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.CHANGELOG_IDS))
+                .from(DONOR_CASE)
+                .fetch();
+
+        for(Record result: results){
+            cases.add(new Case(result));
+        }
+
+        return cases;
+    }
+
+    @Override
+    public List<Case> search(String term) throws Exception{
+        List<Integer> ids = new DBConnector().search(DONOR_CASE, DONOR_CASE.ID, DONOR_CASE.NAME, term);
+        List<Case> cases = new LinkedList<>();
+
+        for (Integer id: ids){
+            cases.add(get(id));
+        }
+
+        return cases;
     }
 
     @Override

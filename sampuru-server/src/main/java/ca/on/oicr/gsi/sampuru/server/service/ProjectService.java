@@ -1,14 +1,23 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
+import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.DSLContext;
+import org.jooq.Result;
+import org.jooq.Record;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Collection;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+
+import static tables_generated.Tables.*;
+
 
 public class ProjectService extends Service<Project> {
 
@@ -28,8 +37,37 @@ public class ProjectService extends Service<Project> {
         getAllParams(new ProjectService(), hse);
     }
 
+    // TODO: Some real good repeat code b/w this and getActiveProjects - refactor me
     public List<Project> getCompletedProjects() throws Exception {
-        return Project.getCompleted();
+        DSLContext context = new DBConnector().getContext();
+        List<Project> newList = new LinkedList<>();
+
+        Result<Record> results = context
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(context
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(context
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS))
+                .from(PROJECT)
+                .where(PROJECT.COMPLETION_DATE.isNotNull())
+                .fetch();
+
+        for (Record result: results) {
+            newList.add(new Project(result));
+        }
+
+        return newList;
     }
 
     public static void getCompletedProjectsParams(HttpServerExchange hse) throws Exception {
@@ -45,14 +83,42 @@ public class ProjectService extends Service<Project> {
             JSONObject projectObject = new JSONObject();
             projectObject.put("id", completedProject.id);
             projectObject.put("name", completedProject.name);
-            projectObject.put("completion_date", JSONObject.escape(completedProject.completionDate.toString()));
+            projectObject.put("completion_date", completedProject.completionDate == null? "null": JSONObject.escape(completedProject.completionDate.toString()));
             jsonArray.add(projectObject);
         }
         return jsonArray.toJSONString();
     }
 
     public List<Project> getActiveProjects() throws Exception {
-        return Project.getActive();
+        DSLContext context = new DBConnector().getContext();
+        List<Project> newList = new LinkedList<>();
+
+        Result<Record> results = context
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(context
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(context
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS))
+                .from(PROJECT)
+                .where(PROJECT.COMPLETION_DATE.isNull())
+                .fetch();
+
+        for (Record result: results) {
+            newList.add(new Project(result));
+        }
+
+        return newList;
     }
 
     public static void getActiveProjectsParams(HttpServerExchange hse) throws Exception {
@@ -78,6 +144,49 @@ public class ProjectService extends Service<Project> {
     }
 
     @Override
+    public List<Project> getAll() {
+        DSLContext context = new DBConnector().getContext();
+        List<Project> projects = new LinkedList<>();
+
+        Result<Record> results = context
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(context
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(context
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS))
+                .from(PROJECT)
+                .fetch();
+
+        for(Record result: results){
+            projects.add(new Project(result));
+        }
+        return projects;
+    }
+
+    @Override
+    public List<Project> search(String term) throws Exception {
+        List<Integer> ids = new DBConnector().search(PROJECT, PROJECT.ID, PROJECT.NAME, term);
+        List<Project> projects = new LinkedList<>();
+
+        for (Integer id: ids){
+            projects.add(get(id));
+        }
+
+        return projects;
+    }
+
+    @Override
     public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
         return toJson(toWrite, false);
     }
@@ -91,9 +200,9 @@ public class ProjectService extends Service<Project> {
 
             jsonObject.put("id", project.id);
             jsonObject.put("name", project.name);
-            jsonObject.put("contact_name", project.contactName);
-            jsonObject.put("contact_email", project.contactEmail);
-            jsonObject.put("completion_date", JSONObject.escape(project.completionDate.toString()));
+            jsonObject.put("contact_name", project.contactName == null? "null": project.contactName);
+            jsonObject.put("contact_email", project.contactEmail == null? "null": project.contactEmail);
+            jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
 
             if(expand){
                 JSONArray infoItemsArray = new JSONArray();
@@ -102,8 +211,8 @@ public class ProjectService extends Service<Project> {
                     infoItemObj.put("id", infoItem.id);
                     infoItemObj.put("entry_type", infoItem.entryType);
                     infoItemObj.put("content", infoItem.content);
-                    infoItemObj.put("expected", infoItem.expected);
-                    infoItemObj.put("received", infoItem.received);
+                    infoItemObj.put("expected", infoItem.expected == null? "null": infoItem.expected);
+                    infoItemObj.put("received", infoItem.received == null? "null": infoItem.received);
                     infoItemsArray.add(infoItemObj);
                 }
                 jsonObject.put("info_items", infoItemsArray);
@@ -126,9 +235,9 @@ public class ProjectService extends Service<Project> {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", subject.id);
         jsonObject.put("name", subject.name);
-        jsonObject.put("contact_name", subject.contactName);
-        jsonObject.put("contact_email", subject.contactEmail);
-        jsonObject.put("completion_date", JSONObject.escape(subject.completionDate.toString()));
+        jsonObject.put("contact_name", subject.contactName == null? "null": subject.contactName);
+        jsonObject.put("contact_email", subject.contactEmail == null? "null": subject.contactEmail);
+        jsonObject.put("completion_date", subject.completionDate  == null? "null": JSONObject.escape(subject.completionDate.toString()));
         jsonObject.put("cases_total", subject.getCasesTotal());
         jsonObject.put("cases_completed", subject.getCasesCompleted());
         jsonObject.put("qcables_total", subject.getQCablesTotal());
@@ -140,8 +249,8 @@ public class ProjectService extends Service<Project> {
             infoItemObj.put("id", infoItem.id);
             infoItemObj.put("entry_type", infoItem.entryType);
             infoItemObj.put("content", infoItem.content);
-            infoItemObj.put("expected", infoItem.expected);
-            infoItemObj.put("received", infoItem.received);
+            infoItemObj.put("expected", infoItem.expected == null? "null": infoItem.expected);
+            infoItemObj.put("received", infoItem.received == null? "null": infoItem.expected);
             infoItemsArray.add(infoItemObj);
         }
         jsonObject.put("info_items", infoItemsArray);
@@ -161,14 +270,12 @@ public class ProjectService extends Service<Project> {
             JSONObject failureObj = new JSONObject();
             failureObj.put("id", failedQCable.id);
             failureObj.put("alias", failedQCable.OICRAlias);
-            failureObj.put("failure_reason", failedQCable.failureReason);
+            failureObj.put("failure_reason", failedQCable.failureReason == null? "null": failedQCable.failureReason);
             failureArray.add(failureObj);
         }
         jsonObject.put("failures", failureArray);
 
-        //TODO: sankey_rows array
-
-
+        jsonObject.put("sankey_transitions", new DBConnector().buildSankeyTransitions(subject));
 
         return jsonObject.toJSONString();
     }

@@ -3,7 +3,6 @@ package ca.on.oicr.gsi.sampuru.server.type;
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import org.jooq.Record;
 import org.jooq.TableField;
-import tables_generated.tables.Qcable;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -12,6 +11,9 @@ import java.util.List;
 import static tables_generated.Tables.*;
 
 public class Project extends SampuruType {
+    public static final String INFO_ITEM_IDS = "info_item_ids";
+    public static final String CASE_IDS = "case_ids";
+    public static final String DELIVERABLE_IDS = "deliverable_ids";
     public String name;
     public String contactName;
     public String contactEmail;
@@ -28,33 +30,19 @@ public class Project extends SampuruType {
         getProjectFromDb(PROJECT.NAME, newName);
     }
 
+    public Project(Record row) {
+        id = row.get(PROJECT.ID);
+        name = row.get(PROJECT.NAME);
+        contactName = row.get(PROJECT.CONTACT_NAME);
+        contactEmail = row.get(PROJECT.CONTACT_EMAIL);
+        completionDate = row.get(PROJECT.COMPLETION_DATE);
+        infoItems = row.get(INFO_ITEM_IDS, List.class);
+        donorCases = row.get(CASE_IDS, List.class);
+        deliverables = row.get(DELIVERABLE_IDS, List.class);
+    }
+
     public static List<Project> getAll() throws Exception {
         return getAll(PROJECT, Project.class);
-    }
-
-    public static List<Project> getCompleted() throws Exception {
-        DBConnector dbConnector = new DBConnector();
-        List<Integer> ids = dbConnector.getCompletedProjectIds();
-        List<Project> newList = new LinkedList<>();
-
-        for (Integer id: ids) {
-            newList.add(new Project(id));
-        }
-
-        return newList;
-    }
-
-    //TODO make this a little more not repeated
-    public static List<Project> getActive() throws Exception {
-        DBConnector dbConnector = new DBConnector();
-        List<Integer> ids = dbConnector.getActiveProjectIds();
-        List<Project> newList = new LinkedList<>();
-
-        for (Integer id: ids) {
-            newList.add(new Project(id));
-        }
-
-        return newList;
     }
 
     public List<ProjectInfoItem> getInfoItems() throws Exception {

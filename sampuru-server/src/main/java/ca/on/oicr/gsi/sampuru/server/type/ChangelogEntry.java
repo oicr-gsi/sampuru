@@ -16,6 +16,12 @@ public class ChangelogEntry extends SampuruType {
         getChangelogEntryFromDb(CHANGELOG.ID, newId);
     }
 
+    public ChangelogEntry(Record row) {
+        id = row.get(CHANGELOG.ID);
+        changeDate = row.get(CHANGELOG.CHANGE_DATE);
+        content = row.get(CHANGELOG.CONTENT);
+    }
+
     private void getChangelogEntryFromDb(TableField field, Object toMatch) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);

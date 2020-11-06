@@ -11,6 +11,7 @@ import static tables_generated.Tables.*;
 
 
 public class QCable extends SampuruType {
+    public static final String CHANGELOG_IDS = "changelog_ids";
     public String OICRAlias;
     public String status;
     public String failureReason;
@@ -25,6 +26,17 @@ public class QCable extends SampuruType {
 
     public QCable(String alias) throws Exception {
         getQCableFromDb(QCABLE.OICR_ALIAS, alias);
+    }
+
+    public QCable(Record row) {
+        id = row.get(QCABLE.ID);
+        OICRAlias = row.get(QCABLE.OICR_ALIAS);
+        status = row.get(QCABLE.STATUS);
+        failureReason = row.get(QCABLE.FAILURE_REASON);
+        libraryDesign = row.get(QCABLE.LIBRARY_DESIGN);
+        type = row.get(QCABLE.QCABLE_TYPE);
+        parentId = row.get(QCABLE.PARENT_ID);
+        changelog = row.get(CHANGELOG_IDS, List.class);
     }
 
     public static List<QCable> getAll() throws Exception {

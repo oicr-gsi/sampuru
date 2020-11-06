@@ -4,14 +4,19 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static tables_generated.Tables.*;
+
 
 public class QCableService extends Service<QCable> {
 
@@ -32,6 +37,41 @@ public class QCableService extends Service<QCable> {
     }
 
     @Override
+    public List<QCable> getAll() {
+        DSLContext context = new DBConnector().getContext();
+        List<QCable> qcables = new LinkedList<>();
+
+        // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
+        Result<Record> results = context
+                .select(QCABLE.asterisk(),
+                        PostgresDSL.array(context
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(QCABLE.ID)))
+                                .as(QCable.CHANGELOG_IDS))
+                .from(QCABLE)
+                .fetch();
+
+        for(Record result: results){
+            qcables.add(new QCable(result));
+        }
+
+        return qcables;
+    }
+
+    @Override
+    public List<QCable> search(String term) throws Exception {
+        List<Integer> ids = new DBConnector().search(QCABLE, QCABLE.ID, QCABLE.OICR_ALIAS, term);
+        List<QCable> qcables = new LinkedList<>();
+
+        for (Integer id: ids){
+            qcables.add(get(id));
+        }
+
+        return qcables;
+    }
+
+    @Override
     public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
         return toJson(toWrite, false);
     }
@@ -44,11 +84,12 @@ public class QCableService extends Service<QCable> {
             QCable qcable = (QCable)item;
 
             jsonObject.put("id", qcable.id);
+            jsonObject.put("alias", qcable.OICRAlias);
             jsonObject.put("status", qcable.status);
-            jsonObject.put("failure_reason", qcable.failureReason);
-            jsonObject.put("library_design", qcable.libraryDesign);
+            jsonObject.put("failure_reason", qcable.failureReason  == null? "null": qcable.failureReason);
+            jsonObject.put("library_design", qcable.libraryDesign  == null? "null": qcable.libraryDesign);
             jsonObject.put("type", qcable.type);
-            jsonObject.put("parent_id", qcable.parentId);
+            jsonObject.put("parent_id", qcable.parentId  == null? "null": qcable.parentId);
 
             if(expand){
                 List<ChangelogEntry> changelogEntries = qcable.getChangelog();
@@ -64,7 +105,7 @@ public class QCableService extends Service<QCable> {
     }
 
     public static void getCaseQcablesTableParams(HttpServerExchange hse) throws Exception {
-        // TODO: get id, see Service TODO
+        // TODO: get id
         int id = 0;
         CaseService cs = new CaseService();
         QCableService qs = new QCableService();
@@ -83,30 +124,10 @@ public class QCableService extends Service<QCable> {
     }
 
     public String getTableJson(List<Case> cases) throws Exception {
-        JSONArray jsonArray = new JSONArray();
-
-        // Each row in table is a Case
-        for (Case tableRow: cases){
-            JSONObject row = new JSONObject();
-            row.put("case_id", tableRow.id);
-            row.put("case_name", tableRow.name);
-
-            // All the qcables
-            List<QCable> qcables = tableRow.getQcables();
-            JSONArray qcableArray = new JSONArray();
-            for (QCable qcable: qcables){
-                JSONObject qcableObj = new JSONObject();
-                qcableObj.put("id", qcable.id);
-                qcableObj.put("alias", qcable.OICRAlias);
-                qcableObj.put("status", qcable.status);
-                qcableObj.put("failure_reason", qcable.failureReason);
-                qcableObj.put("library_design", qcable.libraryDesign);
-                qcableObj.put("type", qcable.type);
-                qcableArray.add(qcableObj);
-            }
-            row.put("qcables", qcableArray);
-            jsonArray.add(row);
+        List<Integer> ids = new LinkedList<>();
+        for (Case donorCase: cases){
+            ids.add(donorCase.id);
         }
-        return jsonArray.toJSONString();
+        return new DBConnector().getQcableTable(ids).toJSONString();
     }
 }
