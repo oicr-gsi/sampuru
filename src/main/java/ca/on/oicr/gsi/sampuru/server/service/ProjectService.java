@@ -4,6 +4,9 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.DSLContext;
+import org.jooq.Result;
+import org.jooq.Record;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -80,6 +83,16 @@ public class ProjectService extends Service<Project> {
             jsonArray.add(projectObject);
         }
         return jsonArray.toJSONString();
+    }
+
+    @Override
+    public List<Project> getAll() {
+        DSLContext context = new DBConnector().getContext();
+        List<Project> projects = new LinkedList<>();
+
+        //Result<Record> results = context.select()
+
+        return projects;
     }
 
     @Override

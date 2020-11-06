@@ -4,6 +4,11 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -65,6 +70,40 @@ public class CaseService extends Service<Case> {
         }
 
         return jsonArray.toJSONString();
+    }
+
+    @Override
+    public List<Case> getAll() throws Exception {
+        DSLContext context = new DBConnector().getContext();
+        List<Case> cases = new LinkedList<>();
+
+        // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
+        Result<Record> results = context
+                .select(DONOR_CASE.asterisk(),
+                        PostgresDSL.array(context
+                                .select(QCABLE.ID)
+                                .from(QCABLE)
+                                .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID))
+                                .orderBy(QCABLE.ID))
+                                .as("qcable_ids"),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as("deliverable_file_ids"),
+                        PostgresDSL.array(context
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as("changelog_ids"))
+                .from(DONOR_CASE)
+                .fetch();
+
+        for(Record result: results){
+            cases.add(new Case(result));
+        }
+
+        return cases;
     }
 
     @Override

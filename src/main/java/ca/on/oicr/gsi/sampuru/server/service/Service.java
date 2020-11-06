@@ -1,11 +1,8 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
-import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import org.jooq.Result;
-import org.jooq.Record;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -31,9 +28,7 @@ public abstract class Service<T extends SampuruType> {
         hse.getResponseSender().send(targetService.toJson(items));
     }
 
-    public List<T> getAll() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return (List<T>)targetClass.getDeclaredMethod("getAll").invoke(null);
-    }
+    public abstract List<T> getAll() throws Exception;
 
     public static void getAllParams(Service targetService, HttpServerExchange hse) throws Exception {
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");

@@ -32,6 +32,11 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     @Override
+    public List<ChangelogEntry> getAll() {
+        throw new UnsupportedOperationException("implement me"); //TODO implement me
+    }
+
+    @Override
     public List<ChangelogEntry> search(String term) throws Exception{
         List<Integer> ids = new DBConnector().search(CHANGELOG, CHANGELOG.ID, CHANGELOG.CONTENT, term);
         List<ChangelogEntry> changelogs = new LinkedList<>();

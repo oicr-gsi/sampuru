@@ -38,8 +38,8 @@ public class Server {
                     // Special frontend endpoints
                     .get("/active_projects", ProjectService::getActiveProjectsParams)
                     .get("/completed_projects", ProjectService::getCompletedProjectsParams)
-                    .get("/cases_cards", CaseService::getCardsParams)
-                    .get("/qcables_table", QCableService::getAllQcablesTableParams)
+                    .get("/cases_cards", CaseService::getCardsParams) //TODO this needs filtering
+                    .get("/qcables_table", QCableService::getAllQcablesTableParams) //TODO this needs filtering
                     .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
                     .get("/search/{type}/{term}", Server::doSearch)
                     .get("/home", Server::helloWorld)
@@ -100,6 +100,7 @@ public class Server {
         hse.getResponseSender().send("You found Sampuru!");
     }
 
+    // TODO:
     protected static void handleException (HttpServerExchange hse){
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

@@ -16,11 +16,15 @@ public class Case extends SampuruType {
     public List<Integer> changelog = new LinkedList<>();
 
     public Case(int id) throws Exception {
-        getCaseFromDb(DONOR_CASE.ID, id);
+        //getCaseFromDb(DONOR_CASE.ID, id);
     }
 
     public Case(String name) throws Exception {
-        getCaseFromDb(DONOR_CASE.NAME, name);
+        //getCaseFromDb(DONOR_CASE.NAME, name);
+    }
+
+    public Case(Record row) throws Exception {
+        getCaseFromRow(row);
     }
 
     public static List<Case> getAll() throws Exception {
@@ -51,15 +55,13 @@ public class Case extends SampuruType {
         return newList;
     }
 
-    private void getCaseFromDb(TableField field, Object toMatch) throws Exception {
-        DBConnector dbConnector = new DBConnector();
-        Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
+    private void getCaseFromRow(Record dbRecord) throws Exception {
         id = dbRecord.get(DONOR_CASE.ID);
         name = dbRecord.get(DONOR_CASE.NAME);
 
-        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.CASE_ID, id);
-        qcables = dbConnector.getChildIdList(QCABLE, QCABLE.CASE_ID, id);
-        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.CASE_ID, id);
+        deliverables = dbRecord.get("deliverable_file_ids", List.class);
+        qcables = dbRecord.get("qcable_ids", List.class);
+        changelog = dbRecord.get("changelog_ids", List.class);
     }
 
     @Override

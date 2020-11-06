@@ -33,6 +33,11 @@ public class QCableService extends Service<QCable> {
     }
 
     @Override
+    public List<QCable> getAll() {
+        throw new UnsupportedOperationException("implement me"); //TODO implement me
+    }
+
+    @Override
     public List<QCable> search(String term) throws Exception {
         List<Integer> ids = new DBConnector().search(QCABLE, QCABLE.ID, QCABLE.OICR_ALIAS, term);
         List<QCable> qcables = new LinkedList<>();

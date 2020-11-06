@@ -30,6 +30,11 @@ public class NotificationService extends Service<Notification> {
     }
 
     @Override
+    public List<Notification> getAll() {
+        throw new UnsupportedOperationException("implement me"); //TODO implement me
+    }
+
+    @Override
     public List<Notification> search(String term) throws Exception {
         List<Integer> ids = new DBConnector().search(NOTIFICATION, NOTIFICATION.ID, NOTIFICATION.CONTENT, term);
         List<Notification> notifications = new LinkedList<>();

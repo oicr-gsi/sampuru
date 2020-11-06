@@ -30,6 +30,11 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     @Override
+    public List<Deliverable> getAll() {
+        throw new UnsupportedOperationException("implement me"); //TODO implement me
+    }
+
+    @Override
     public List<Deliverable> search(String term) throws Exception {
         List<Integer> ids = new DBConnector().search(DELIVERABLE_FILE, DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CONTENT, term);
         List<Deliverable> deliverables = new LinkedList<>();
