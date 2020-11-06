@@ -217,6 +217,8 @@ export function cardContainer(
 
   content
     .forEach((card) => {
+      const br = document.createElement("br");
+      cardContainer.appendChild(br);
       cardContainer.appendChild(card);
     } )
 
