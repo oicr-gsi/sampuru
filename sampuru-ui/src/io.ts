@@ -1,3 +1,23 @@
+export interface Project {
+  id: number,
+  name: string,
+  cases_total: number,
+  cases_completed: number,
+  qcables_total: number,
+  qcables_completed: number,
+  last_update: string,
+}
+
+export interface ProjectJSON {
+  id: number,
+  name: string,
+  cases_total: number,
+  cases_completed: number,
+  qcables_total: number,
+  qcables_completed: number,
+  last_update: string,
+}
+
 /**
  * Perform a JSON fetch operation
  */

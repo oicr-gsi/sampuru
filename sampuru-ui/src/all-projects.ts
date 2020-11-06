@@ -2,29 +2,23 @@ import {
   UIElement,
   Card,
   staticCard,
-  cardContainer,
+  cardContainer, cardContent, collapsibleCard,
 } from "./html";
 
-export type Project = {
-  id: number,
-  name: string,
-  casesTotal: number,
-  casesCompleted: number,
-  qcAblesTotal: number,
-  qcAblesCompleted: number,
-  completionDate: number
-}
+import {
+  Project
+} from "./io";
 
 export function initialiseActiveProjects(projects: Project[]): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
-  const ui = document.createElement("p");
 
   const cards: HTMLElement[] = [];
   projects
     .forEach((project) => {
-      const card: Card = {contents: ui, header: project.name, title: project.name, tagId: project.name}
-      cards.push(staticCard(card));
+      const card_content = cardContent(project.cases_total, project.cases_completed, project.qcables_total, project.qcables_completed);
+      const card: Card = {contents: card_content, header: project.name, title: project.name, tagId: project.name}
+      cards.push(collapsibleCard(null, card));
     })
 
   // todo: move this out to a function

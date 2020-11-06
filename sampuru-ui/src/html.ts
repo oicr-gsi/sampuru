@@ -44,6 +44,38 @@ export interface Card {
   tagId: string;
 }
 
+export function navbar():HTMLElement {
+  // horizontal navbar that becomes vertical on small screens
+  const nav = document.createElement("nav");
+  nav.className = "navbar navbar-expand-sm bg-light navbar-light";
+
+  const sampuru = document.createElement("a");
+  sampuru.className = "navbar-brand";
+  sampuru.innerText = "Sampuru";
+  sampuru.href = "#";
+
+  const searchForm = document.createElement("form");
+  searchForm.className = "form-inline mx-lg-auto";
+
+  const inputBox = document.createElement("input");
+  inputBox.className = "form-control mr-sm-2";
+  inputBox.type = "search";
+  inputBox.placeholder = "Search";
+
+  const submitButton = document.createElement("button");
+  submitButton.className = "btn btn-outline-secondary my-2 my-sm-0";
+  submitButton.type = "submit";
+  submitButton.innerText = "Search";
+
+  searchForm.appendChild(inputBox);
+  searchForm.appendChild(submitButton);
+
+  nav.appendChild(sampuru);
+  nav.appendChild(searchForm);
+
+  return nav;
+}
+
 export function createLinkElement(
   className: string,
   innerText: string,
@@ -56,7 +88,7 @@ export function createLinkElement(
   link.target = "_blank";
   url ? link.href = url : null;
   if(attributes) {
-    attributes.forEach( (qualifiedName, value) => link.setAttribute(qualifiedName, value));
+    attributes.forEach( (value, qualifiedName) => link.setAttribute(qualifiedName, value));
   }
   return link;
 }
@@ -78,11 +110,11 @@ export function collapsibleCard(
 
   const cardBodyInner = document.createElement("div");
   cardBodyInner.className = "card-body";
-  // TODO: Pass in body contents
+  cardBodyInner.appendChild(content.contents);
 
   const cardBody = document.createElement("div");
   cardBody.id = `#${content.tagId}`;
-  cardBody.className = "collapse";
+  cardBody.className = "collapse show";
   cardBody.appendChild(cardBodyInner);
 
   const card = document.createElement("div");
@@ -104,13 +136,75 @@ export function staticCard(
 
   const cardBody = document.createElement("div");
   cardBody.className = "card-body";
-  // TODO: Pass in body contents
+  cardBody.appendChild(content.contents);
 
   const card = document.createElement("div");
   card.className = "card";
   card.appendChild(cardHeader);
   card.appendChild(cardBody);
   return card;
+}
+
+export function progressBar(
+  total: number,
+  completed: number
+): HTMLElement {
+  //todo: bring css out to a separate file
+  const progress = document.createElement("div");
+  progress.className = "progress";
+  progress.setAttribute("style", "position:relative");
+
+  const progressBar = document.createElement("div");
+  progressBar.className = "progress-bar bg-success";
+  const casesPercentCompleted = Math.floor((completed/total) * 100);
+  progressBar.setAttribute("style", "width:" + casesPercentCompleted.toString() + "%");
+
+  const progressText = document.createElement("div");
+  progressText.className = "progress-text"
+  progressText.innerText = completed.toString() + "/" + total.toString() + " Completed";
+  progressText.setAttribute("style", "position: absolute; line-height: 1rem; text-align: center; right: 0; left: 0;");
+
+  progress.appendChild(progressBar);
+  progress.appendChild(progressText);
+
+  return progress;
+}
+
+export function cardContent(
+  cases_total: number,
+  cases_completed: number,
+  qcables_total: number,
+  qcables_completed: number
+): HTMLElement {
+
+  //todo: refactor so this is extensible to other pages
+  const casesProgress = progressBar(cases_total, cases_completed);
+  const qcablesProgress = progressBar(qcables_total, qcables_completed);
+
+  const cases = document.createElement("div");
+  cases.className = "cases";
+
+  const casesTitle = document.createElement("h6");
+  casesTitle.innerText = "Cases";
+
+  cases.appendChild(casesTitle);
+  cases.appendChild(casesProgress);
+
+  const qcables = document.createElement("div");
+  qcables.className = "qcables";
+
+  const qcablesTitle = document.createElement("h6");
+  qcablesTitle.innerText = "QCables";
+
+  qcables.appendChild(qcablesTitle);
+  qcables.appendChild(qcablesProgress);
+
+  const container = document.createElement("div");
+  container.className = "card-container";
+  //todo: add last update time
+  container.appendChild(cases);
+  container.appendChild(qcables);
+  return container;
 }
 
 // todo: function for paginated cards or infinite scroll cards
