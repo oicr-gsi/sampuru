@@ -27,7 +27,7 @@ public class Server {
             .addPrefixPath("/api", new RoutingHandler()
                     // Normal REST endpoints
                     .get("/projects", ProjectService::getAllParams)
-                    .get("/project/{id}", ProjectService::getIdParams)
+                    .get("/project/{id}", ProjectService::getIdParams) // TODO: update to use Row probably
                     .get("/cases", CaseService::getAllParams)
                     .get("/case/{id}", CaseService::getIdParams)
                     .get("/notifications", NotificationService::getAllParams) //TODO most of these are unrealistic past alpha, get all _for user_

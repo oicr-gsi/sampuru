@@ -5,6 +5,9 @@ import ca.on.oicr.gsi.sampuru.server.type.Case;
 import ca.on.oicr.gsi.sampuru.server.type.Notification;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -30,8 +33,17 @@ public class NotificationService extends Service<Notification> {
     }
 
     @Override
-    public List<Notification> getAll() {
-        throw new UnsupportedOperationException("implement me"); //TODO implement me
+    public List<Notification> getAll() throws Exception {
+        DSLContext context = new DBConnector().getContext();
+        List<Notification> notifications = new LinkedList<>();
+
+        Result<Record> results = context.select().from(NOTIFICATION).fetch();
+
+        for(Record result: results){
+            notifications.add(new Notification(result));
+        }
+
+        return notifications;
     }
 
     @Override

@@ -11,6 +11,9 @@ import java.util.List;
 import static tables_generated.Tables.*;
 
 public class Project extends SampuruType {
+    public static final String INFO_ITEM_IDS = "info_item_ids";
+    public static final String CASE_IDS = "case_ids";
+    public static final String DELIVERABLE_IDS = "deliverable_ids";
     public String name;
     public String contactName;
     public String contactEmail;
@@ -25,6 +28,17 @@ public class Project extends SampuruType {
 
     public Project(String newName) throws Exception {
         getProjectFromDb(PROJECT.NAME, newName);
+    }
+
+    public Project(Record row) {
+        id = row.get(PROJECT.ID);
+        name = row.get(PROJECT.NAME);
+        contactName = row.get(PROJECT.CONTACT_NAME);
+        contactEmail = row.get(PROJECT.CONTACT_EMAIL);
+        completionDate = row.get(PROJECT.COMPLETION_DATE);
+        infoItems = row.get(INFO_ITEM_IDS, List.class);
+        donorCases = row.get(CASE_IDS, List.class);
+        deliverables = row.get(DELIVERABLE_IDS, List.class);
     }
 
     public static List<Project> getAll() throws Exception {

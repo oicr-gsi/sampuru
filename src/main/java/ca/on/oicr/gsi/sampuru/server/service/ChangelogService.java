@@ -6,6 +6,9 @@ import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import tables_generated.tables.Changelog;
@@ -32,8 +35,19 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     @Override
-    public List<ChangelogEntry> getAll() {
-        throw new UnsupportedOperationException("implement me"); //TODO implement me
+    public List<ChangelogEntry> getAll() throws Exception {
+        DSLContext context = new DBConnector().getContext();
+        List<ChangelogEntry> changelogs = new LinkedList<>();
+
+        Result<Record> results = context
+                .select()
+                .from(CHANGELOG)
+                .fetch();
+
+        for (Record result: results){
+            changelogs.add(new ChangelogEntry(result));
+        }
+        return changelogs;
     }
 
     @Override

@@ -5,6 +5,9 @@ import ca.on.oicr.gsi.sampuru.server.type.Case;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -30,8 +33,18 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     @Override
-    public List<Deliverable> getAll() {
-        throw new UnsupportedOperationException("implement me"); //TODO implement me
+    public List<Deliverable> getAll() throws Exception {
+        DSLContext context = new DBConnector().getContext();
+        List<Deliverable> deliverables = new LinkedList<>();
+
+        Result<Record> results = context.select()
+                .from(DELIVERABLE_FILE)
+                .fetch();
+
+        for(Record result: results){
+            deliverables.add(new Deliverable(result));
+        }
+        return deliverables;
     }
 
     @Override

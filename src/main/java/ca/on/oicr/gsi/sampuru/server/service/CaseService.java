@@ -83,19 +83,18 @@ public class CaseService extends Service<Case> {
                         PostgresDSL.array(context
                                 .select(QCABLE.ID)
                                 .from(QCABLE)
-                                .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID))
-                                .orderBy(QCABLE.ID))
-                                .as("qcable_ids"),
+                                .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.QCABLE_IDS),
                         PostgresDSL.array(context
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
                                 .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
-                                .as("deliverable_file_ids"),
+                                .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(context
                                 .select(CHANGELOG.ID)
                                 .from(CHANGELOG)
                                 .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
-                                .as("changelog_ids"))
+                                .as(Case.CHANGELOG_IDS))
                 .from(DONOR_CASE)
                 .fetch();
 

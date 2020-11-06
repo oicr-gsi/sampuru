@@ -19,6 +19,13 @@ public class Notification extends SampuruType {
         getNotificationFromDb(NOTIFICATION.ID, newId);
     }
 
+    public Notification(Record row) {
+        id = row.get(NOTIFICATION.ID);
+        issueDate = row.get(NOTIFICATION.ISSUE_DATE);
+        resolvedDate = row.get(NOTIFICATION.RESOLVED_DATE);
+        content = row.get(NOTIFICATION.CONTENT);
+    }
+
     public static List<Notification> getAll() throws Exception {
         return getAll(NOTIFICATION, Notification.class);
     }

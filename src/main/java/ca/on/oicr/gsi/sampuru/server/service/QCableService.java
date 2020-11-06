@@ -4,6 +4,10 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -34,7 +38,25 @@ public class QCableService extends Service<QCable> {
 
     @Override
     public List<QCable> getAll() {
-        throw new UnsupportedOperationException("implement me"); //TODO implement me
+        DSLContext context = new DBConnector().getContext();
+        List<QCable> qcables = new LinkedList<>();
+
+        // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
+        Result<Record> results = context
+                .select(QCABLE.asterisk(),
+                        PostgresDSL.array(context
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(QCABLE.ID)))
+                                .as(QCable.CHANGELOG_IDS))
+                .from(QCABLE)
+                .fetch();
+
+        for(Record result: results){
+            qcables.add(new QCable(result));
+        }
+
+        return qcables;
     }
 
     @Override

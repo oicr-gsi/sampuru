@@ -7,6 +7,7 @@ import io.undertow.util.Headers;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.Record;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -90,8 +91,29 @@ public class ProjectService extends Service<Project> {
         DSLContext context = new DBConnector().getContext();
         List<Project> projects = new LinkedList<>();
 
-        //Result<Record> results = context.select()
+        Result<Record> results = context
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(context
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(context
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS))
+                .from(PROJECT)
+                .fetch();
 
+        for(Record result: results){
+            projects.add(new Project(result));
+        }
         return projects;
     }
 
