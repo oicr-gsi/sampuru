@@ -1,7 +1,9 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.TableField;
 
 import java.time.LocalDateTime;
@@ -43,24 +45,6 @@ public class Project extends SampuruType {
 
     public static List<Project> getAll() throws Exception {
         return getAll(PROJECT, Project.class);
-    }
-
-    public static List<Project> getCompleted() throws Exception {
-        return getMany(new DBConnector().getCompletedProjectIds());
-    }
-
-    public static List<Project> getActive() throws Exception {
-        return getMany(new DBConnector().getActiveProjectIds());
-    }
-
-    public static List<Project> getMany(List<Integer> ids) throws Exception {
-        List<Project> newList = new LinkedList<>();
-
-        for (Integer id: ids) {
-            newList.add(new Project(id));
-        }
-
-        return newList;
     }
 
     public List<ProjectInfoItem> getInfoItems() throws Exception {

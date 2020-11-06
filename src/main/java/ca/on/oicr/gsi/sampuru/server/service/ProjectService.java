@@ -37,8 +37,37 @@ public class ProjectService extends Service<Project> {
         getAllParams(new ProjectService(), hse);
     }
 
+    // TODO: Some real good repeat code b/w this and getActiveProjects - refactor me
     public List<Project> getCompletedProjects() throws Exception {
-        return Project.getCompleted();
+        DSLContext context = new DBConnector().getContext();
+        List<Project> newList = new LinkedList<>();
+
+        Result<Record> results = context
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(context
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(context
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS))
+                .from(PROJECT)
+                .where(PROJECT.COMPLETION_DATE.isNotNull())
+                .fetch();
+
+        for (Record result: results) {
+            newList.add(new Project(result));
+        }
+
+        return newList;
     }
 
     public static void getCompletedProjectsParams(HttpServerExchange hse) throws Exception {
@@ -61,7 +90,35 @@ public class ProjectService extends Service<Project> {
     }
 
     public List<Project> getActiveProjects() throws Exception {
-        return Project.getActive();
+        DSLContext context = new DBConnector().getContext();
+        List<Project> newList = new LinkedList<>();
+
+        Result<Record> results = context
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(context
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(context
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS))
+                .from(PROJECT)
+                .where(PROJECT.COMPLETION_DATE.isNull())
+                .fetch();
+
+        for (Record result: results) {
+            newList.add(new Project(result));
+        }
+
+        return newList;
     }
 
     public static void getActiveProjectsParams(HttpServerExchange hse) throws Exception {

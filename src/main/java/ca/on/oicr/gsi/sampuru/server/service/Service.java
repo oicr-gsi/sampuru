@@ -35,7 +35,7 @@ public abstract class Service<T extends SampuruType> {
         hse.getResponseSender().send(targetService.toJson(targetService.getAll()));
     }
 
-    // TODO this needs to not search everything
+    // TODO this needs to be filterable
     public abstract List<T> search(String term) throws Exception;
 
     public abstract String toJson(Collection<? extends  SampuruType> toWrite) throws Exception;

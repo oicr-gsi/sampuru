@@ -38,8 +38,8 @@ public class Server {
                     // Special frontend endpoints
                     .get("/active_projects", ProjectService::getActiveProjectsParams)
                     .get("/completed_projects", ProjectService::getCompletedProjectsParams)
-                    .get("/cases_cards", CaseService::getCardsParams) //TODO this needs filtering
-                    .get("/qcables_table", QCableService::getAllQcablesTableParams) //TODO this needs filtering
+                    .get("/cases_cards/{projectId}", CaseService::getCardsParams) //TODO implement the filtering
+                    .get("/qcables_table/{filterType}/{filterId}", QCableService::getAllQcablesTableParams) //TODO implement the filtering
                     .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
                     .get("/search/{type}/{term}", Server::doSearch)
                     .get("/home", Server::helloWorld)
