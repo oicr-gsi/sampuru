@@ -3,11 +3,11 @@ import {
   Card,
   staticCard,
   cardContainer, cardContent, collapsibleCard,
-} from "./html";
+} from "./html.js";
 
 import {
   Project
-} from "./io";
+} from "./io.js";
 
 export function initialiseActiveProjects(projects: Project[]): HTMLElement {
   const cardContainer = document.createElement("div");

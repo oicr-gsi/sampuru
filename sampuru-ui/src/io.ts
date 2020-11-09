@@ -5,7 +5,7 @@ export interface Project {
   cases_completed: number,
   qcables_total: number,
   qcables_completed: number,
-  last_update: string,
+  last_update: Date,
 }
 
 export interface ProjectJSON {
@@ -19,7 +19,7 @@ export interface ProjectJSON {
 }
 
 /**
- * Perform a JSON fetch operation
+ * Perform a JSON fetch operation with a callback
  */
 export function fetchJson<T>(
   url: RequestInfo,
@@ -33,6 +33,27 @@ export function fetchJson<T>(
         callback(response as T);
       })
   );
+}
+
+
+export function fetchAsPromise<T> (
+  url: RequestInfo,
+  parameters: RequestInit
+): Promise<T> {
+  return fetch(url, parameters)
+    .then((response) => {
+      if (response.ok) {
+        return Promise.resolve(response);
+      } else if (response.status == 503) {
+        return Promise.reject(new Error("Sampuru is currently overloaded."));
+      } else {
+        return Promise.reject(
+          new Error(`Failed to load: ${response.status} ${response.statusText}`)
+        );
+      }
+    })
+    .then((response) => response.json())
+    .then((response) => response as T);
 }
 
 
@@ -59,4 +80,10 @@ export function fetchOperation<T>(
     })
   )
     .catch((error) => alert(error.nessage)); //TODO: better error handling
+}
+
+export function decodeProject(json: ProjectJSON): Project {
+  return Object.assign({}, json, {
+    last_update: new Date(json.last_update)
+  });
 }

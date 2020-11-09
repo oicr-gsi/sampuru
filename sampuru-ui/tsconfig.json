@@ -12,7 +12,7 @@
     "noImplicitAny": true, /* Raise error on expressions and declarations with an implied 'any' type. */
     "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     "noImplicitThis": true, /* Raise error on 'this' expressions with an implied 'any' type. */
-    "outDir": "../sampuru-server/src/main/resources/ca/on/oicr/gsi/sampuru", /* Redirect output structure to the directory. */
+    "outDir": "../sampuru-server/src/main/resources/static", /* Redirect output structure to the directory. */
     "rootDir": "./src/",
     "strict": true, /* Enable all strict type-checking options. */
     "strictBindCallApply": true,
