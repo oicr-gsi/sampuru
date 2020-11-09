@@ -1,8 +1,6 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
-import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import org.jooq.Record;
-import org.jooq.TableField;
 
 import java.util.LinkedList;
 import java.util.List;

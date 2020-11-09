@@ -112,7 +112,7 @@ public class Server {
 
     private static void readProperties() {
         try{
-            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/sampuru.properties");
+            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/sampuru-server/src/main/resources/sampuru.properties");
             properties = new Properties();
             properties.load(fis);
         } catch (FileNotFoundException e) {

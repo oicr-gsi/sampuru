@@ -1,7 +1,6 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
-import ca.on.oicr.gsi.sampuru.server.type.Case;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;

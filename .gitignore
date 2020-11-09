@@ -31,4 +31,13 @@ hs_err_pid*
 target/
 
 # Config
-src/main/resources/sampuru.properties
+sampuru-server/src/main/resources/sampuru.properties
+
+# Downloads from npm
+node_modules
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Transpiled js files
+sampuru-server/src/main/resources/static/*.js

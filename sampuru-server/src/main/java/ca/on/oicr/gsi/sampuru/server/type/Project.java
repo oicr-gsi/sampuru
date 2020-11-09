@@ -1,9 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
-import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.TableField;
 
 import java.time.LocalDateTime;
