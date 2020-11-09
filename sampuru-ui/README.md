@@ -1,5 +1,5 @@
 # Getting started with client-side TypeScript
-- `yarn` to manage packages
+- `yarn` or `npm` to manage packages
 - `npm run` to do various tasks
 - `webpack` to build and serve UI development
 
@@ -7,13 +7,19 @@
 - `tsconfig.json` configures the TypeScript compiler `tsc`
 - `webpack.config.js` configures WebPack
 
+## Minimum version requirements
+
+node >= 14
+npm >= 6
+tsc >= 3 
+
 ## Downloading dependencies
 In order to download the dependencies in package.json:
-yarn install 
+`yarn install`
 
 or 
 
-npm install
+`npm install`
 
 ## Run scripts in package.json
 npm run `script_name`
