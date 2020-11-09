@@ -19,7 +19,7 @@ export interface ProjectJSON {
 }
 
 /**
- * Perform a JSON fetch operation with a callback
+ * Perform JSON fetch operation with a callback
  */
 export function fetchJson<T>(
   url: RequestInfo,
@@ -35,7 +35,13 @@ export function fetchJson<T>(
   );
 }
 
-
+/**
+ *
+ * @param url
+ * @param parameters
+ *
+ * Return promise
+ */
 export function fetchAsPromise<T> (
   url: RequestInfo,
   parameters: RequestInit
@@ -60,7 +66,6 @@ export function fetchAsPromise<T> (
 /**
  * Perform a generic asynchronous fetch operation
  */
-
 export function fetchOperation<T>(
   url: RequestInfo,
   parameters: RequestInit,
@@ -82,6 +87,9 @@ export function fetchOperation<T>(
     .catch((error) => alert(error.nessage)); //TODO: better error handling
 }
 
+/**
+ * Convert ProjectJson object to Project
+* */
 export function decodeProject(json: ProjectJSON): Project {
   return Object.assign({}, json, {
     last_update: new Date(json.last_update)

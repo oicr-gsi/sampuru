@@ -1,15 +1,15 @@
 import {
-  UIElement,
   Card,
-  staticCard,
-  cardContainer, cardContent, collapsibleCard,
+  cardContent, collapsibleCard, busyDialog,
 } from "./html.js";
 
 import {
-  Project
+  decodeProject,
+  fetchAsPromise,
+  Project, ProjectJSON
 } from "./io.js";
 
-export function initialiseActiveProjects(projects: Project[]): HTMLElement {
+export function activeProjects(projects: Project[]): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
@@ -24,8 +24,26 @@ export function initialiseActiveProjects(projects: Project[]): HTMLElement {
   // todo: move this out to a function
   cards
     .forEach((card) => {
+      const spacing = document.createElement("br");
+      cardContainer.appendChild(spacing);
       cardContainer.appendChild(card);
     })
 
   return cardContainer;
+}
+
+//todo: catch errors
+export function initialiseActiveProjects() {
+  const closeBusy = busyDialog();
+
+  fetchAsPromise<ProjectJSON[]>("api/active_projects", {body: null})
+    .then((data) => {
+      const projects: Project[] = [];
+      data.forEach(proj => projects.push(decodeProject(proj)));
+      return projects;
+    })
+    .then((projects) => {
+      document.body.appendChild(activeProjects(projects));
+    })
+    .finally(closeBusy);
 }

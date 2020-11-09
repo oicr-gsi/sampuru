@@ -4,16 +4,6 @@
  */
 export type ClickHandler = (e: MouseEvent) => void;
 
-export interface ComplexElement<T extends HTMLElement> {
-  element: T
-}
-
-// @ts-ignore
-export type UIElement =
-  | UIElement[]
-  | string
-  | number
-  | ComplexElement<HTMLElement>;
 
 /**
  * The contents of a card
@@ -93,7 +83,7 @@ export function createLinkElement(
   return link;
 }
 
-//todo: refactor everything to do with cards so it's reproducible
+//todo: refactor DOM element creation so less verbose
 export function collapsibleCard(
   click: ClickHandler | null,
   content: Card
@@ -208,11 +198,10 @@ export function cardContent(
   return container;
 }
 
-// todo: function for paginated cards or infinite scroll cards
-// todo: error not constructable for type HTMLDivElement
+//todo:
 export function cardContainer(
   ...content: HTMLElement[]
-) {
+):HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
@@ -221,19 +210,27 @@ export function cardContainer(
       const br = document.createElement("br");
       cardContainer.appendChild(br);
       cardContainer.appendChild(card);
-    } )
+    })
 
   return cardContainer;
 }
 
-export function addCards(
-  target: HTMLElement,
-  ...content: HTMLElement[]
-): HTMLElement {
-  content
-    .forEach((card) => {
-      target.appendChild(card);
-    })
+/**
+ * Return a function to close loader
+ */
+export function busyDialog(): () => void {
+  const spinner = document.createElement("div");
+  spinner.className = "spinner-border";
+  spinner.setAttribute("role", "status");
 
-  return target;
+  const loading = document.createElement("span");
+  loading.className = "sr-only";
+  loading.innerText = "Loading...";
+
+  spinner.appendChild(loading);
+  document.body.appendChild(spinner);
+
+  return () => {
+    document.body.removeChild(spinner);
+  }
 }
