@@ -34,8 +34,11 @@ export interface Card {
   tagId: string;
 }
 
+/***
+ * Horizontal navbar that becomes vertical on small screens
+ */
 export function navbar():HTMLElement {
-  // horizontal navbar that becomes vertical on small screens
+
   const nav = document.createElement("nav");
   nav.className = "navbar navbar-expand-sm bg-light navbar-light";
 

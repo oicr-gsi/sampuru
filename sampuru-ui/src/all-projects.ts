@@ -32,7 +32,10 @@ export function activeProjects(projects: Project[]): HTMLElement {
   return cardContainer;
 }
 
-//todo: catch errors
+
+/***
+ * Fetch active projects and populate the page
+ */
 export function initialiseActiveProjects() {
   const closeBusy = busyDialog();
 
@@ -44,6 +47,6 @@ export function initialiseActiveProjects() {
     })
     .then((projects) => {
       document.body.appendChild(activeProjects(projects));
-    })
+    })//todo: catch errors
     .finally(closeBusy);
 }
