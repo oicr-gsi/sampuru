@@ -4,7 +4,7 @@
   <groupId>ca.on.oicr.gsi.sampuru</groupId>
   <artifactId>sampuru</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1</version>
   <name>Sampuru</name>
 
   <!-- TODO: url, licence, developers -->
