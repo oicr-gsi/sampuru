@@ -1,9 +1,173 @@
-
 /**
  * The callback for handling mouse events
  */
+
 export type ClickHandler = (e: MouseEvent) => void;
 
+export interface CardElement {
+  type: "card";
+
+  attributes?: Map<string, string>;
+
+  /** Header to apply to card */
+  header: string;
+
+  /** Tooltip on hover */
+  title?: string;
+
+  /** Card body */
+  contents: DOMElement;
+
+  /** ID to apply to card body's div so Bootstrap knows which element to collapse/expand */
+  id: string;
+
+  /** Cards expanded by default or not. true = expanded, false = collapsed */
+  show: boolean;
+
+  /** Collapse cards or static cards. true = collapse, false = static */
+  collapse: boolean;
+}
+
+export interface LinkElement {
+  type: "a";
+
+  /** URL to link to*/
+  url: string;
+
+  /** Display text to use*/
+  innerText: string;
+
+  /** Tooltip for the link*/
+  title: string;
+
+  /** Space-separated list of classes to apply to link*/
+  className: string;
+}
+
+export interface ComplexElement<T extends HTMLElement> {
+  type: "complex";
+  /** DOM node*/
+  element: T;
+}
+
+export interface TextElement {
+  type:
+    | "p" // paragraph
+    | "b" // bold
+    | "i"; // italic
+  contents: DisplayElement;
+  className: string | null;
+}
+
+/** Elements not associated with a DOM node */
+export type DisplayElement =
+  | number
+  | string
+  | null // for wbr elements
+  | TextElement
+  | LinkElement
+
+/** Any elements that can be associated with a DOM node*/
+export type DOMElement =
+  | number
+  | string
+  | null // for wbr elements
+  | LinkElement
+  | TextElement
+  | DisplayElement
+  | CardElement
+  | ComplexElement<HTMLElement>
+
+function addElements(
+  target: HTMLElement,
+  ...elements: DOMElement[]
+): void {
+  elements
+    .flat(Number.MAX_VALUE)
+    .forEach((result: Exclude<DOMElement, DOMElement[]>) => {
+      if (result === null) {
+        target.appendChild(document.createElement("wbr"));
+      } else if (typeof result == "string") {
+        target.appendChild(document.createTextNode(result));
+      } else if (typeof result == "number") {
+        target.appendChild(document.createTextNode(result.toString()));
+      } else {
+        switch (result.type) {
+          case "a": {
+            const element = document.createElement("a");
+            element.innerText = result.innerText;
+            element.href = result.url;
+            element.title = result.title;
+            element.className = result.className;
+            target.appendChild(element);
+          }
+            break;
+          case "b":
+          case "i":
+          case "p": {
+            const element = elementFromTag(result.type, result.className, result.contents);
+            target.appendChild(element.element);
+          }
+            break;
+          case "complex": {
+            target.appendChild(result.element); // Already an HTML element so just append to target
+          }
+            break;
+          case "card": {
+            const linkElement = link(result.header, "#", "card-link"); //todo: data-toggle: collapse attribute
+            const cardHeader = elementFromTag("div", "card-header", linkElement);
+
+            const cardBodyInner = elementFromTag("div", "card-body", result.contents);
+
+            if(result.collapse) {
+              let className = "collapse";
+              if(result.show) {
+                className = `${className} show`;
+              }
+            }
+
+            const cardBody = document.createElement("div");
+            cardBody.id = `#${result.id}`;
+
+
+
+
+        }
+      }
+    }
+}
+
+);
+}
+
+/**
+ *
+ * @param innerText - label for the link
+ * @param url - target of the hyperlink
+ * @param title - optional tooltip
+ * @param className - class for hyperlink element
+ */
+export function link(
+  innerText: string | number,
+  url: string,
+  className: string,
+  title?: string
+): LinkElement {
+  return { type: "a", url: url, innerText: innerText.toString(), title: title || "", className: className}
+}
+
+export function elementFromTag<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className: string | null,
+  ...elements: DOMElement[]
+): ComplexElement<HTMLElementTagNameMap[K]> {
+  const target = document.createElement(tag);
+  if (typeof className == "string") {
+    target.className = className;
+  }
+  addElements(target, ...elements);
+  return {element: target, type: "complex"};
+}
 
 /**
  * The contents of a card
@@ -37,7 +201,7 @@ export interface Card {
 /***
  * Horizontal navbar that becomes vertical on small screens
  */
-export function navbar():HTMLElement {
+export function navbar(): HTMLElement {
 
   const nav = document.createElement("nav");
   nav.className = "navbar navbar-expand-sm bg-light navbar-light";
@@ -80,8 +244,8 @@ export function createLinkElement(
   link.innerText = innerText;
   link.target = "_blank";
   url ? link.href = url : null;
-  if(attributes) {
-    attributes.forEach( (value, qualifiedName) => link.setAttribute(qualifiedName, value));
+  if (attributes) {
+    attributes.forEach((value, qualifiedName) => link.setAttribute(qualifiedName, value));
   }
   return link;
 }
@@ -150,7 +314,7 @@ export function progressBar(
 
   const progressBar = document.createElement("div");
   progressBar.className = "progress-bar bg-success";
-  const casesPercentCompleted = Math.floor((completed/total) * 100);
+  const casesPercentCompleted = Math.floor((completed / total) * 100);
   progressBar.setAttribute("style", "width:" + casesPercentCompleted.toString() + "%");
 
   const progressText = document.createElement("div");
@@ -204,7 +368,7 @@ export function cardContent(
 //todo:
 export function cardContainer(
   ...content: HTMLElement[]
-):HTMLElement {
+): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
@@ -237,3 +401,5 @@ export function busyDialog(): () => void {
     document.body.removeChild(spinner);
   }
 }
+
+
