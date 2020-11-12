@@ -33,11 +33,11 @@ target/
 # Config
 sampuru-server/src/main/resources/sampuru.properties
 
-# Downloads from npm
+# Downloads from npm / yarn related things
 node_modules
 yarn-error.log
 yarn.lock
-package-lock.json
 
 # Transpiled js files
 sampuru-server/src/main/resources/static/*.js
+dist/
