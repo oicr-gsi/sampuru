@@ -119,15 +119,20 @@ function addElements(
 
             const cardBodyInner = elementFromTag("div", "card-body", result.contents);
 
+            const cardBody = document.createElement("div");
+            cardBody.id = `#${result.id}`;
+
             if(result.collapse) {
-              let className = "collapse";
+              cardBody.className = "collapse"
               if(result.show) {
-                className = `${className} show`;
+                cardBody.className += " show"
               }
             }
 
-            const cardBody = document.createElement("div");
-            cardBody.id = `#${result.id}`;
+            cardBody.appendChild(cardBodyInner.element);
+
+
+
 
         }
       }
