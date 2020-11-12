@@ -1,13 +1,13 @@
 import {
   Card,
   cardContent, collapsibleCard, busyDialog,
-} from "./html.js";
+} from "./html";
 
 import {
   decodeProject,
   fetchAsPromise,
   Project, ProjectJSON
-} from "./io.js";
+} from "./io";
 
 export function activeProjects(projects: Project[]): HTMLElement {
   const cardContainer = document.createElement("div");

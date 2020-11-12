@@ -129,9 +129,6 @@ function addElements(
             const cardBody = document.createElement("div");
             cardBody.id = `#${result.id}`;
 
-
-
-
         }
       }
     }
