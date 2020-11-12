@@ -7,7 +7,20 @@ module.exports = {
   mode: "development",
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: "index.js"
+    filename: 'index.js'
+  },
+  devServer: {
+    port: 8080,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8088',
+        secure: false,
+        changeOrigin: true
+      }
+    },
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    }
   },
   module: {
     rules: [
@@ -39,11 +52,12 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js', '.json']
+    extensions: ['.js', '.ts']
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "sampuru-server/src/main/resources/static/index.html"
+      template: "sampuru-server/src/main/resources/static/index.html",
+      inject: false
     }),
     new MiniCssExtractPlugin({
       filename: 'index.css',
