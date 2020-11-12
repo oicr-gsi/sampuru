@@ -14,9 +14,9 @@ public class Case extends SampuruType {
     public static final String QCABLE_IDS = "qcable_ids";
     public static final String CHANGELOG_IDS = "changelog_ids";
     public String name;
-    public List<Integer> deliverables = new LinkedList<>();
-    public List<Integer> qcables = new LinkedList<>();
-    public List<Integer> changelog = new LinkedList<>();
+    public List<Integer> deliverables;
+    public List<Integer> qcables;
+    public List<Integer> changelog;
 
     public Case(int newId) throws Exception {
         getCaseFromDb(DONOR_CASE.ID, newId);

@@ -54,7 +54,7 @@ public class Server {
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String type = ptm.getParameters().get("type");
         String term = ptm.getParameters().get("term");
-        List<? extends SampuruType> list = new LinkedList<>();
+        List<? extends SampuruType> list;
 
         switch(type){
             case "project":

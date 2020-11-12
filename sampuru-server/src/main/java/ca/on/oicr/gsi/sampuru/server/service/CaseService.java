@@ -4,6 +4,7 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -38,8 +39,12 @@ public class CaseService extends Service<Case> {
 
     public static void getCardsParams(HttpServerExchange hse) throws Exception {
         CaseService cs = new CaseService();
+        ProjectService ps = new ProjectService();
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        //TODO: maybe in the future we'll want the opportunity for this to be blank
+        Integer projectId = Integer.valueOf(ptm.getParameters().get("projectId"));
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(cs.getCardJson(cs.getAll()));
+        hse.getResponseSender().send(cs.getCardJson(ps.get(projectId).getCases()));
     }
 
     public String getCardJson(List<Case> cases) throws Exception {
