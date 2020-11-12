@@ -326,6 +326,7 @@ public class DBConnector {
 
     // TODO: This could probably be a loop if I thought about it for a second
     // Logic is kind of wonky because ETL currently sets lots of things to 'pending' regardless of their children
+    // TODO: This is almost sure to kill the db, isn't it
     public JSONObject buildSankeyTransitions(Project project) {
         Integer targetId = project.id;
         JSONObject jsonObject = new JSONObject();
