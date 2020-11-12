@@ -55,18 +55,9 @@ public class CaseService extends Service<Case> {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("id", caseItem.id);
             jsonObject.put("name", caseItem.name);
-
-            //TODO: just get the JSON from the changelog itself
+            
             List<ChangelogEntry> changelogForItem = caseItem.getChangelog();
-            JSONArray changelogArray = new JSONArray();
-            for (ChangelogEntry changelog: changelogForItem){
-                JSONObject changelogJsonObject = new JSONObject();
-                changelogJsonObject.put("id", changelog.id);
-                changelogJsonObject.put("change_date", changelog.changeDate == null? "null": JSONObject.escape(changelog.changeDate.toString()));
-                changelogJsonObject.put("content", changelog.content);
-                changelogArray.add(changelogJsonObject);
-            }
-            jsonObject.put("changelog", changelogArray);
+            jsonObject.put("changelog", new ChangelogService().toJson(changelogForItem));
 
             jsonObject.put("bars", new DBConnector().buildCaseBars(caseItem));
 
@@ -100,6 +91,40 @@ public class CaseService extends Service<Case> {
                                 .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
                                 .as(Case.CHANGELOG_IDS))
                 .from(DONOR_CASE)
+                .fetch();
+
+        for(Record result: results){
+            cases.add(new Case(result));
+        }
+
+        return cases;
+    }
+
+    // TODO: Probably refactor to limit repeat code with getAll
+    public List<Case> getForProject(Integer projectId) throws Exception {
+        DSLContext context = new DBConnector().getContext();
+        List<Case> cases = new LinkedList<>();
+
+        // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
+        Result<Record> results = context
+                .select(DONOR_CASE.asterisk(),
+                        PostgresDSL.array(context
+                                .select(QCABLE.ID)
+                                .from(QCABLE)
+                                .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.QCABLE_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.DELIVERABLE_IDS),
+                        PostgresDSL.array(context
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.CHANGELOG_IDS))
+                .from(DONOR_CASE)
+                .where(DONOR_CASE.PROJECT_ID.eq(projectId))
                 .fetch();
 
         for(Record result: results){
