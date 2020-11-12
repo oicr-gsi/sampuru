@@ -7,6 +7,10 @@
     <packaging>pom</packaging>
     <version>0.2-SNAPSHOT</version>
 
+    <properties>
+        <maven.compiler.release>14</maven.compiler.release>
+    </properties>
+
     <modules>
         <module>sampuru-server</module>
     </modules>
