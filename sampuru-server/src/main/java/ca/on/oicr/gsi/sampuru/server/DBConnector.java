@@ -207,86 +207,119 @@ public class DBConnector {
         return result.get(0).value1();
     }
 
-    public JSONArray buildCaseBars(Case toExpand){
+    public JSONArray buildCaseBars(List<Integer> caseIdsToExpand){
         JSONArray bars = new JSONArray();
         DSLContext context = getContext();
 
-        // Get distinct library designs in case (each is one bar)
-        // TODO: Will this get ''(blank) as a Library Design?
         Result<Record1<String>> distinctLibraryDesignsResult = context
                 .selectDistinct(QCABLE.LIBRARY_DESIGN)
                 .from(QCABLE)
-                .where(QCABLE.CASE_ID.eq(toExpand.id))
+                .where(QCABLE.CASE_ID.in(caseIdsToExpand))
                 .fetch();
-        for(Record1<String> distinctLibraryDesignRecord: distinctLibraryDesignsResult){
-            JSONObject barObj = new JSONObject();
-            String currentLibraryDesign = distinctLibraryDesignRecord.value1();
-            barObj.put("library_design", currentLibraryDesign);
+        Result<Record1<String>> distinctTypesResult = context
+                .selectDistinct(QCABLE.QCABLE_TYPE)
+                .from(QCABLE)
+                .where(QCABLE.CASE_ID.in(caseIdsToExpand))
+                .fetch();
 
-            // Get steps
-            JSONArray steps = new JSONArray();
-            Result<Record1<String>> distinctTypesResult = context
-                    .selectDistinct(QCABLE.QCABLE_TYPE)
-                    .from(QCABLE)
-                    .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
-                            QCABLE.CASE_ID.eq(toExpand.id)
-                    ))
-                    .fetch();
-            for(Record1<String> distinctTypeRecord: distinctTypesResult){
-                JSONObject stepObj = new JSONObject();
-                String currentType = distinctTypeRecord.value1();
-                stepObj.put("type", currentType);
-
-                //total count
-                stepObj.put("total",
-                        context.selectCount()
-                            .from(QCABLE)
-                            .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
-                                    QCABLE.CASE_ID.eq(toExpand.id)).and(
-                                            QCABLE.QCABLE_TYPE.eq((currentType))
-                            )).fetch().get(0).value1());
-
-                //completed count
-                stepObj.put("completed",
-                        context.selectCount()
-                                .from(QCABLE)
-                                .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
-                                        QCABLE.CASE_ID.eq(toExpand.id)).and(
-                                        QCABLE.QCABLE_TYPE.eq((currentType))
-                                ).and(QCABLE.STATUS.eq(QC_PASSED))).fetch().get(0).value1());
-
-                // aggregate status
-                Result<Record1<String>> statusResult = context
-                        .select(QCABLE.STATUS)
-                        .from(QCABLE)
-                        .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign)
-                            .and(QCABLE.CASE_ID.eq((toExpand.id)))
-                            .and(QCABLE.QCABLE_TYPE.eq(currentType)))
-                        .fetch();
-                List<String> statuses = new LinkedList<>();
-                for(Record1<String> statusRecord: statusResult){
-                    statuses.add(statusRecord.value1());
+        List<SelectFieldOrAsterisk> selectFields = new LinkedList<>();
+        for (Record1<String> libraryDesignRecord: distinctLibraryDesignsResult){
+            String libraryDesign = libraryDesignRecord.value1();
+            for(Record1<String> typeRecord: distinctTypesResult){
+                String type = typeRecord.value1();
+                String[] counts = {"completed", "total"};
+                for(String count: counts){
+                    selectFields.add();
                 }
-                String stepObjStatus = "";
-                if(statuses.contains(QC_FAILED)){
-                    stepObjStatus = "failed";
-                } else if (statuses.contains(QC_PENDING)) {
-                    stepObjStatus = "pending";
-                } else if (statuses.contains(QC_PASSED)){
-                    stepObjStatus = "passed";
-                } else {
-                    stepObjStatus = "UNKNOWN!";
-                }
-                stepObj.put("status", stepObjStatus);
-                steps.add(stepObj);
+
+
             }
-            barObj.put("bars", steps);
-            bars.add(barObj);
         }
 
 
         return bars;
     }
+
+//    public JSONArray buildCaseBars(Case toExpand){
+//        JSONArray bars = new JSONArray();
+//        DSLContext context = getContext();
+//
+//        // Get distinct library designs in case (each is one bar)
+//        // TODO: Will this get ''(blank) as a Library Design?
+//        Result<Record1<String>> distinctLibraryDesignsResult = context
+//                .selectDistinct(QCABLE.LIBRARY_DESIGN)
+//                .from(QCABLE)
+//                .where(QCABLE.CASE_ID.eq(toExpand.id))
+//                .fetch();
+//        for(Record1<String> distinctLibraryDesignRecord: distinctLibraryDesignsResult){
+//            JSONObject barObj = new JSONObject();
+//            String currentLibraryDesign = distinctLibraryDesignRecord.value1();
+//            barObj.put("library_design", currentLibraryDesign);
+//
+//            // Get steps
+//            JSONArray steps = new JSONArray();
+//            Result<Record1<String>> distinctTypesResult = context
+//                    .selectDistinct(QCABLE.QCABLE_TYPE)
+//                    .from(QCABLE)
+//                    .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
+//                            QCABLE.CASE_ID.eq(toExpand.id)
+//                    ))
+//                    .fetch();
+//            for(Record1<String> distinctTypeRecord: distinctTypesResult){
+//                JSONObject stepObj = new JSONObject();
+//                String currentType = distinctTypeRecord.value1();
+//                stepObj.put("type", currentType);
+//
+//                //total count
+//                stepObj.put("total",
+//                        context.selectCount()
+//                            .from(QCABLE)
+//                            .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
+//                                    QCABLE.CASE_ID.eq(toExpand.id)).and(
+//                                            QCABLE.QCABLE_TYPE.eq((currentType))
+//                            )).fetch().get(0).value1());
+//
+//                //completed count
+//                stepObj.put("completed",
+//                        context.selectCount()
+//                                .from(QCABLE)
+//                                .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
+//                                        QCABLE.CASE_ID.eq(toExpand.id)).and(
+//                                        QCABLE.QCABLE_TYPE.eq((currentType))
+//                                ).and(QCABLE.STATUS.eq(QC_PASSED))).fetch().get(0).value1());
+//
+//                // aggregate status
+//                Result<Record1<String>> statusResult = context
+//                        .select(QCABLE.STATUS)
+//                        .from(QCABLE)
+//                        .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign)
+//                            .and(QCABLE.CASE_ID.eq((toExpand.id)))
+//                            .and(QCABLE.QCABLE_TYPE.eq(currentType)))
+//                        .fetch();
+//                List<String> statuses = new LinkedList<>();
+//                for(Record1<String> statusRecord: statusResult){
+//                    statuses.add(statusRecord.value1());
+//                }
+//                String stepObjStatus = "";
+//                if(statuses.contains(QC_FAILED)){
+//                    stepObjStatus = "failed";
+//                } else if (statuses.contains(QC_PENDING)) {
+//                    stepObjStatus = "pending";
+//                } else if (statuses.contains(QC_PASSED)){
+//                    stepObjStatus = "passed";
+//                } else {
+//                    stepObjStatus = "UNKNOWN!";
+//                }
+//                stepObj.put("status", stepObjStatus);
+//                steps.add(stepObj);
+//            }
+//            barObj.put("bars", steps);
+//            bars.add(barObj);
+//        }
+//
+//
+//        return bars;
+//    }
 
 
 
