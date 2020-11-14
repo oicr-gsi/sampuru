@@ -118,13 +118,26 @@ public class QCableService extends Service<QCable> {
     }
 
     public static void getAllQcablesTableParams(HttpServerExchange hse) throws Exception {
-        CaseService cs = new CaseService();
         QCableService qs = new QCableService();
+        List<Case> cases = new LinkedList<>();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String filterType = ptm.getParameters().get("filterType");
-        String filterId = ptm.getParameters().get("filterId");
+        Integer filterId = Integer.valueOf(ptm.getParameters().get("filterId"));
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(qs.getTableJson(cs.getAll()));
+        switch(filterType){
+            case "project":
+                ProjectService ps = new ProjectService();
+                cases = ps.get(filterId).getCases();
+                break;
+            case "case":
+                CaseService cs = new CaseService();
+                cases.add(cs.get(filterId));
+                break;
+            default:
+                throw new UnsupportedOperationException("Bad filter type "
+                        + filterType +" , supported types are: project, case");
+        }
+        hse.getResponseSender().send(qs.getTableJson(cases));
     }
 
     public String getTableJson(List<Case> cases) throws Exception {
