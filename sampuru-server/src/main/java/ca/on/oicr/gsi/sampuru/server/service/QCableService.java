@@ -4,6 +4,7 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -119,6 +120,9 @@ public class QCableService extends Service<QCable> {
     public static void getAllQcablesTableParams(HttpServerExchange hse) throws Exception {
         CaseService cs = new CaseService();
         QCableService qs = new QCableService();
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        String filterType = ptm.getParameters().get("filterType");
+        String filterId = ptm.getParameters().get("filterId");
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(qs.getTableJson(cs.getAll()));
     }
