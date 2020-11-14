@@ -1,6 +1,8 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
+import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import org.jooq.Record;
+import org.jooq.TableField;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,12 +18,12 @@ public class Case extends SampuruType {
     public List<Integer> qcables = new LinkedList<>();
     public List<Integer> changelog = new LinkedList<>();
 
-    public Case(int id) throws Exception {
-        throw new UnsupportedOperationException("Implement me :("); //TODO Implement me
+    public Case(int newId) throws Exception {
+        getCaseFromDb(DONOR_CASE.ID, newId);
     }
 
-    public Case(String name) throws Exception {
-        throw new UnsupportedOperationException("Implement me :("); //TODO Implement me
+    public Case(String newName) throws Exception {
+        getCaseFromDb(DONOR_CASE.NAME, newName);
     }
 
     public Case(Record row) throws Exception {
@@ -59,6 +61,17 @@ public class Case extends SampuruType {
             newList.add(new ChangelogEntry(changelogId));
         }
         return newList;
+    }
+
+    private void getCaseFromDb(TableField field, Object toMatch) throws Exception {
+        DBConnector dbConnector = new DBConnector();
+        Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
+        id = dbRecord.get(DONOR_CASE.ID);
+        name = dbRecord.get(DONOR_CASE.NAME);
+
+        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.CASE_ID, id);
+        qcables = dbConnector.getChildIdList(QCABLE, QCABLE.CASE_ID, id);
+        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.CASE_ID, id);
     }
 
     @Override
