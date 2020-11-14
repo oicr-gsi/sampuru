@@ -105,18 +105,6 @@ public class QCableService extends Service<QCable> {
         return jsonArray.toJSONString();
     }
 
-    public static void getCaseQcablesTableParams(HttpServerExchange hse) throws Exception {
-        // TODO: get id
-        int id = 0;
-        CaseService cs = new CaseService();
-        QCableService qs = new QCableService();
-        List<Case> cases = new LinkedList<>();
-        //TODO: multiple
-        cases.add(cs.get(id));
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(qs.getTableJsonFromCases(cases));
-    }
-
     public static void getAllQcablesTableParams(HttpServerExchange hse) throws Exception {
         CaseService cs = new CaseService();
         QCableService qs = new QCableService();
