@@ -47,7 +47,7 @@ public class CaseService extends Service<Case> {
         hse.getResponseSender().send(cs.getCardJson(ps.get(projectId).donorCases));
     }
 
-    // Front end will need to
+    // Front end will need to group by case_id
     public String getCardJson(List<Integer> caseIds) throws Exception {
         return new DBConnector().getCaseBars(caseIds).toJSONString();
     }
