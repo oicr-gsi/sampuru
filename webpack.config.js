@@ -10,6 +10,7 @@ module.exports = {
     filename: 'index.js'
   },
   devServer: {
+    open: true,
     port: 8080,
     proxy: {
       '/api': {
