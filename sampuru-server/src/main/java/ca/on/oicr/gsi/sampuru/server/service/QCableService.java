@@ -4,6 +4,7 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -104,30 +105,44 @@ public class QCableService extends Service<QCable> {
         return jsonArray.toJSONString();
     }
 
-    public static void getCaseQcablesTableParams(HttpServerExchange hse) throws Exception {
-        // TODO: get id
-        int id = 0;
-        CaseService cs = new CaseService();
-        QCableService qs = new QCableService();
-        List<Case> cases = new LinkedList<>();
-        //TODO: multiple
-        cases.add(cs.get(id));
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(qs.getTableJson(cases));
-    }
-
     public static void getAllQcablesTableParams(HttpServerExchange hse) throws Exception {
         CaseService cs = new CaseService();
         QCableService qs = new QCableService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(qs.getTableJson(cs.getAll()));
+        hse.getResponseSender().send(qs.getTableJsonFromCases(cs.getAll()));
     }
 
-    public String getTableJson(List<Case> cases) throws Exception {
+    public static void getFilteredQcablesTableParams(HttpServerExchange hse) throws Exception {
+        QCableService qs = new QCableService();
+        List<Integer> cases = new LinkedList<>();
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        String filterType = ptm.getParameters().get("filterType");
+        Integer filterId = Integer.valueOf(ptm.getParameters().get("filterId"));
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        switch(filterType){
+            case "project":
+                ProjectService ps = new ProjectService();
+                cases = ps.get(filterId).donorCases;
+                break;
+            case "case":
+                cases.add(filterId);
+                break;
+            default:
+                throw new UnsupportedOperationException("Bad filter type "
+                        + filterType +" , supported types are: project, case");
+        }
+        hse.getResponseSender().send(qs.getTableJsonFromIds(cases));
+    }
+
+    public String getTableJsonFromCases(List<Case> cases) throws Exception {
         List<Integer> ids = new LinkedList<>();
         for (Case donorCase: cases){
             ids.add(donorCase.id);
         }
         return new DBConnector().getQcableTable(ids).toJSONString();
+    }
+
+    public String getTableJsonFromIds(List<Integer> caseIds) throws Exception {
+        return new DBConnector().getQcableTable(caseIds).toJSONString();
     }
 }
