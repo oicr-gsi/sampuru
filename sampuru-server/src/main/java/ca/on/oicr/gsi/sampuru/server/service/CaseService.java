@@ -44,27 +44,12 @@ public class CaseService extends Service<Case> {
         //TODO: maybe in the future we'll want the opportunity for this to be blank
         Integer projectId = Integer.valueOf(ptm.getParameters().get("projectId"));
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(cs.getCardJson(ps.get(projectId).getCases()));
+        hse.getResponseSender().send(cs.getCardJson(ps.get(projectId).donorCases));
     }
 
-    public String getCardJson(List<Case> cases) throws Exception {
-        JSONArray jsonArray = new JSONArray();
-
-        for (SampuruType item: cases){
-            Case caseItem = (Case)item;
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", caseItem.id);
-            jsonObject.put("name", caseItem.name);
-            
-            List<ChangelogEntry> changelogForItem = caseItem.getChangelog();
-            jsonObject.put("changelog", new ChangelogService().toJson(changelogForItem));
-
-            jsonObject.put("bars", new DBConnector().buildCaseBars(caseItem));
-
-            jsonArray.add(jsonObject);
-        }
-
-        return jsonArray.toJSONString();
+    // Front end will need to
+    public String getCardJson(List<Integer> caseIds) throws Exception {
+        return new DBConnector().getCaseBars(caseIds).toJSONString();
     }
 
     @Override

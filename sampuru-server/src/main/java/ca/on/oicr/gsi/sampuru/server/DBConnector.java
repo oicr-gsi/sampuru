@@ -207,95 +207,38 @@ public class DBConnector {
         return result.get(0).value1();
     }
 
-    public JSONArray buildCaseBars(List<Integer> caseIdsToExpand){
+    public JSONArray getCaseBars(List<Integer> caseIdsToExpand){
         JSONArray bars = new JSONArray();
-        DSLContext context = getContext();
+        Result<Record> results = getContext()
+                .select()
+                .from(CASE_CARD)
+                .where(CASE_CARD.CASE_ID.in(caseIdsToExpand))
+                .fetch();
+        for(Record result: results){
+            JSONObject entry = new JSONObject();
+            entry.put("id", result.get(CASE_CARD.CASE_ID));
+            entry.put("name", result.get(CASE_CARD.CASE_NAME));
+            entry.put("library_design", result.get(CASE_CARD.LIBRARY_DESIGN));
+            entry.put("tissue_completed", result.get(CASE_CARD.TISSUE_COMPLETED));
+            entry.put("tissue_total", result.get(CASE_CARD.TISSUE_TOTAL));
+            entry.put("extraction_completed", result.get(CASE_CARD.EXTRACTION_COMPLETED));
+            entry.put("extraction_total", result.get(CASE_CARD.EXTRACTION_TOTAL));
+            entry.put("library_preparation_completed", result.get(CASE_CARD.LIBRARY_PREPARATION_COMPLETED));
+            entry.put("library_preparation_total", result.get(CASE_CARD.LIBRARY_PREPARATION_TOTAL));
+            entry.put("low_pass_sequencing_completed", result.get(CASE_CARD.LOW_PASS_SEQUENCING_COMPLETED));
+            entry.put("low_pass_sequencing_total", result.get(CASE_CARD.LOW_PASS_SEQUENCING_TOTAL));
+            entry.put("full_depth_sequencing_completed", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_COMPLETED));
+            entry.put("full_depth_sequencing_total", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_TOTAL));
+            entry.put("informatics_interpretation_completed", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_COMPLETED));
+            entry.put("informatics_interpretation_total", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_TOTAL));
+            entry.put("final_report_completed", result.get(CASE_CARD.FINAL_REPORT_COMPLETED));
+            entry.put("final_report_total", result.get(CASE_CARD.FINAL_REPORT_TOTAL));
+
+            bars.add(entry);
+        }
 
         return bars;
     }
-
-//    public JSONArray buildCaseBars(Case toExpand){
-//        JSONArray bars = new JSONArray();
-//        DSLContext context = getContext();
-//
-//        // Get distinct library designs in case (each is one bar)
-//        // TODO: Will this get ''(blank) as a Library Design?
-//        Result<Record1<String>> distinctLibraryDesignsResult = context
-//                .selectDistinct(QCABLE.LIBRARY_DESIGN)
-//                .from(QCABLE)
-//                .where(QCABLE.CASE_ID.eq(toExpand.id))
-//                .fetch();
-//        for(Record1<String> distinctLibraryDesignRecord: distinctLibraryDesignsResult){
-//            JSONObject barObj = new JSONObject();
-//            String currentLibraryDesign = distinctLibraryDesignRecord.value1();
-//            barObj.put("library_design", currentLibraryDesign);
-//
-//            // Get steps
-//            JSONArray steps = new JSONArray();
-//            Result<Record1<String>> distinctTypesResult = context
-//                    .selectDistinct(QCABLE.QCABLE_TYPE)
-//                    .from(QCABLE)
-//                    .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
-//                            QCABLE.CASE_ID.eq(toExpand.id)
-//                    ))
-//                    .fetch();
-//            for(Record1<String> distinctTypeRecord: distinctTypesResult){
-//                JSONObject stepObj = new JSONObject();
-//                String currentType = distinctTypeRecord.value1();
-//                stepObj.put("type", currentType);
-//
-//                //total count
-//                stepObj.put("total",
-//                        context.selectCount()
-//                            .from(QCABLE)
-//                            .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
-//                                    QCABLE.CASE_ID.eq(toExpand.id)).and(
-//                                            QCABLE.QCABLE_TYPE.eq((currentType))
-//                            )).fetch().get(0).value1());
-//
-//                //completed count
-//                stepObj.put("completed",
-//                        context.selectCount()
-//                                .from(QCABLE)
-//                                .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign).and(
-//                                        QCABLE.CASE_ID.eq(toExpand.id)).and(
-//                                        QCABLE.QCABLE_TYPE.eq((currentType))
-//                                ).and(QCABLE.STATUS.eq(QC_PASSED))).fetch().get(0).value1());
-//
-//                // aggregate status
-//                Result<Record1<String>> statusResult = context
-//                        .select(QCABLE.STATUS)
-//                        .from(QCABLE)
-//                        .where(QCABLE.LIBRARY_DESIGN.eq(currentLibraryDesign)
-//                            .and(QCABLE.CASE_ID.eq((toExpand.id)))
-//                            .and(QCABLE.QCABLE_TYPE.eq(currentType)))
-//                        .fetch();
-//                List<String> statuses = new LinkedList<>();
-//                for(Record1<String> statusRecord: statusResult){
-//                    statuses.add(statusRecord.value1());
-//                }
-//                String stepObjStatus = "";
-//                if(statuses.contains(QC_FAILED)){
-//                    stepObjStatus = "failed";
-//                } else if (statuses.contains(QC_PENDING)) {
-//                    stepObjStatus = "pending";
-//                } else if (statuses.contains(QC_PASSED)){
-//                    stepObjStatus = "passed";
-//                } else {
-//                    stepObjStatus = "UNKNOWN!";
-//                }
-//                stepObj.put("status", stepObjStatus);
-//                steps.add(stepObj);
-//            }
-//            barObj.put("bars", steps);
-//            bars.add(barObj);
-//        }
-//
-//
-//        return bars;
-//    }
-
-
 
 
     public LocalDateTime getLastUpdate(Project project) {
