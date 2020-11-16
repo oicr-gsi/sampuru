@@ -1,6 +1,7 @@
 CREATE VIEW case_card AS
 SELECT
 case_id,
+(SELECT donor_case.name FROM donor_case WHERE donor_case.id = case_id) AS case_name,
 library_design,
 SUM(CASE WHEN tissue_qcable_status = 'passed' AND tissue_qcable_alias IS NOT NULL THEN 1 ELSE 0 END) AS tissue_completed,
 SUM(CASE WHEN tissue_qcable_alias IS NOT NULL THEN 1 ELSE 0 END) AS tissue_total,

@@ -211,32 +211,6 @@ public class DBConnector {
         JSONArray bars = new JSONArray();
         DSLContext context = getContext();
 
-        Result<Record1<String>> distinctLibraryDesignsResult = context
-                .selectDistinct(QCABLE.LIBRARY_DESIGN)
-                .from(QCABLE)
-                .where(QCABLE.CASE_ID.in(caseIdsToExpand))
-                .fetch();
-        Result<Record1<String>> distinctTypesResult = context
-                .selectDistinct(QCABLE.QCABLE_TYPE)
-                .from(QCABLE)
-                .where(QCABLE.CASE_ID.in(caseIdsToExpand))
-                .fetch();
-
-        List<SelectFieldOrAsterisk> selectFields = new LinkedList<>();
-        for (Record1<String> libraryDesignRecord: distinctLibraryDesignsResult){
-            String libraryDesign = libraryDesignRecord.value1();
-            for(Record1<String> typeRecord: distinctTypesResult){
-                String type = typeRecord.value1();
-                String[] counts = {"completed", "total"};
-                for(String count: counts){
-                    selectFields.add();
-                }
-
-
-            }
-        }
-
-
         return bars;
     }
 
