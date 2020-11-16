@@ -38,7 +38,7 @@ public class Server {
                     // Special frontend endpoints
                     .get("/active_projects", ProjectService::getActiveProjectsParams)
                     .get("/completed_projects", ProjectService::getCompletedProjectsParams)
-                    .get("/cases_cards/{projectId}", CaseService::getCardsParams) //TODO implement the filtering
+                    .get("/cases_cards/{projectId}", CaseService::getCardsParams)
                     .get("/qcables_table", QCableService::getAllQcablesTableParams)
                     .get("/qcables_table/{filterType}/{filterId}", QCableService::getFilteredQcablesTableParams)
                     .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
@@ -54,7 +54,7 @@ public class Server {
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String type = ptm.getParameters().get("type");
         String term = ptm.getParameters().get("term");
-        List<? extends SampuruType> list = new LinkedList<>();
+        List<? extends SampuruType> list;
 
         switch(type){
             case "project":

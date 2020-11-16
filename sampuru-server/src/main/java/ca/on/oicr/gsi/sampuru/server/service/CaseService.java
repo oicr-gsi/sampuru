@@ -4,6 +4,7 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -38,37 +39,17 @@ public class CaseService extends Service<Case> {
 
     public static void getCardsParams(HttpServerExchange hse) throws Exception {
         CaseService cs = new CaseService();
+        ProjectService ps = new ProjectService();
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        //TODO: maybe in the future we'll want the opportunity for this to be blank
+        Integer projectId = Integer.valueOf(ptm.getParameters().get("projectId"));
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(cs.getCardJson(cs.getAll()));
+        hse.getResponseSender().send(cs.getCardJson(ps.get(projectId).donorCases));
     }
 
-    public String getCardJson(List<Case> cases) throws Exception {
-        JSONArray jsonArray = new JSONArray();
-
-        for (SampuruType item: cases){
-            Case caseItem = (Case)item;
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", caseItem.id);
-            jsonObject.put("name", caseItem.name);
-
-            //TODO: just get the JSON from the changelog itself
-            List<ChangelogEntry> changelogForItem = caseItem.getChangelog();
-            JSONArray changelogArray = new JSONArray();
-            for (ChangelogEntry changelog: changelogForItem){
-                JSONObject changelogJsonObject = new JSONObject();
-                changelogJsonObject.put("id", changelog.id);
-                changelogJsonObject.put("change_date", changelog.changeDate == null? "null": JSONObject.escape(changelog.changeDate.toString()));
-                changelogJsonObject.put("content", changelog.content);
-                changelogArray.add(changelogJsonObject);
-            }
-            jsonObject.put("changelog", changelogArray);
-
-            jsonObject.put("bars", new DBConnector().buildCaseBars(caseItem));
-
-            jsonArray.add(jsonObject);
-        }
-
-        return jsonArray.toJSONString();
+    // Front end will need to group by case_id
+    public String getCardJson(List<Integer> caseIds) throws Exception {
+        return new DBConnector().getCaseBars(caseIds).toJSONString();
     }
 
     @Override
@@ -95,6 +76,40 @@ public class CaseService extends Service<Case> {
                                 .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
                                 .as(Case.CHANGELOG_IDS))
                 .from(DONOR_CASE)
+                .fetch();
+
+        for(Record result: results){
+            cases.add(new Case(result));
+        }
+
+        return cases;
+    }
+
+    // TODO: Probably refactor to limit repeat code with getAll
+    public List<Case> getForProject(Integer projectId) throws Exception {
+        DSLContext context = new DBConnector().getContext();
+        List<Case> cases = new LinkedList<>();
+
+        // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
+        Result<Record> results = context
+                .select(DONOR_CASE.asterisk(),
+                        PostgresDSL.array(context
+                                .select(QCABLE.ID)
+                                .from(QCABLE)
+                                .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.QCABLE_IDS),
+                        PostgresDSL.array(context
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.DELIVERABLE_IDS),
+                        PostgresDSL.array(context
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.CHANGELOG_IDS))
+                .from(DONOR_CASE)
+                .where(DONOR_CASE.PROJECT_ID.eq(projectId))
                 .fetch();
 
         for(Record result: results){

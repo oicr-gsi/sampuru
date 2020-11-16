@@ -1,6 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import ca.on.oicr.gsi.sampuru.server.service.CaseService;
 import org.jooq.Record;
 import org.jooq.TableField;
 
@@ -54,11 +55,7 @@ public class Project extends SampuruType {
     }
 
     public List<Case> getCases() throws Exception {
-        List<Case> caseList = new LinkedList<>();
-        for (Integer i: donorCases){
-            caseList.add(new Case(i));
-        }
-        return caseList;
+        return new CaseService().getForProject(this.id);
     }
 
     public List<Deliverable> getDeliverables() throws Exception {
