@@ -236,50 +236,43 @@ public class DBConnector {
             receiptStep.put("type", "receipt");
             receiptStep.put("total", result.get(CASE_CARD.TISSUE_TOTAL));
             receiptStep.put("completed", result.get(CASE_CARD.TISSUE_COMPLETED));
-            receiptStep.put("status", //TODO: This should incorporate whether there is a 'failed' amongst the qcables, also deal with 0 total
-                    receiptStep.get("completed") == receiptStep.get("total")? "passed": "pending");
+            receiptStep.put("status", determineStepStatus((Long)receiptStep.get("completed"), (Long)receiptStep.get("total")));
             steps.add(receiptStep);
 
             extractionStep.put("type", "extraction");
             extractionStep.put("total", result.get(CASE_CARD.EXTRACTION_TOTAL));
             extractionStep.put("completed", result.get(CASE_CARD.EXTRACTION_COMPLETED));
-            extractionStep.put("status", //TODO: This should incorporate whether there is a 'failed' amongst the qcables
-                    extractionStep.get("completed") == extractionStep.get("total")? "passed": "pending");
+            extractionStep.put("status", determineStepStatus((Long)extractionStep.get("completed"), (Long)extractionStep.get("total")));
             steps.add(extractionStep);
-            
+
             libraryPrepStep.put("type", "libraryPrep");
             libraryPrepStep.put("total", result.get(CASE_CARD.LIBRARY_PREPARATION_TOTAL));
             libraryPrepStep.put("completed", result.get(CASE_CARD.LIBRARY_PREPARATION_COMPLETED));
-            libraryPrepStep.put("status", //TODO: This should incorporate whether there is a 'failed' amongst the qcables
-                    libraryPrepStep.get("completed") == libraryPrepStep.get("total")? "passed": "pending");
+            libraryPrepStep.put("status", determineStepStatus((Long)libraryPrepStep.get("completed"), (Long)libraryPrepStep.get("total")));
             steps.add(libraryPrepStep);
-            
-            lowPassStep.put("type", "lowPass");
+
+            lowPassStep.put("type", "low_pass");
             lowPassStep.put("total", result.get(CASE_CARD.LOW_PASS_SEQUENCING_TOTAL));
             lowPassStep.put("completed", result.get(CASE_CARD.LOW_PASS_SEQUENCING_COMPLETED));
-            lowPassStep.put("status", //TODO: This should incorporate whether there is a 'failed' amongst the qcables
-                    lowPassStep.get("completed") == lowPassStep.get("total")? "passed": "pending");
+            lowPassStep.put("status", determineStepStatus((Long)lowPassStep.get("completed"), (Long)lowPassStep.get("total")));
             steps.add(lowPassStep);
-            
-            fullDepthStep.put("type", "fullDepth");
+
+            fullDepthStep.put("type", "full_depth");
             fullDepthStep.put("total", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_TOTAL));
             fullDepthStep.put("completed", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_COMPLETED));
-            fullDepthStep.put("status", //TODO: This should incorporate whether there is a 'failed' amongst the qcables
-                    fullDepthStep.get("completed") == fullDepthStep.get("total")? "passed": "pending");
+            fullDepthStep.put("status", determineStepStatus((Long)fullDepthStep.get("completed"), (Long)fullDepthStep.get("total")));
             steps.add(fullDepthStep);
-            
+
             informaticsStep.put("type", "informatics");
             informaticsStep.put("total", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_TOTAL));
             informaticsStep.put("completed", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_COMPLETED));
-            informaticsStep.put("status", //TODO: This should incorporate whether there is a 'failed' amongst the qcables
-                    informaticsStep.get("completed") == informaticsStep.get("total")? "passed": "pending");
+            informaticsStep.put("status", determineStepStatus((Long)informaticsStep.get("completed"), (Long)informaticsStep.get("total")));
             steps.add(informaticsStep);
-            
-            finalReportStep.put("type", "finalReport");
+
+            finalReportStep.put("type", "final_report");
             finalReportStep.put("total", result.get(CASE_CARD.FINAL_REPORT_TOTAL));
             finalReportStep.put("completed", result.get(CASE_CARD.FINAL_REPORT_COMPLETED));
-            finalReportStep.put("status", //TODO: This should incorporate whether there is a 'failed' amongst the qcables
-                    finalReportStep.get("completed") == finalReportStep.get("total")? "passed": "pending");
+            finalReportStep.put("status", determineStepStatus((Long)finalReportStep.get("completed"), (Long)finalReportStep.get("total")));
             steps.add(finalReportStep);
 
             thisBar.put("steps", steps);
@@ -310,6 +303,13 @@ public class DBConnector {
         }
 
         return cards.toArray();
+    }
+
+    // TODO: do we need to worry about failures?
+    private String determineStepStatus(Long completed, Long total){
+        if(total == 0) return "not started";
+        if(total == completed) return "passed";
+        return "pending";
     }
 
     public LocalDateTime getLastUpdate(Project project) {
