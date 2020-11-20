@@ -1,6 +1,5 @@
 package ca.on.oicr.gsi.sampuru.server;
 
-import ca.on.oicr.gsi.sampuru.server.type.Case;
 import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import org.jooq.Record;
@@ -208,38 +207,110 @@ public class DBConnector {
     }
 
     public JSONArray getCaseBars(List<Integer> caseIdsToExpand){
-        JSONArray bars = new JSONArray();
-        Result<Record> results = getContext()
+        JSONObjectMap cards = new JSONObjectMap();
+        DSLContext context = getContext();
+        Result<Record> cardResults = context
                 .select()
                 .from(CASE_CARD)
                 .where(CASE_CARD.CASE_ID.in(caseIdsToExpand))
                 .fetch();
-        for(Record result: results){
-            JSONObject entry = new JSONObject();
-            entry.put("id", result.get(CASE_CARD.CASE_ID));
-            entry.put("name", result.get(CASE_CARD.CASE_NAME));
-            entry.put("library_design", result.get(CASE_CARD.LIBRARY_DESIGN));
-            entry.put("tissue_completed", result.get(CASE_CARD.TISSUE_COMPLETED));
-            entry.put("tissue_total", result.get(CASE_CARD.TISSUE_TOTAL));
-            entry.put("extraction_completed", result.get(CASE_CARD.EXTRACTION_COMPLETED));
-            entry.put("extraction_total", result.get(CASE_CARD.EXTRACTION_TOTAL));
-            entry.put("library_preparation_completed", result.get(CASE_CARD.LIBRARY_PREPARATION_COMPLETED));
-            entry.put("library_preparation_total", result.get(CASE_CARD.LIBRARY_PREPARATION_TOTAL));
-            entry.put("low_pass_sequencing_completed", result.get(CASE_CARD.LOW_PASS_SEQUENCING_COMPLETED));
-            entry.put("low_pass_sequencing_total", result.get(CASE_CARD.LOW_PASS_SEQUENCING_TOTAL));
-            entry.put("full_depth_sequencing_completed", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_COMPLETED));
-            entry.put("full_depth_sequencing_total", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_TOTAL));
-            entry.put("informatics_interpretation_completed", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_COMPLETED));
-            entry.put("informatics_interpretation_total", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_TOTAL));
-            entry.put("final_report_completed", result.get(CASE_CARD.FINAL_REPORT_COMPLETED));
-            entry.put("final_report_total", result.get(CASE_CARD.FINAL_REPORT_TOTAL));
+        for(Record result: cardResults){
+            Integer thisId = result.get(CASE_CARD.CASE_ID);
+            JSONObject currentCard = cards.get(thisId);
+            if(null == currentCard.get("bars")) currentCard.put("bars", new JSONArray());
+            JSONArray currentBars = (JSONArray)currentCard.get("bars");
 
-            bars.add(entry);
+            currentCard.put("id", thisId); // This will probably overwrite things many times, w/e
+            currentCard.put("name", result.get(CASE_CARD.CASE_NAME)); // same
+            JSONObject thisBar = new JSONObject();
+            thisBar.put("library_design", result.get(CASE_CARD.LIBRARY_DESIGN));
+            JSONArray steps = new JSONArray();
+            JSONObject receiptStep = new JSONObject(),
+                    extractionStep = new JSONObject(),
+                    libraryPrepStep = new JSONObject(),
+                    lowPassStep = new JSONObject(),
+                    fullDepthStep = new JSONObject(),
+                    informaticsStep = new JSONObject(),
+                    finalReportStep = new JSONObject();
+
+            receiptStep.put("type", "receipt");
+            receiptStep.put("total", result.get(CASE_CARD.TISSUE_TOTAL));
+            receiptStep.put("completed", result.get(CASE_CARD.TISSUE_COMPLETED));
+            receiptStep.put("status", determineStepStatus((Long)receiptStep.get("completed"), (Long)receiptStep.get("total")));
+            steps.add(receiptStep);
+
+            extractionStep.put("type", "extraction");
+            extractionStep.put("total", result.get(CASE_CARD.EXTRACTION_TOTAL));
+            extractionStep.put("completed", result.get(CASE_CARD.EXTRACTION_COMPLETED));
+            extractionStep.put("status", determineStepStatus((Long)extractionStep.get("completed"), (Long)extractionStep.get("total")));
+            steps.add(extractionStep);
+
+            libraryPrepStep.put("type", "library_prep");
+            libraryPrepStep.put("total", result.get(CASE_CARD.LIBRARY_PREPARATION_TOTAL));
+            libraryPrepStep.put("completed", result.get(CASE_CARD.LIBRARY_PREPARATION_COMPLETED));
+            libraryPrepStep.put("status", determineStepStatus((Long)libraryPrepStep.get("completed"), (Long)libraryPrepStep.get("total")));
+            steps.add(libraryPrepStep);
+
+            lowPassStep.put("type", "low_pass");
+            lowPassStep.put("total", result.get(CASE_CARD.LOW_PASS_SEQUENCING_TOTAL));
+            lowPassStep.put("completed", result.get(CASE_CARD.LOW_PASS_SEQUENCING_COMPLETED));
+            lowPassStep.put("status", determineStepStatus((Long)lowPassStep.get("completed"), (Long)lowPassStep.get("total")));
+            steps.add(lowPassStep);
+
+            fullDepthStep.put("type", "full_depth");
+            fullDepthStep.put("total", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_TOTAL));
+            fullDepthStep.put("completed", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_COMPLETED));
+            fullDepthStep.put("status", determineStepStatus((Long)fullDepthStep.get("completed"), (Long)fullDepthStep.get("total")));
+            steps.add(fullDepthStep);
+
+            informaticsStep.put("type", "informatics");
+            informaticsStep.put("total", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_TOTAL));
+            informaticsStep.put("completed", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_COMPLETED));
+            informaticsStep.put("status", determineStepStatus((Long)informaticsStep.get("completed"), (Long)informaticsStep.get("total")));
+            steps.add(informaticsStep);
+
+            finalReportStep.put("type", "final_report");
+            finalReportStep.put("total", result.get(CASE_CARD.FINAL_REPORT_TOTAL));
+            finalReportStep.put("completed", result.get(CASE_CARD.FINAL_REPORT_COMPLETED));
+            finalReportStep.put("status", determineStepStatus((Long)finalReportStep.get("completed"), (Long)finalReportStep.get("total")));
+            steps.add(finalReportStep);
+
+            thisBar.put("steps", steps);
+            currentBars.add(thisBar);
+            currentCard.put("bars", currentBars);
+            cards.put(thisId, currentCard);
         }
 
-        return bars;
+        Result<Record> changelogResults = context
+                .select()
+                .from(CHANGELOG)
+                .where(CHANGELOG.CASE_ID.in(caseIdsToExpand))
+                .fetch();
+        for(Record result: changelogResults){
+            Integer thisId = result.get(CASE_CARD.CASE_ID);
+            JSONObject currentCard = cards.get(thisId);
+            if(null == currentCard.get("changelog")) currentCard.put("changelog", new JSONArray());
+            JSONArray currentChangelog = (JSONArray)currentCard.get("changelog");
+            JSONObject changelogEntry = new JSONObject();
+
+            changelogEntry.put("id", result.get(CHANGELOG.ID));
+            changelogEntry.put("change_date", result.get(CHANGELOG.CHANGE_DATE));
+            changelogEntry.put("content", result.get(CHANGELOG.CONTENT));
+
+            currentChangelog.add(changelogEntry);
+            currentCard.put("changelog", currentChangelog);
+            cards.put(thisId, currentCard);
+        }
+
+        return cards.toArray();
     }
 
+    // TODO: do we need to worry about failures?
+    private String determineStepStatus(Long completed, Long total){
+        if(total == 0) return "not started";
+        if(total == completed) return "passed";
+        return "pending";
+    }
 
     public LocalDateTime getLastUpdate(Project project) {
         //TODO: this is a placeholder value
@@ -385,5 +456,35 @@ public class DBConnector {
             items.add((Integer)record.get(idField));
         }
         return items;
+    }
+
+    private class JSONArrayMap extends HashMap<Integer, JSONArray>{
+        @Override
+        public JSONArray get(Object key) {
+            if(!this.containsKey(key)){
+                if(!(key instanceof Integer)) throw new UnsupportedOperationException("JSONArrayMap needs Integer for key, got " + key.getClass());
+                this.put((Integer)key, new JSONArray());
+            }
+            return super.get(key);
+        }
+    }
+
+    private class JSONObjectMap extends HashMap<Integer, JSONObject>{
+        @Override
+        public JSONObject get(Object key) {
+            if(!this.containsKey(key)){
+                if(!(key instanceof Integer)) throw new UnsupportedOperationException("JSONObjectMap needs Integer for key, got " + key.getClass());
+                this.put((Integer)key, new JSONObject());
+            }
+            return super.get(key);
+        }
+
+        public JSONArray toArray(){
+            JSONArray target = new JSONArray();
+            for (JSONObject object: this.values()){
+                target.add(object);
+            }
+            return target;
+        }
     }
 }
