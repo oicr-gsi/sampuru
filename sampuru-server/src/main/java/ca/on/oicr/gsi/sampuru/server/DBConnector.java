@@ -245,7 +245,7 @@ public class DBConnector {
             extractionStep.put("status", determineStepStatus((Long)extractionStep.get("completed"), (Long)extractionStep.get("total")));
             steps.add(extractionStep);
 
-            libraryPrepStep.put("type", "libraryPrep");
+            libraryPrepStep.put("type", "library_prep");
             libraryPrepStep.put("total", result.get(CASE_CARD.LIBRARY_PREPARATION_TOTAL));
             libraryPrepStep.put("completed", result.get(CASE_CARD.LIBRARY_PREPARATION_COMPLETED));
             libraryPrepStep.put("status", determineStepStatus((Long)libraryPrepStep.get("completed"), (Long)libraryPrepStep.get("total")));
