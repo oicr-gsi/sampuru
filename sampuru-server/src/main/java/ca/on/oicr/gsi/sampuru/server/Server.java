@@ -42,6 +42,8 @@ public class Server {
                     .get("/qcables_table", QCableService::getAllQcablesTableParams)
                     .get("/qcables_table/{filterType}/{filterId}", QCableService::getFilteredQcablesTableParams)
                     .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
+                    .get("/notifications-active", NotificationService::getActiveParams)
+                    .get("/notifications-historic", NotificationService::getAllParams) // This is the same as the all endpoint, just want naming consistency
                     .get("/search/{type}/{term}", Server::doSearch)
                     .get("/home", Server::helloWorld)
             )

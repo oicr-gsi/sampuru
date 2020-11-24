@@ -4,6 +4,7 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Notification;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -72,5 +73,24 @@ public class NotificationService extends Service<Notification> {
         }
 
         return jsonArray.toJSONString();
+    }
+
+    public static void getActiveParams(HttpServerExchange hse) {
+        NotificationService ns = new NotificationService();
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        hse.getResponseSender().send(ns.toJson(ns.getActiveNotifications()));
+    }
+
+    private List<Notification> getActiveNotifications() {
+        Result<Record> results = new DBConnector().getContext()
+                .select()
+                .from(NOTIFICATION)
+                .where(NOTIFICATION.RESOLVED_DATE.isNull())
+                .fetch();
+        List<Notification> newList = new LinkedList<>();
+        for(Record result: results){
+            newList.add(new Notification(result));
+        }
+        return newList;
     }
 }
