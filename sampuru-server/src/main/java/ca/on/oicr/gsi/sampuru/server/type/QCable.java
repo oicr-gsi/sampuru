@@ -6,11 +6,13 @@ import org.jooq.TableField;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
 
 public class QCable extends SampuruType {
+    public String id;
     public static final String CHANGELOG_IDS = "changelog_ids";
     public String OICRAlias;
     public String status;
@@ -20,12 +22,8 @@ public class QCable extends SampuruType {
     public Integer parentId;
     public List<Integer> changelog;
 
-    public QCable(int newId) throws Exception {
+    public QCable(String newId) throws Exception {
         getQCableFromDb(QCABLE.ID, newId);
-    }
-
-    public QCable(String alias) throws Exception {
-        getQCableFromDb(QCABLE.OICR_ALIAS, alias);
     }
 
     public QCable(Record row) {
@@ -62,7 +60,7 @@ public class QCable extends SampuruType {
         type = dbRecord.get(QCABLE.QCABLE_TYPE);
         parentId = dbRecord.get(QCABLE.PARENT_ID);
 
-        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.QCABLE_ID, id);
+        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.QCABLE_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
     }
 
     @Override

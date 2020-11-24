@@ -14,15 +14,19 @@ public abstract class Service<T extends SampuruType> {
         targetClass = newTarget;
     }
 
-    public T get(int id) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return targetClass.getDeclaredConstructor(int.class).newInstance(id);
+    public T get(String id) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        try {
+            return targetClass.getDeclaredConstructor(String.class).newInstance(id);
+        } catch (NoSuchMethodException nsme){
+            return targetClass.getDeclaredConstructor(int.class).newInstance(Integer.valueOf(id));
+        }
     }
 
     public static void getIdParams(Service targetService, HttpServerExchange hse) throws Exception {
         Deque<String> idparams = hse.getQueryParameters().get("id");
         Set<SampuruType> items = new HashSet<>();
         for(String id: idparams){
-            items.add(targetService.get(Integer.valueOf(id)));
+            items.add(targetService.get(id));
         }
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(targetService.toJson(items));

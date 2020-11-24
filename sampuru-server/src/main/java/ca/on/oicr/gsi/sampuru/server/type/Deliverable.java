@@ -10,6 +10,7 @@ import static tables_generated.Tables.*;
 
 
 public class Deliverable extends SampuruType {
+    public int id;
     public String content;
     public LocalDateTime expiryDate;
 

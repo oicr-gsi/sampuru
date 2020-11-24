@@ -6,24 +6,22 @@ import org.jooq.TableField;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
 public class Case extends SampuruType {
+    public String id;
     public static final String DELIVERABLE_IDS = "deliverable_ids";
     public static final String QCABLE_IDS = "qcable_ids";
     public static final String CHANGELOG_IDS = "changelog_ids";
     public String name;
     public List<Integer> deliverables;
-    public List<Integer> qcables;
+    public List<String> qcables;
     public List<Integer> changelog;
 
-    public Case(int newId) throws Exception {
+    public Case(String newId) throws Exception {
         getCaseFromDb(DONOR_CASE.ID, newId);
-    }
-
-    public Case(String newName) throws Exception {
-        getCaseFromDb(DONOR_CASE.NAME, newName);
     }
 
     public Case(Record row) throws Exception {
@@ -41,7 +39,7 @@ public class Case extends SampuruType {
 
     public List<QCable> getQcables() throws Exception {
         List<QCable> newList = new LinkedList<>();
-        for (Integer qcId: qcables){
+        for (String qcId: qcables){
             newList.add(new QCable(qcId));
         }
         return newList;
@@ -69,9 +67,9 @@ public class Case extends SampuruType {
         id = dbRecord.get(DONOR_CASE.ID);
         name = dbRecord.get(DONOR_CASE.NAME);
 
-        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.CASE_ID, id);
-        qcables = dbConnector.getChildIdList(QCABLE, QCABLE.CASE_ID, id);
-        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.CASE_ID, id);
+        changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.CASE_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());
+        qcables = dbConnector.getChildIdList(QCABLE, QCABLE.CASE_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;
+        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.CASE_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());
     }
 
     @Override

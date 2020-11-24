@@ -103,11 +103,11 @@ public class DBConnector {
         return newList;
     }
 
-    public List<Integer> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
-        List<Integer> newList = new LinkedList<>();
-        Field<Integer> idField = getFrom.field("id");
+    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
+        List<Object> newList = new LinkedList<>();
+        Field<Object> idField = getFrom.field("id");
 
-        Result<Record1<Integer>> idsFromDb = getContext()
+        Result<Record1<Object>> idsFromDb = getContext()
                 .select(idField)
                 .from(getFrom)
                 .where(matchField.eq(toMatch))
@@ -345,7 +345,7 @@ public class DBConnector {
         return ids;
     }
 
-    public JSONObject getSankeyTransitions(Integer projectId) throws SQLException {
+    public JSONObject getSankeyTransitions(String projectId) throws SQLException {
         JSONObject jsonObject = new JSONObject();
         Result<Record> shouldBeSingularResult = getContext()
                 .select()
@@ -413,7 +413,7 @@ public class DBConnector {
         return jsonObject;
     }
 
-    public JSONArray getQcableTable(List<Integer> caseIds){
+    public JSONArray getQcableTable(List<String> caseIds){
         JSONArray jsonArray = new JSONArray();
         Result<Record> result = getContext()
                 .select()
@@ -446,14 +446,14 @@ public class DBConnector {
         return jsonArray;
     }
 
-    public List<Integer> search(Table targetTable, TableField idField, TableField contentField, String term){
-        List<Integer> items = new LinkedList<>();
+    public List<Object> search(Table targetTable, TableField idField, TableField contentField, String term){
+        List<Object> items = new LinkedList<>();
         Result<Record> results = getContext()
                 .selectDistinct(idField)
                 .from(targetTable)
                 .where(contentField.like("%"+term+"%")).fetch();
         for(Record record: results){
-            items.add((Integer)record.get(idField));
+            items.add((record.get(idField)));
         }
         return items;
     }

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import static tables_generated.Tables.*;
 
 public class ChangelogEntry extends SampuruType {
+    public int id;
     public LocalDateTime changeDate;
     public String content;
 

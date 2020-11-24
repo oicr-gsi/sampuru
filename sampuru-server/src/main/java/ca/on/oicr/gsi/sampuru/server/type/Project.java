@@ -8,6 +8,7 @@ import org.jooq.TableField;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -15,20 +16,17 @@ public class Project extends SampuruType {
     public static final String INFO_ITEM_IDS = "info_item_ids";
     public static final String CASE_IDS = "case_ids";
     public static final String DELIVERABLE_IDS = "deliverable_ids";
+    public String id;
     public String name;
     public String contactName;
     public String contactEmail;
     public LocalDateTime completionDate;
     public List<Integer> infoItems = new LinkedList<>();
-    public List<Integer> donorCases = new LinkedList<>();
+    public List<String> donorCases = new LinkedList<>();
     public List<Integer> deliverables = new LinkedList<>();
 
-    public Project(int newId) throws Exception {
+    public Project(String newId) throws Exception {
         getProjectFromDb(PROJECT.ID, newId);
-    }
-
-    public Project(String newName) throws Exception {
-        getProjectFromDb(PROJECT.NAME, newName);
     }
 
     public Project(Record row) {
@@ -95,16 +93,16 @@ public class Project extends SampuruType {
         contactEmail = dbRecord.get(PROJECT.CONTACT_EMAIL);
         completionDate = dbRecord.get(PROJECT.COMPLETION_DATE);
 
-        infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id);
-        donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id);
-        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id);
+        infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
+        donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;
+        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
     }
 
     public List<QCable> getFailedQCables() throws Exception {
-        List<Integer> failedQCablesIds = new DBConnector().getFailedQCablesForProject(this.id);
+        List<String> failedQCablesIds = new DBConnector().getFailedQCablesForProject(this.id);
         List<QCable> failedQCables = new LinkedList<>();
 
-        for(Integer failureId: failedQCablesIds){
+        for(String failureId: failedQCablesIds){
             failedQCables.add(new QCable(failureId));
         }
 
