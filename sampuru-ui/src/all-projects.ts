@@ -6,8 +6,8 @@ import {
 import {
   decodeProject,
   fetchAsPromise,
-  Project, ProjectJSON
 } from "./io";
+import {Project, ProjectJSON} from "./data-transfer-objects";
 
 export function activeProjects(projects: Project[]): HTMLElement {
   const cardContainer = document.createElement("div");
@@ -17,7 +17,7 @@ export function activeProjects(projects: Project[]): HTMLElement {
   projects
     .forEach((project) => {
       const card_content = cardContent(project.cases_total, project.cases_completed, project.qcables_total, project.qcables_completed);
-      const card: Card = {contents: card_content, header: project.name, title: project.name, tagId: project.name}
+      const card: Card = {contents: card_content, header: project.name, title: project.name, tagId: project.name};
       cards.push(collapsibleCard(null, card));
     })
 

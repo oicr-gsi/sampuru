@@ -28,6 +28,29 @@ export interface CardElement {
   collapse: boolean;
 }
 
+export interface TableCell {
+  /**
+   * Class name for the table cell
+   */
+  className?: string;
+  /**
+   * A callback if the cell is clicked
+   */
+  click?: ClickHandler;
+  /**
+   * The elements that should be in the cell.
+   */
+  contents: DOMElement;
+  /**
+   * If true, the cell is a header; if false or absent, it is a data cell.
+   */
+  header?: boolean;
+  /**
+   * A tooltip for the cell
+   */
+  title?: string;
+}
+
 export interface LinkElement {
   type: "a";
 
@@ -77,6 +100,7 @@ export type DOMElement =
   | DisplayElement
   | CardElement
   | ComplexElement<HTMLElement>
+  | DOMElement[]
 
 function addElements(
   target: HTMLElement,
@@ -114,6 +138,7 @@ function addElements(
           }
             break;
           case "card": {
+            //todo: not currently working
             const linkElement = link(result.header, "#", "card-link"); //todo: data-toggle: collapse attribute
             const cardHeader = elementFromTag("div", "card-header", linkElement);
 
@@ -128,18 +153,95 @@ function addElements(
                 cardBody.className += " show"
               }
             }
-
             cardBody.appendChild(cardBodyInner.element);
-
-
-
-
         }
       }
     }
+    });
 }
 
-);
+
+export function elementFromTag<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className: string | null,
+  ...elements: DOMElement[]
+): ComplexElement<HTMLElementTagNameMap[K]> {
+  const target = document.createElement(tag);
+  if (typeof className == "string") {
+    target.className = className;
+  }
+  addElements(target, ...elements);
+  return {element: target, type: "complex"};
+}
+
+/**
+ * Display a table from the supplied items.
+ * @param rows - the items to use for each row
+ * @param headers - a list of columns, each with a title and a function to render that column for each row
+ */
+export function table<T>(
+  rows: T[],
+  ...headers: [DOMElement, (value: T) => DOMElement][]
+): DOMElement {
+  if (rows.length == 0) return [];
+  return elementFromTag("table", "table",
+    elementFromTag("tr", null,
+      headers.map(([name, _func]) => elementFromTag("th", null, name))
+    ),
+    rows.map((row) =>
+      elementFromTag("tr", null,
+        headers.map(([_name, func]) => elementFromTag("td", null, func(row)))
+      )
+    )
+  );
+}
+
+/**
+ * Create a table from a collection of rows
+ */
+export function tableFromRows(
+  className: string | null,
+  rows: ComplexElement<HTMLTableRowElement>[]
+): DOMElement {
+  if (rows.length == 0) return [];
+  return elementFromTag("table", (typeof className == "string") ? className : null, ...rows);
+}
+
+/**
+ * Create a single row to put in a table
+ * @param click an optional click handler
+ * @param cells the cells to put in this row
+ */
+export function tableRow(
+  click: ClickHandler | null,
+  ...cells: TableCell[]
+): ComplexElement<HTMLTableRowElement> {
+  const row = elementFromTag("tr", null,
+    cells.map(({ className, click, contents, header, title }) => {
+      const cell = elementFromTag(
+        header ? "th" : "td",
+        (typeof className == "string") ? className : null,
+        contents);
+
+      if (click) {
+        cell.element.style.cursor = "pointer";
+        cell.element.addEventListener("click", (e) => {
+          e.stopPropagation();
+          click(e);
+        });
+      }
+
+      if (title) {
+        cell.element.title = title;
+      }
+      return cell;
+    })
+  );
+  if (click) {
+    row.element.style.cursor = "pointer";
+    row.element.addEventListener("click", click);
+  }
+  return row;
 }
 
 /**
@@ -156,19 +258,6 @@ export function link(
   title?: string
 ): LinkElement {
   return { type: "a", url: url, innerText: innerText.toString(), title: title || "", className: className}
-}
-
-export function elementFromTag<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string | null,
-  ...elements: DOMElement[]
-): ComplexElement<HTMLElementTagNameMap[K]> {
-  const target = document.createElement(tag);
-  if (typeof className == "string") {
-    target.className = className;
-  }
-  addElements(target, ...elements);
-  return {element: target, type: "complex"};
 }
 
 /**
@@ -315,7 +404,7 @@ export function progressBar(
   progress.setAttribute("style", "position:relative");
 
   const progressBar = document.createElement("div");
-  progressBar.className = "progress-bar bg-success";
+  progressBar.className = "progress-bar bg-primary";
   const casesPercentCompleted = Math.floor((completed / total) * 100);
   progressBar.setAttribute("style", "width:" + casesPercentCompleted.toString() + "%");
 
