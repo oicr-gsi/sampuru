@@ -59,3 +59,9 @@ ALTER TABLE changelog ADD CONSTRAINT changelog_case_id_match FOREIGN KEY (case_i
 ALTER TABLE changelog ADD CONSTRAINT changelog_qcable_id_match FOREIGN KEY (qcable_id) REFERENCES qcable (id);
 ALTER TABLE project_info_item ADD CONSTRAINT project_info_item_project_id_match FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE;
 ALTER TABLE qcable ADD CONSTRAINT qcable_parent_id_match FOREIGN KEY (parent_id) REFERENCES qcable (id);
+
+CREATE INDEX ON qcable(id);
+CREATE INDEX ON qcable(project_id);
+CREATE INDEX ON qcable(case_id);
+CREATE INDEX ON qcable(parent_id);
+CREATE INDEX ON donor_case(project_id);
