@@ -26,10 +26,6 @@ public class ProjectService extends Service<Project> {
         super(Project.class);
     }
 
-    public Project get(String name){
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
     public static void getIdParams(HttpServerExchange hse) throws Exception {
         getIdParams(new ProjectService(), hse);
     }

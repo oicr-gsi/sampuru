@@ -43,7 +43,7 @@ public class CaseService extends Service<Case> {
         ProjectService ps = new ProjectService();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         //TODO: maybe in the future we'll want the opportunity for this to be blank
-        Integer projectId = Integer.valueOf(ptm.getParameters().get("projectId"));
+        String projectId = ptm.getParameters().get("projectId");
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(cs.getCardJson(ps.get(projectId).donorCases));
     }

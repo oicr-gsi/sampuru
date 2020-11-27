@@ -462,7 +462,7 @@ public class DBConnector {
         @Override
         public JSONArray get(Object key) {
             if(!this.containsKey(key)){
-                if(!(key instanceof Integer)) throw new UnsupportedOperationException("JSONArrayMap needs Integer for key, got " + key.getClass());
+                if(!(key instanceof String)) throw new UnsupportedOperationException("JSONArrayMap needs String for key, got " + key.getClass());
                 this.put((String)key, new JSONArray());
             }
             return super.get(key);
@@ -473,7 +473,7 @@ public class DBConnector {
         @Override
         public JSONObject get(Object key) {
             if(!this.containsKey(key)){
-                if(!(key instanceof Integer)) throw new UnsupportedOperationException("JSONObjectMap needs Integer for key, got " + key.getClass());
+                if(!(key instanceof String)) throw new UnsupportedOperationException("JSONObjectMap needs String for key, got " + key.getClass());
                 this.put((String)key, new JSONObject());
             }
             return super.get(key);
