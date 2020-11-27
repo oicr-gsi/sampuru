@@ -3,12 +3,15 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
 module.exports = {
-  entry: './sampuru-ui/src/index.ts',
-  mode: "development",
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'index.js'
+  // https://webpack.js.org/concepts/entry-points/#multi-page-application
+  entry: {
+    index: './sampuru-ui/src/index.ts',
+    project: './sampuru-ui/src/project-overview.ts',
+    qcables: './sampuru-ui/src/qcables.ts',
+    cases: './sampuru-ui/src/cases.ts'
   },
+  mode: "development",
+  // https://webpack.js.org/configuration/dev-server/
   devServer: {
     open: true,
     port: 8080,
@@ -23,6 +26,7 @@ module.exports = {
       "Access-Control-Allow-Origin": "*",
     }
   },
+  // https://webpack.js.org/concepts/loaders/
   module: {
     rules: [
       {
@@ -55,10 +59,31 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts']
   },
+  // https://webpack.js.org/concepts/plugins/
   plugins: [
     new HtmlWebpackPlugin({
       template: "sampuru-server/src/main/resources/static/index.html",
-      inject: false
+      inject: false,
+      chunks: ['index'],
+      filename: "index.html"
+    }),
+    new HtmlWebpackPlugin({
+      template: "sampuru-server/src/main/resources/static/project.html",
+      inject: false,
+      chunks: ['project-overview'],
+      filename: "project.html"
+    }),
+    new HtmlWebpackPlugin({
+      template: "sampuru-server/src/main/resources/static/qcables.html",
+      inject: false,
+      chunks: ['qcables'],
+      filename: "qcables.html"
+    }),
+    new HtmlWebpackPlugin({
+      template: "sampuru-server/src/main/resources/static/cases.html",
+      inject: false,
+      chunks: ['cases'],
+      filename: "cases.html"
     }),
     new MiniCssExtractPlugin({
       filename: 'index.css',

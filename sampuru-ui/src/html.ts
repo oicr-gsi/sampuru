@@ -1,6 +1,8 @@
 /**
  * The callback for handling mouse events
  */
+import {initialiseQCables} from "./qcables";
+import {Project} from "./data-transfer-objects";
 
 export type ClickHandler = (e: MouseEvent) => void;
 
@@ -101,6 +103,7 @@ export type DOMElement =
   | CardElement
   | ComplexElement<HTMLElement>
   | DOMElement[]
+
 
 function addElements(
   target: HTMLElement,
@@ -420,15 +423,12 @@ export function progressBar(
 }
 
 export function cardContent(
-  cases_total: number,
-  cases_completed: number,
-  qcables_total: number,
-  qcables_completed: number
+  project: Project
 ): HTMLElement {
 
-  //todo: refactor so this is extensible to other pages
-  const casesProgress = progressBar(cases_total, cases_completed);
-  const qcablesProgress = progressBar(qcables_total, qcables_completed);
+  //todo: refactor so it's extensible to other pages
+  const casesProgress = progressBar(project.cases_total, project.cases_completed);
+  const qcablesProgress = progressBar(project.qcables_total, project.qcables_completed);
 
   const cases = document.createElement("div");
   cases.className = "cases";
@@ -442,7 +442,15 @@ export function cardContent(
   const qcables = document.createElement("div");
   qcables.className = "qcables";
 
-  const qcablesTitle = document.createElement("h6");
+  const qcablesTitle = document.createElement("a");
+  qcablesTitle.addEventListener("click", () => {
+    sessionStorage.setItem("qcables-filter-type", "project");
+    sessionStorage.setItem("qcables-filter-id", project.id.toString());
+    sessionStorage.setItem("qcables-filter-name", project.name);
+  });
+  qcablesTitle.href = "qcables.html";
+
+
   qcablesTitle.innerText = "QCables";
 
   qcables.appendChild(qcablesTitle);
