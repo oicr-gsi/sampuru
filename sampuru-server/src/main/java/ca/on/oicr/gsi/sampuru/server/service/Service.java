@@ -14,11 +14,11 @@ public abstract class Service<T extends SampuruType> {
         targetClass = newTarget;
     }
 
-    public T get(String id) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public T get(Object id) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         try {
             return targetClass.getDeclaredConstructor(String.class).newInstance(id);
         } catch (NoSuchMethodException nsme){
-            return targetClass.getDeclaredConstructor(int.class).newInstance(Integer.valueOf(id));
+            return targetClass.getDeclaredConstructor(int.class).newInstance(id);
         }
     }
 

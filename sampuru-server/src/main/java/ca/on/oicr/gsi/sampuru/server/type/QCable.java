@@ -19,7 +19,7 @@ public class QCable extends SampuruType {
     public String failureReason;
     public String libraryDesign;
     public String type;
-    public Integer parentId;
+    public String parentId;
     public List<Integer> changelog;
 
     public QCable(String newId) throws Exception {

@@ -14,6 +14,7 @@ import tables_generated.tables.Changelog;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -49,7 +50,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
 
     @Override
     public List<ChangelogEntry> search(String term) throws Exception{
-        List<Integer> ids = new DBConnector().search(CHANGELOG, CHANGELOG.ID, CHANGELOG.CONTENT, term);
+        List<Integer> ids = new DBConnector().search(CHANGELOG, CHANGELOG.ID, CHANGELOG.CONTENT, term).stream().map(o -> (Integer)o).collect(Collectors.toList());
         List<ChangelogEntry> changelogs = new LinkedList<>();
 
         for (Integer id: ids){
