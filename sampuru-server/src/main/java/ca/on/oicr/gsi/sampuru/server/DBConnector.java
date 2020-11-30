@@ -152,7 +152,7 @@ public class DBConnector {
         return projectsIdsList;
     }
 
-    // TODO: these aren't killer for now, but would be great to move this to a field of Project to save on db connections
+    // TODO: these are killer now, move this to a field of Project to save on db connections
     public Integer getCasesTotal(Project project) {
         Result<Record1<Integer>> result = getContext()
                 .selectCount()
