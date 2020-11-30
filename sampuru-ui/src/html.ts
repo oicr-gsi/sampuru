@@ -1,7 +1,6 @@
 /**
  * The callback for handling mouse events
  */
-import {initialiseQCables} from "./qcables";
 import {Project} from "./data-transfer-objects";
 
 export type ClickHandler = (e: MouseEvent) => void;
@@ -200,20 +199,20 @@ export function table<T>(
 }
 
 /**
- * Create a table from a collection of rows
+ * Create a table body from a collection of rows
  */
-export function tableFromRows(
+export function tableBodyFromRows(
   className: string | null,
   rows: ComplexElement<HTMLTableRowElement>[]
-): DOMElement {
-  if (rows.length == 0) return [];
-  return elementFromTag("table", (typeof className == "string") ? className : null, ...rows);
+): HTMLElement {
+  const tbody = elementFromTag("tbody", (typeof className == "string") ? className : null, ...rows);
+  return tbody.element;
 }
 
 /**
  * Create a single row to put in a table
- * @param click an optional click handler
- * @param cells the cells to put in this row
+ * @param click - an optional click handler
+ * @param cells - the cells to put in this row
  */
 export function tableRow(
   click: ClickHandler | null,
@@ -245,6 +244,47 @@ export function tableRow(
     row.element.addEventListener("click", click);
   }
   return row;
+}
+
+
+/**
+ * Instantiate Bootstrap table
+ * @param headers -> map of data-field to header innerText
+ * @param pagination -> boolean for paginating table
+ * @param search -> boolean for adding a search to table
+ * */
+export function bootstrapTable(
+  headers: Map<string, string>,
+  pagination: boolean,
+  search: boolean
+): HTMLElement {
+  
+  const table = document.createElement("table");
+  table.id = "table";
+  table.setAttribute("data-toggle", "table");
+
+  if (pagination) {
+    table.setAttribute("data-pagination", "true");
+  }
+
+  if (search) {
+    table.setAttribute("data-search", "true");
+  }
+
+  const thead = document.createElement("thead");
+  const tr = document.createElement("tr");
+
+  headers
+    .forEach((header, data, map) => {
+      const cell = document.createElement("th");
+      cell.setAttribute("data-field", data);
+      cell.innerText = header;
+      tr.appendChild(cell);
+    });
+
+  thead.appendChild(tr);
+  table.appendChild(thead);
+  return table;
 }
 
 /**
@@ -443,15 +483,13 @@ export function cardContent(
   qcables.className = "qcables";
 
   const qcablesTitle = document.createElement("a");
+  qcablesTitle.innerText = "QCables";
   qcablesTitle.addEventListener("click", () => {
     sessionStorage.setItem("qcables-filter-type", "project");
     sessionStorage.setItem("qcables-filter-id", project.id.toString());
     sessionStorage.setItem("qcables-filter-name", project.name);
   });
   qcablesTitle.href = "qcables.html";
-
-
-  qcablesTitle.innerText = "QCables";
 
   qcables.appendChild(qcablesTitle);
   qcables.appendChild(qcablesProgress);
