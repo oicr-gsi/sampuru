@@ -13,17 +13,19 @@ import java.util.stream.Collectors;
 import static tables_generated.Tables.*;
 
 public class Project extends SampuruType {
-    public static final String INFO_ITEM_IDS = "info_item_ids";
-    public static final String CASE_IDS = "case_ids";
-    public static final String DELIVERABLE_IDS = "deliverable_ids";
-    public String id;
-    public String name;
-    public String contactName;
-    public String contactEmail;
-    public LocalDateTime completionDate;
-    public List<Integer> infoItems = new LinkedList<>();
+    public static final String INFO_ITEM_IDS = "info_item_ids",
+            CASE_IDS = "case_ids",
+            DELIVERABLE_IDS = "deliverable_ids",
+            CASES_TOTAL = "cases_total",
+            CASES_COMPLETED = "cases_completed",
+            QCABLES_TOTAL = "qcables_total",
+            QCABLES_COMPLETED = "qcables_completed";
+
+    public String id, name, contactName, contactEmail;
+    public LocalDateTime completionDate, lastUpdate;
+    public List<Integer> infoItems = new LinkedList<>(), deliverables = new LinkedList<>();
     public List<String> donorCases = new LinkedList<>();
-    public List<Integer> deliverables = new LinkedList<>();
+    public int casesTotal, casesCompleted, qcablesTotal, qcablesCompleted;
 
     public Project(String newId) throws Exception {
         getProjectFromDb(PROJECT.ID, newId);
@@ -62,26 +64,6 @@ public class Project extends SampuruType {
             deliverableList.add(new Deliverable(i));
         }
         return deliverableList;
-    }
-
-    public Integer getCasesTotal(){
-        return new DBConnector().getCasesTotal(this);
-    }
-
-    public Integer getCasesCompleted(){
-        return new DBConnector().getCasesCompleted(this);
-    }
-
-    public Integer getQCablesTotal(){
-        return new DBConnector().getQCablesTotal(this);
-    }
-
-    public Integer getQCablesCompleted(){
-        return new DBConnector().getQCablesCompleted(this);
-    }
-
-    public LocalDateTime getLastUpdate(){
-        return new DBConnector().getLastUpdate(this);
     }
 
     private void getProjectFromDb(TableField field, Object toMatch) throws Exception {

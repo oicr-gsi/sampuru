@@ -25,7 +25,7 @@ public class Server {
      */
     private final static HttpHandler ROUTES = Handlers.path()
             .addPrefixPath("/api", new RoutingHandler()
-                    // Normal REST endpoints
+                    // Normal REST endpoints. P sure ALL of these are tech debt
                     .get("/projects", ProjectService::getAllParams)
                     .get("/project/{id}", ProjectService::getIdParams) // TODO: update to use Row probably
                     .get("/cases", CaseService::getAllParams)
