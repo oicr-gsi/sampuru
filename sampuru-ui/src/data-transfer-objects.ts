@@ -2,7 +2,7 @@
  * Data returned from api/active_projects
  * */
 export interface Project {
-  id: number,
+  id: string,
   name: string,
   cases_total: number,
   cases_completed: number,
@@ -12,7 +12,7 @@ export interface Project {
 }
 
 export interface ProjectJSON {
-  id: number,
+  id: string,
   name: string,
   cases_total: number,
   cases_completed: number,
@@ -38,7 +38,7 @@ export interface SankeyTransition {
 }
 
 export interface ProjectInfo {
-  id: number,
+  id: string,
   name: string,
   contact_name: string,
   contact_email: string,
@@ -54,8 +54,8 @@ export interface ProjectInfo {
 }
 
 export interface QCable {
-  project_id: number,
-  case_id: number,
+  project_id: string,
+  case_id: string,
   tissue_qcable_alias: string | null,
   tissue_qcable_status: string | null,
   extraction_qcable_alias: string | null,

@@ -108,7 +108,7 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
 export function initialiseQCables(filterType: string, filterId: string, filterName: string) {
   const closeBusy = busyDialog();
 
-  fetchAsPromise<QCable[]>("api/qcables_table/" + filterType + "/" + filterId.toString(), {body: null})
+  fetchAsPromise<QCable[]>("api/qcables_table/" + filterType + "/" + filterId, {body: null})
     .then((data) => {
       qcablesTable(data, filterName);
     })

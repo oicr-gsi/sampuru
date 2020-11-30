@@ -499,7 +499,7 @@ export function projectCard(
   const casesTitle = document.createElement("a");
   casesTitle.innerText = "Cases";
   casesTitle.addEventListener("click", () => {
-    sessionStorage.setItem("cases-project-id", project.id.toString());
+    sessionStorage.setItem("cases-project-id", project.id);
   });
   casesTitle.href = "cases.html";
 
@@ -513,7 +513,7 @@ export function projectCard(
   qcablesTitle.innerText = "QCables";
   qcablesTitle.addEventListener("click", () => {
     sessionStorage.setItem("qcables-filter-type", "project");
-    sessionStorage.setItem("qcables-filter-id", project.id.toString());
+    sessionStorage.setItem("qcables-filter-id", project.id);
     sessionStorage.setItem("qcables-filter-name", project.name);
   });
   qcablesTitle.href = "qcables.html";
