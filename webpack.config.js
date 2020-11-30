@@ -5,7 +5,7 @@ module.exports = {
   // https://webpack.js.org/concepts/entry-points/#multi-page-application
   entry: {
     index: './sampuru-ui/src/index.ts',
-    project: './sampuru-ui/src/project-overview.ts',
+    project: './sampuru-ui/src/project.ts',
     qcables: './sampuru-ui/src/qcables.ts',
     cases: './sampuru-ui/src/cases.ts'
   },
@@ -58,7 +58,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "sampuru-server/src/main/resources/static/project.html",
       inject: false,
-      chunks: ['project-overview'],
+      chunks: ['project'],
       filename: "project.html"
     }),
     new HtmlWebpackPlugin({

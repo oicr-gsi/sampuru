@@ -1,4 +1,4 @@
-import {Project, ProjectJSON} from "./data-transfer-objects";
+import {Project, ProjectJSON} from "./data-transfer-objects.js";
 
 /**
  * Perform JSON fetch operation with a callback

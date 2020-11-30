@@ -27,6 +27,16 @@ export interface ProjectJSON {
  *
  */
 
+export interface SankeyTransition {
+  receipt: {total: number, pending: number, passed: number, failed: number},
+  extraction: {total: number, pending: number, passed: number, failed: number},
+  library_preparation: {total: number, pending: number, passed: number, failed: number},
+  low_pass_sequencing: {total: number, pending: number, passed: number, failed: number},
+  full_depth_sequencing: {total: number, pending: number, passed: number, failed: number},
+  informatics_interpretation: {total: number, pending: number, passed: number, failed: number},
+  final_report: {total: number, pending: number, passed: number, failed: number},
+}
+
 export interface ProjectInfo {
   id: number,
   name: string,
@@ -34,7 +44,7 @@ export interface ProjectInfo {
   contact_email: string,
   info_items: string[],
   failures: string[],
-  sankey_transitions: Map<string, Map<string, string>>,
+  sankey_transitions: SankeyTransition,
   deliverables: string[],
   qcables_total: number,
   qcables_completed: number,
@@ -60,4 +70,22 @@ export interface QCable {
   informatics_interpretation_qcable_status: string | null,
   final_report_qcable_alias: string | null,
   final_report_qcable_status: string | null
+}
+
+export interface Step {
+  total: number,
+  completed: number,
+  type: string,
+  status: string
+}
+
+export interface Bar {
+  library_design: string | null,
+  steps: Step[]
+}
+
+export interface Case {
+  name: string,
+  id: number,
+  bars: Bar[]
 }

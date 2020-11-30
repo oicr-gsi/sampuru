@@ -1,7 +1,11 @@
+<<<<<<< HEAD
+import {Case, Project} from "./data-transfer-objects.js";
+
+=======
+>>>>>>> 2d25c05... First pass of UI refactor
 /**
  * The callback for handling mouse events
  */
-import {Project} from "./data-transfer-objects";
 
 export type ClickHandler = (e: MouseEvent) => void;
 
@@ -29,6 +33,7 @@ export interface CardElement {
   collapse: boolean;
 }
 
+<<<<<<< HEAD
 export interface TableCell {
   /**
    * Class name for the table cell
@@ -52,6 +57,8 @@ export interface TableCell {
   title?: string;
 }
 
+=======
+>>>>>>> 2d25c05... First pass of UI refactor
 export interface LinkElement {
   type: "a";
 
@@ -101,8 +108,10 @@ export type DOMElement =
   | DisplayElement
   | CardElement
   | ComplexElement<HTMLElement>
+<<<<<<< HEAD
   | DOMElement[]
-
+=======
+>>>>>>> 2d25c05... First pass of UI refactor
 
 function addElements(
   target: HTMLElement,
@@ -140,12 +149,16 @@ function addElements(
           }
             break;
           case "card": {
+<<<<<<< HEAD
             //todo: not currently working
+=======
+>>>>>>> 2d25c05... First pass of UI refactor
             const linkElement = link(result.header, "#", "card-link"); //todo: data-toggle: collapse attribute
             const cardHeader = elementFromTag("div", "card-header", linkElement);
 
             const cardBodyInner = elementFromTag("div", "card-body", result.contents);
 
+<<<<<<< HEAD
             const cardBody = document.createElement("div");
             cardBody.id = `#${result.id}`;
 
@@ -156,12 +169,12 @@ function addElements(
               }
             }
             cardBody.appendChild(cardBodyInner.element);
+
         }
       }
     }
     });
 }
-
 
 export function elementFromTag<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -287,6 +300,46 @@ export function bootstrapTable(
   return table;
 }
 
+export function caseCard(
+  caseContent: Case
+): HTMLElement {
+
+  const caseProgess: DOMElement[] = [];
+  caseContent.bars.forEach((bar) => {
+    const steps: DOMElement[] = [];
+    bar.steps.forEach((step) => {
+      steps.push(elementFromTag("div", "col", step.type + ": ", step.completed.toString() + "/" + step.total.toString()));
+    });
+    caseProgess.push(elementFromTag("div", "row",
+      elementFromTag("div", "col", bar.library_design + ": "), steps));
+  });
+
+  const container = elementFromTag("div", "container", caseProgess);
+  return container.element;
+
+=======
+            if(result.collapse) {
+              let className = "collapse";
+              if(result.show) {
+                className = `${className} show`;
+              }
+            }
+
+            const cardBody = document.createElement("div");
+            cardBody.id = `#${result.id}`;
+
+
+
+
+        }
+      }
+    }
+}
+
+);
+>>>>>>> 2d25c05... First pass of UI refactor
+}
+
 /**
  *
  * @param innerText - label for the link
@@ -302,6 +355,22 @@ export function link(
 ): LinkElement {
   return { type: "a", url: url, innerText: innerText.toString(), title: title || "", className: className}
 }
+<<<<<<< HEAD
+=======
+
+export function elementFromTag<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className: string | null,
+  ...elements: DOMElement[]
+): ComplexElement<HTMLElementTagNameMap[K]> {
+  const target = document.createElement(tag);
+  if (typeof className == "string") {
+    target.className = className;
+  }
+  addElements(target, ...elements);
+  return {element: target, type: "complex"};
+}
+>>>>>>> 2d25c05... First pass of UI refactor
 
 /**
  * The contents of a card
@@ -343,7 +412,7 @@ export function navbar(): HTMLElement {
   const sampuru = document.createElement("a");
   sampuru.className = "navbar-brand";
   sampuru.innerText = "Sampuru";
-  sampuru.href = "#";
+  sampuru.href = "/";
 
   const searchForm = document.createElement("form");
   searchForm.className = "form-inline mx-lg-auto";
@@ -390,11 +459,19 @@ export function collapsibleCard(
   content: Card
 ): HTMLElement {
 
+  /*
   let attributes = new Map();
   attributes.set('data-toggle', 'collapse');
   attributes.set('href', `#${content.tagId}`);
 
-  const cardLink = createLinkElement("card-link", content.header, attributes, null);
+  const cardLink = createLinkElement("card-link", content.header, attributes, null);*/
+
+  const cardLink = document.createElement("a");
+  cardLink.innerText = content.header;
+  cardLink.addEventListener("click", () => {
+    sessionStorage.setItem("project-overview-id", content.tagId);
+  });
+  cardLink.href = "project.html";
 
   const cardHeader = document.createElement("div");
   cardHeader.className = "card-header";
@@ -405,7 +482,6 @@ export function collapsibleCard(
   cardBodyInner.appendChild(content.contents);
 
   const cardBody = document.createElement("div");
-  cardBody.id = `#${content.tagId}`;
   cardBody.className = "collapse show";
   cardBody.appendChild(cardBodyInner);
 
@@ -419,12 +495,8 @@ export function collapsibleCard(
 export function staticCard(
   content: Card
 ): HTMLElement {
-  //todo: populate url with path to project info page
-  const cardHeaderLink = createLinkElement("card-link", content.header, null, "project-link");
 
-  const cardHeader = document.createElement("div");
-  cardHeader.className = "card-header";
-  cardHeader.appendChild(cardHeaderLink);
+  const cardHeader = elementFromTag("div", "card-header", content.header);
 
   const cardBody = document.createElement("div");
   cardBody.className = "card-body";
@@ -432,7 +504,7 @@ export function staticCard(
 
   const card = document.createElement("div");
   card.className = "card";
-  card.appendChild(cardHeader);
+  card.appendChild(cardHeader.element);
   card.appendChild(cardBody);
   return card;
 }
@@ -447,7 +519,12 @@ export function progressBar(
   progress.setAttribute("style", "position:relative");
 
   const progressBar = document.createElement("div");
+<<<<<<< HEAD
   progressBar.className = "progress-bar bg-primary";
+
+=======
+  progressBar.className = "progress-bar bg-success";
+>>>>>>> 2d25c05... First pass of UI refactor
   const casesPercentCompleted = Math.floor((completed / total) * 100);
   progressBar.setAttribute("style", "width:" + casesPercentCompleted.toString() + "%");
 
@@ -462,7 +539,7 @@ export function progressBar(
   return progress;
 }
 
-export function cardContent(
+export function projectCard(
   project: Project
 ): HTMLElement {
 
@@ -473,8 +550,12 @@ export function cardContent(
   const cases = document.createElement("div");
   cases.className = "cases";
 
-  const casesTitle = document.createElement("h6");
+  const casesTitle = document.createElement("a");
   casesTitle.innerText = "Cases";
+  casesTitle.addEventListener("click", () => {
+    sessionStorage.setItem("cases-project-id", project.id.toString());
+  });
+  casesTitle.href = "cases.html";
 
   cases.appendChild(casesTitle);
   cases.appendChild(casesProgress);
