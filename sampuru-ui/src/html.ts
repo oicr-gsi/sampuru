@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import {Case, Project} from "./data-transfer-objects.js";
 
-=======
->>>>>>> 2d25c05... First pass of UI refactor
 /**
  * The callback for handling mouse events
  */
@@ -33,7 +30,6 @@ export interface CardElement {
   collapse: boolean;
 }
 
-<<<<<<< HEAD
 export interface TableCell {
   /**
    * Class name for the table cell
@@ -57,8 +53,6 @@ export interface TableCell {
   title?: string;
 }
 
-=======
->>>>>>> 2d25c05... First pass of UI refactor
 export interface LinkElement {
   type: "a";
 
@@ -108,10 +102,7 @@ export type DOMElement =
   | DisplayElement
   | CardElement
   | ComplexElement<HTMLElement>
-<<<<<<< HEAD
   | DOMElement[]
-=======
->>>>>>> 2d25c05... First pass of UI refactor
 
 function addElements(
   target: HTMLElement,
@@ -149,16 +140,12 @@ function addElements(
           }
             break;
           case "card": {
-<<<<<<< HEAD
             //todo: not currently working
-=======
->>>>>>> 2d25c05... First pass of UI refactor
             const linkElement = link(result.header, "#", "card-link"); //todo: data-toggle: collapse attribute
             const cardHeader = elementFromTag("div", "card-header", linkElement);
 
             const cardBodyInner = elementFromTag("div", "card-body", result.contents);
 
-<<<<<<< HEAD
             const cardBody = document.createElement("div");
             cardBody.id = `#${result.id}`;
 
@@ -317,27 +304,6 @@ export function caseCard(
   const container = elementFromTag("div", "container", caseProgess);
   return container.element;
 
-=======
-            if(result.collapse) {
-              let className = "collapse";
-              if(result.show) {
-                className = `${className} show`;
-              }
-            }
-
-            const cardBody = document.createElement("div");
-            cardBody.id = `#${result.id}`;
-
-
-
-
-        }
-      }
-    }
-}
-
-);
->>>>>>> 2d25c05... First pass of UI refactor
 }
 
 /**
@@ -355,22 +321,6 @@ export function link(
 ): LinkElement {
   return { type: "a", url: url, innerText: innerText.toString(), title: title || "", className: className}
 }
-<<<<<<< HEAD
-=======
-
-export function elementFromTag<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string | null,
-  ...elements: DOMElement[]
-): ComplexElement<HTMLElementTagNameMap[K]> {
-  const target = document.createElement(tag);
-  if (typeof className == "string") {
-    target.className = className;
-  }
-  addElements(target, ...elements);
-  return {element: target, type: "complex"};
-}
->>>>>>> 2d25c05... First pass of UI refactor
 
 /**
  * The contents of a card
@@ -519,12 +469,8 @@ export function progressBar(
   progress.setAttribute("style", "position:relative");
 
   const progressBar = document.createElement("div");
-<<<<<<< HEAD
   progressBar.className = "progress-bar bg-primary";
 
-=======
-  progressBar.className = "progress-bar bg-success";
->>>>>>> 2d25c05... First pass of UI refactor
   const casesPercentCompleted = Math.floor((completed / total) * 100);
   progressBar.setAttribute("style", "width:" + casesPercentCompleted.toString() + "%");
 
