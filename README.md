@@ -1,6 +1,9 @@
 # Getting started
 
+`npm install` to download dependencies in `package.json`
+
 `tsc -p sampuru-ui`
+
 `mvn clean install`
 
 ## Minimum version requirements

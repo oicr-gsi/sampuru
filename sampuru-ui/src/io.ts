@@ -1,22 +1,4 @@
-export interface Project {
-  id: number,
-  name: string,
-  cases_total: number,
-  cases_completed: number,
-  qcables_total: number,
-  qcables_completed: number,
-  last_update: Date,
-}
-
-export interface ProjectJSON {
-  id: number,
-  name: string,
-  cases_total: number,
-  cases_completed: number,
-  qcables_total: number,
-  qcables_completed: number,
-  last_update: string,
-}
+import {Project, ProjectJSON} from "./data-transfer-objects.js";
 
 /**
  * Perform JSON fetch operation with a callback

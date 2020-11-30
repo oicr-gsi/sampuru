@@ -3,35 +3,40 @@
 - `npm run` to do various tasks
 - `webpack` to build and serve UI development
 
+
 - `package.json` contains modules to download
 - `tsconfig.json` configures the TypeScript compiler `tsc`
 - `webpack.config.js` configures WebPack
 
 ## Minimum version requirements
 
-node >= 14
-npm >= 6
-tsc >= 3 
+* `Java 14`
+* `node >= 14`
+* `npm >= 6`
+* `tsc >= 3` 
 
 ## Downloading dependencies
 In order to download the dependencies in package.json:
-`yarn install`
-
-or 
 
 `npm install`
 
+or 
+
+`yarn install`
+
+
 ## Run scripts in package.json
 npm run `script_name`
-So execute the build script:
-npm run build
 
-This will transpile the TypeScript into js files that are outputted in 
-`sampuru-server/src/main/resources/ca/on/oicr/gsi/sampuru`
 
-For the Server to read 
+In order to transpile the TypeScript files:
+`npm run build`
+
+Output will be redirected to:
+`sampuru-server/src/main/resources/static`
+
 
 ## Using webpack dev server to test UI changes
-npm run start
+`npm run start`
 
-A webpage should open with the UI as served from index.ts
+A webpage should open with the UI as served from `index.ts`

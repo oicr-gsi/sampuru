@@ -1,9 +1,326 @@
+import {Case, Project} from "./data-transfer-objects.js";
 
 /**
  * The callback for handling mouse events
  */
+
 export type ClickHandler = (e: MouseEvent) => void;
 
+export interface CardElement {
+  type: "card";
+
+  attributes?: Map<string, string>;
+
+  /** Header to apply to card */
+  header: string;
+
+  /** Tooltip on hover */
+  title?: string;
+
+  /** Card body */
+  contents: DOMElement;
+
+  /** ID to apply to card body's div so Bootstrap knows which element to collapse/expand */
+  id: string;
+
+  /** Cards expanded by default or not. true = expanded, false = collapsed */
+  show: boolean;
+
+  /** Collapse cards or static cards. true = collapse, false = static */
+  collapse: boolean;
+}
+
+export interface TableCell {
+  /**
+   * Class name for the table cell
+   */
+  className?: string;
+  /**
+   * A callback if the cell is clicked
+   */
+  click?: ClickHandler;
+  /**
+   * The elements that should be in the cell.
+   */
+  contents: DOMElement;
+  /**
+   * If true, the cell is a header; if false or absent, it is a data cell.
+   */
+  header?: boolean;
+  /**
+   * A tooltip for the cell
+   */
+  title?: string;
+}
+
+export interface LinkElement {
+  type: "a";
+
+  /** URL to link to*/
+  url: string;
+
+  /** Display text to use*/
+  innerText: string;
+
+  /** Tooltip for the link*/
+  title: string;
+
+  /** Space-separated list of classes to apply to link*/
+  className: string;
+}
+
+export interface ComplexElement<T extends HTMLElement> {
+  type: "complex";
+  /** DOM node*/
+  element: T;
+}
+
+export interface TextElement {
+  type:
+    | "p" // paragraph
+    | "b" // bold
+    | "i"; // italic
+  contents: DisplayElement;
+  className: string | null;
+}
+
+/** Elements not associated with a DOM node */
+export type DisplayElement =
+  | number
+  | string
+  | null // for wbr elements
+  | TextElement
+  | LinkElement
+
+/** Any elements that can be associated with a DOM node*/
+export type DOMElement =
+  | number
+  | string
+  | null // for wbr elements
+  | LinkElement
+  | TextElement
+  | DisplayElement
+  | CardElement
+  | ComplexElement<HTMLElement>
+  | DOMElement[]
+
+function addElements(
+  target: HTMLElement,
+  ...elements: DOMElement[]
+): void {
+  elements
+    .flat(Number.MAX_VALUE)
+    .forEach((result: Exclude<DOMElement, DOMElement[]>) => {
+      if (result === null) {
+        target.appendChild(document.createElement("wbr"));
+      } else if (typeof result == "string") {
+        target.appendChild(document.createTextNode(result));
+      } else if (typeof result == "number") {
+        target.appendChild(document.createTextNode(result.toString()));
+      } else {
+        switch (result.type) {
+          case "a": {
+            const element = document.createElement("a");
+            element.innerText = result.innerText;
+            element.href = result.url;
+            element.title = result.title;
+            element.className = result.className;
+            target.appendChild(element);
+          }
+            break;
+          case "b":
+          case "i":
+          case "p": {
+            const element = elementFromTag(result.type, result.className, result.contents);
+            target.appendChild(element.element);
+          }
+            break;
+          case "complex": {
+            target.appendChild(result.element); // Already an HTML element so just append to target
+          }
+            break;
+          case "card": {
+            //todo: not currently working
+            const linkElement = link(result.header, "#", "card-link"); //todo: data-toggle: collapse attribute
+            const cardHeader = elementFromTag("div", "card-header", linkElement);
+
+            const cardBodyInner = elementFromTag("div", "card-body", result.contents);
+
+            const cardBody = document.createElement("div");
+            cardBody.id = `#${result.id}`;
+
+            if(result.collapse) {
+              cardBody.className = "collapse"
+              if(result.show) {
+                cardBody.className += " show"
+              }
+            }
+            cardBody.appendChild(cardBodyInner.element);
+
+        }
+      }
+    }
+    });
+}
+
+export function elementFromTag<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className: string | null,
+  ...elements: DOMElement[]
+): ComplexElement<HTMLElementTagNameMap[K]> {
+  const target = document.createElement(tag);
+  if (typeof className == "string") {
+    target.className = className;
+  }
+  addElements(target, ...elements);
+  return {element: target, type: "complex"};
+}
+
+/**
+ * Display a table from the supplied items.
+ * @param rows - the items to use for each row
+ * @param headers - a list of columns, each with a title and a function to render that column for each row
+ */
+export function table<T>(
+  rows: T[],
+  ...headers: [DOMElement, (value: T) => DOMElement][]
+): DOMElement {
+  if (rows.length == 0) return [];
+  return elementFromTag("table", "table",
+    elementFromTag("tr", null,
+      headers.map(([name, _func]) => elementFromTag("th", null, name))
+    ),
+    rows.map((row) =>
+      elementFromTag("tr", null,
+        headers.map(([_name, func]) => elementFromTag("td", null, func(row)))
+      )
+    )
+  );
+}
+
+/**
+ * Create a table body from a collection of rows
+ */
+export function tableBodyFromRows(
+  className: string | null,
+  rows: ComplexElement<HTMLTableRowElement>[]
+): HTMLElement {
+  const tbody = elementFromTag("tbody", (typeof className == "string") ? className : null, ...rows);
+  return tbody.element;
+}
+
+/**
+ * Create a single row to put in a table
+ * @param click - an optional click handler
+ * @param cells - the cells to put in this row
+ */
+export function tableRow(
+  click: ClickHandler | null,
+  ...cells: TableCell[]
+): ComplexElement<HTMLTableRowElement> {
+  const row = elementFromTag("tr", null,
+    cells.map(({ className, click, contents, header, title }) => {
+      const cell = elementFromTag(
+        header ? "th" : "td",
+        (typeof className == "string") ? className : null,
+        contents);
+
+      if (click) {
+        cell.element.style.cursor = "pointer";
+        cell.element.addEventListener("click", (e) => {
+          e.stopPropagation();
+          click(e);
+        });
+      }
+
+      if (title) {
+        cell.element.title = title;
+      }
+      return cell;
+    })
+  );
+  if (click) {
+    row.element.style.cursor = "pointer";
+    row.element.addEventListener("click", click);
+  }
+  return row;
+}
+
+
+/**
+ * Instantiate Bootstrap table
+ * @param headers -> map of data-field to header innerText
+ * @param pagination -> boolean for paginating table
+ * @param search -> boolean for adding a search to table
+ * */
+export function bootstrapTable(
+  headers: Map<string, string>,
+  pagination: boolean,
+  search: boolean
+): HTMLElement {
+  
+  const table = document.createElement("table");
+  table.id = "table";
+  table.setAttribute("data-toggle", "table");
+
+  if (pagination) {
+    table.setAttribute("data-pagination", "true");
+  }
+
+  if (search) {
+    table.setAttribute("data-search", "true");
+  }
+
+  const thead = document.createElement("thead");
+  const tr = document.createElement("tr");
+
+  headers
+    .forEach((header, data, map) => {
+      const cell = document.createElement("th");
+      cell.setAttribute("data-field", data);
+      cell.innerText = header;
+      tr.appendChild(cell);
+    });
+
+  thead.appendChild(tr);
+  table.appendChild(thead);
+  return table;
+}
+
+export function caseCard(
+  caseContent: Case
+): HTMLElement {
+
+  const caseProgess: DOMElement[] = [];
+  caseContent.bars.forEach((bar) => {
+    const steps: DOMElement[] = [];
+    bar.steps.forEach((step) => {
+      steps.push(elementFromTag("div", "col", step.type + ": ", step.completed.toString() + "/" + step.total.toString()));
+    });
+    caseProgess.push(elementFromTag("div", "row",
+      elementFromTag("div", "col", bar.library_design + ": "), steps));
+  });
+
+  const container = elementFromTag("div", "container", caseProgess);
+  return container.element;
+
+}
+
+/**
+ *
+ * @param innerText - label for the link
+ * @param url - target of the hyperlink
+ * @param title - optional tooltip
+ * @param className - class for hyperlink element
+ */
+export function link(
+  innerText: string | number,
+  url: string,
+  className: string,
+  title?: string
+): LinkElement {
+  return { type: "a", url: url, innerText: innerText.toString(), title: title || "", className: className}
+}
 
 /**
  * The contents of a card
@@ -37,7 +354,7 @@ export interface Card {
 /***
  * Horizontal navbar that becomes vertical on small screens
  */
-export function navbar():HTMLElement {
+export function navbar(): HTMLElement {
 
   const nav = document.createElement("nav");
   nav.className = "navbar navbar-expand-sm bg-light navbar-light";
@@ -45,7 +362,7 @@ export function navbar():HTMLElement {
   const sampuru = document.createElement("a");
   sampuru.className = "navbar-brand";
   sampuru.innerText = "Sampuru";
-  sampuru.href = "#";
+  sampuru.href = "/";
 
   const searchForm = document.createElement("form");
   searchForm.className = "form-inline mx-lg-auto";
@@ -80,8 +397,8 @@ export function createLinkElement(
   link.innerText = innerText;
   link.target = "_blank";
   url ? link.href = url : null;
-  if(attributes) {
-    attributes.forEach( (value, qualifiedName) => link.setAttribute(qualifiedName, value));
+  if (attributes) {
+    attributes.forEach((value, qualifiedName) => link.setAttribute(qualifiedName, value));
   }
   return link;
 }
@@ -92,11 +409,19 @@ export function collapsibleCard(
   content: Card
 ): HTMLElement {
 
+  /*
   let attributes = new Map();
   attributes.set('data-toggle', 'collapse');
   attributes.set('href', `#${content.tagId}`);
 
-  const cardLink = createLinkElement("card-link", content.header, attributes, null);
+  const cardLink = createLinkElement("card-link", content.header, attributes, null);*/
+
+  const cardLink = document.createElement("a");
+  cardLink.innerText = content.header;
+  cardLink.addEventListener("click", () => {
+    sessionStorage.setItem("project-overview-id", content.tagId);
+  });
+  cardLink.href = "project.html";
 
   const cardHeader = document.createElement("div");
   cardHeader.className = "card-header";
@@ -107,7 +432,6 @@ export function collapsibleCard(
   cardBodyInner.appendChild(content.contents);
 
   const cardBody = document.createElement("div");
-  cardBody.id = `#${content.tagId}`;
   cardBody.className = "collapse show";
   cardBody.appendChild(cardBodyInner);
 
@@ -121,12 +445,8 @@ export function collapsibleCard(
 export function staticCard(
   content: Card
 ): HTMLElement {
-  //todo: populate url with path to project info page
-  const cardHeaderLink = createLinkElement("card-link", content.header, null, "project-link");
 
-  const cardHeader = document.createElement("div");
-  cardHeader.className = "card-header";
-  cardHeader.appendChild(cardHeaderLink);
+  const cardHeader = elementFromTag("div", "card-header", content.header);
 
   const cardBody = document.createElement("div");
   cardBody.className = "card-body";
@@ -134,7 +454,7 @@ export function staticCard(
 
   const card = document.createElement("div");
   card.className = "card";
-  card.appendChild(cardHeader);
+  card.appendChild(cardHeader.element);
   card.appendChild(cardBody);
   return card;
 }
@@ -149,8 +469,9 @@ export function progressBar(
   progress.setAttribute("style", "position:relative");
 
   const progressBar = document.createElement("div");
-  progressBar.className = "progress-bar bg-success";
-  const casesPercentCompleted = Math.floor((completed/total) * 100);
+  progressBar.className = "progress-bar bg-primary";
+
+  const casesPercentCompleted = Math.floor((completed / total) * 100);
   progressBar.setAttribute("style", "width:" + casesPercentCompleted.toString() + "%");
 
   const progressText = document.createElement("div");
@@ -164,22 +485,23 @@ export function progressBar(
   return progress;
 }
 
-export function cardContent(
-  cases_total: number,
-  cases_completed: number,
-  qcables_total: number,
-  qcables_completed: number
+export function projectCard(
+  project: Project
 ): HTMLElement {
 
-  //todo: refactor so this is extensible to other pages
-  const casesProgress = progressBar(cases_total, cases_completed);
-  const qcablesProgress = progressBar(qcables_total, qcables_completed);
+  //todo: refactor so it's extensible to other pages
+  const casesProgress = progressBar(project.cases_total, project.cases_completed);
+  const qcablesProgress = progressBar(project.qcables_total, project.qcables_completed);
 
   const cases = document.createElement("div");
   cases.className = "cases";
 
-  const casesTitle = document.createElement("h6");
+  const casesTitle = document.createElement("a");
   casesTitle.innerText = "Cases";
+  casesTitle.addEventListener("click", () => {
+    sessionStorage.setItem("cases-project-id", project.id);
+  });
+  casesTitle.href = "cases.html";
 
   cases.appendChild(casesTitle);
   cases.appendChild(casesProgress);
@@ -187,8 +509,14 @@ export function cardContent(
   const qcables = document.createElement("div");
   qcables.className = "qcables";
 
-  const qcablesTitle = document.createElement("h6");
+  const qcablesTitle = document.createElement("a");
   qcablesTitle.innerText = "QCables";
+  qcablesTitle.addEventListener("click", () => {
+    sessionStorage.setItem("qcables-filter-type", "project");
+    sessionStorage.setItem("qcables-filter-id", project.id);
+    sessionStorage.setItem("qcables-filter-name", project.name);
+  });
+  qcablesTitle.href = "qcables.html";
 
   qcables.appendChild(qcablesTitle);
   qcables.appendChild(qcablesProgress);
@@ -204,7 +532,7 @@ export function cardContent(
 //todo:
 export function cardContainer(
   ...content: HTMLElement[]
-):HTMLElement {
+): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
@@ -237,3 +565,5 @@ export function busyDialog(): () => void {
     document.body.removeChild(spinner);
   }
 }
+
+
