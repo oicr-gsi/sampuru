@@ -7,6 +7,7 @@ import org.jooq.TableField;
 import static tables_generated.Tables.*;
 
 public class ProjectInfoItem extends SampuruType {
+    public int id;
     public String entryType;
     public String content;
     public Integer expected;

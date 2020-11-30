@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -48,7 +49,7 @@ public class NotificationService extends Service<Notification> {
 
     @Override
     public List<Notification> search(String term) throws Exception {
-        List<Integer> ids = new DBConnector().search(NOTIFICATION, NOTIFICATION.ID, NOTIFICATION.CONTENT, term);
+        List<Integer> ids = new DBConnector().search(NOTIFICATION, NOTIFICATION.ID, NOTIFICATION.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
         List<Notification> notifications = new LinkedList<>();
 
         for (Integer id: ids){

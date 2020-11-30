@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -23,10 +24,6 @@ public class ProjectService extends Service<Project> {
 
     public ProjectService(){
         super(Project.class);
-    }
-
-    public Project get(String name){
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     public static void getIdParams(HttpServerExchange hse) throws Exception {
@@ -176,10 +173,10 @@ public class ProjectService extends Service<Project> {
 
     @Override
     public List<Project> search(String term) throws Exception {
-        List<Integer> ids = new DBConnector().search(PROJECT, PROJECT.ID, PROJECT.NAME, term);
+        List<String> ids = new DBConnector().search(PROJECT, PROJECT.ID, PROJECT.NAME, term).stream().map(o -> (String)o).collect(Collectors.toList());
         List<Project> projects = new LinkedList<>();
 
-        for (Integer id: ids){
+        for (String id: ids){
             projects.add(get(id));
         }
 
@@ -289,6 +286,6 @@ public class ProjectService extends Service<Project> {
         }
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(Integer.valueOf(idparams.getFirst()))));
+        hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(idparams.getFirst())));
     }
 }

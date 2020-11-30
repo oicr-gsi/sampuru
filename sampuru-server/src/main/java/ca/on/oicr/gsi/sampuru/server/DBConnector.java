@@ -103,11 +103,11 @@ public class DBConnector {
         return newList;
     }
 
-    public List<Integer> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
-        List<Integer> newList = new LinkedList<>();
-        Field<Integer> idField = getFrom.field("id");
+    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
+        List<Object> newList = new LinkedList<>();
+        Field<Object> idField = getFrom.field("id");
 
-        Result<Record1<Integer>> idsFromDb = getContext()
+        Result<Record1<Object>> idsFromDb = getContext()
                 .select(idField)
                 .from(getFrom)
                 .where(matchField.eq(toMatch))
@@ -120,8 +120,8 @@ public class DBConnector {
         return newList;
     }
 
-    public List<Integer> getCompletedProjectIds() throws Exception {
-        List<Integer> projectsIdsList = new LinkedList<>();
+    public List<String> getCompletedProjectIds() throws Exception {
+        List<String> projectsIdsList = new LinkedList<>();
 
         Result<Record> completedProjects = getContext()
                 .select()
@@ -136,8 +136,8 @@ public class DBConnector {
         return projectsIdsList;
     }
 
-    public List<Integer> getActiveProjectIds() throws Exception {
-        List<Integer> projectsIdsList = new LinkedList<>();
+    public List<String> getActiveProjectIds() throws Exception {
+        List<String> projectsIdsList = new LinkedList<>();
 
         Result<Record> activeProjects = getContext()
                 .select()
@@ -206,7 +206,7 @@ public class DBConnector {
         return result.get(0).value1();
     }
 
-    public JSONArray getCaseBars(List<Integer> caseIdsToExpand){
+    public JSONArray getCaseBars(List<String> caseIdsToExpand){
         JSONObjectMap cards = new JSONObjectMap();
         DSLContext context = getContext();
         Result<Record> cardResults = context
@@ -215,7 +215,7 @@ public class DBConnector {
                 .where(CASE_CARD.CASE_ID.in(caseIdsToExpand))
                 .fetch();
         for(Record result: cardResults){
-            Integer thisId = result.get(CASE_CARD.CASE_ID);
+            String thisId = result.get(CASE_CARD.CASE_ID);
             JSONObject currentCard = cards.get(thisId);
             if(null == currentCard.get("bars")) currentCard.put("bars", new JSONArray());
             JSONArray currentBars = (JSONArray)currentCard.get("bars");
@@ -287,7 +287,7 @@ public class DBConnector {
                 .where(CHANGELOG.CASE_ID.in(caseIdsToExpand))
                 .fetch();
         for(Record result: changelogResults){
-            Integer thisId = result.get(CASE_CARD.CASE_ID);
+            String thisId = result.get(CASE_CARD.CASE_ID);
             JSONObject currentCard = cards.get(thisId);
             if(null == currentCard.get("changelog")) currentCard.put("changelog", new JSONArray());
             JSONArray currentChangelog = (JSONArray)currentCard.get("changelog");
@@ -329,23 +329,23 @@ public class DBConnector {
 //        return result.get(0).value1();
     }
 
-    public List<Integer> getFailedQCablesForProject(int id) {
-        List<Integer> ids = new LinkedList<>();
-        Result<Record1<Integer>> result = getContext()
+    public List<String> getFailedQCablesForProject(String id) {
+        List<String> ids = new LinkedList<>();
+        Result<Record1<String>> result = getContext()
                 .select(QCABLE.ID)
                 .from(QCABLE)
                 .where(QCABLE.PROJECT_ID.eq(id)
                 .and(QCABLE.FAILURE_REASON.isNotNull()))
                 .fetch();
 
-        for(Record1<Integer> r: result){
+        for(Record1<String> r: result){
             ids.add(r.value1());
         }
 
         return ids;
     }
 
-    public JSONObject getSankeyTransitions(Integer projectId) throws SQLException {
+    public JSONObject getSankeyTransitions(String projectId) throws SQLException {
         JSONObject jsonObject = new JSONObject();
         Result<Record> shouldBeSingularResult = getContext()
                 .select()
@@ -413,7 +413,7 @@ public class DBConnector {
         return jsonObject;
     }
 
-    public JSONArray getQcableTable(List<Integer> caseIds){
+    public JSONArray getQcableTable(List<String> caseIds){
         JSONArray jsonArray = new JSONArray();
         Result<Record> result = getContext()
                 .select()
@@ -446,35 +446,35 @@ public class DBConnector {
         return jsonArray;
     }
 
-    public List<Integer> search(Table targetTable, TableField idField, TableField contentField, String term){
-        List<Integer> items = new LinkedList<>();
+    public List<Object> search(Table targetTable, TableField idField, TableField contentField, String term){
+        List<Object> items = new LinkedList<>();
         Result<Record> results = getContext()
                 .selectDistinct(idField)
                 .from(targetTable)
                 .where(contentField.like("%"+term+"%")).fetch();
         for(Record record: results){
-            items.add((Integer)record.get(idField));
+            items.add((record.get(idField)));
         }
         return items;
     }
 
-    private class JSONArrayMap extends HashMap<Integer, JSONArray>{
+    private class JSONArrayMap extends HashMap<String, JSONArray>{
         @Override
         public JSONArray get(Object key) {
             if(!this.containsKey(key)){
-                if(!(key instanceof Integer)) throw new UnsupportedOperationException("JSONArrayMap needs Integer for key, got " + key.getClass());
-                this.put((Integer)key, new JSONArray());
+                if(!(key instanceof String)) throw new UnsupportedOperationException("JSONArrayMap needs String for key, got " + key.getClass());
+                this.put((String)key, new JSONArray());
             }
             return super.get(key);
         }
     }
 
-    private class JSONObjectMap extends HashMap<Integer, JSONObject>{
+    private class JSONObjectMap extends HashMap<String, JSONObject>{
         @Override
         public JSONObject get(Object key) {
             if(!this.containsKey(key)){
-                if(!(key instanceof Integer)) throw new UnsupportedOperationException("JSONObjectMap needs Integer for key, got " + key.getClass());
-                this.put((Integer)key, new JSONObject());
+                if(!(key instanceof String)) throw new UnsupportedOperationException("JSONObjectMap needs String for key, got " + key.getClass());
+                this.put((String)key, new JSONObject());
             }
             return super.get(key);
         }

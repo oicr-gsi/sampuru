@@ -11,6 +11,7 @@ import static tables_generated.Tables.*;
 
 
 public class Notification extends SampuruType {
+    public int id;
     public LocalDateTime issueDate;
     public LocalDateTime resolvedDate;
     public String content;

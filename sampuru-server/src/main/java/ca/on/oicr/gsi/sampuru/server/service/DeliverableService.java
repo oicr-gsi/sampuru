@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -48,7 +49,7 @@ public class DeliverableService extends Service<Deliverable> {
 
     @Override
     public List<Deliverable> search(String term) throws Exception {
-        List<Integer> ids = new DBConnector().search(DELIVERABLE_FILE, DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CONTENT, term);
+        List<Integer> ids = new DBConnector().search(DELIVERABLE_FILE, DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
         List<Deliverable> deliverables = new LinkedList<>();
 
         for (Integer id: ids){

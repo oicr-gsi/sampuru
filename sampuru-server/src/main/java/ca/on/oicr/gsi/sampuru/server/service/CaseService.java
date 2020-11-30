@@ -15,6 +15,7 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -42,13 +43,13 @@ public class CaseService extends Service<Case> {
         ProjectService ps = new ProjectService();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         //TODO: maybe in the future we'll want the opportunity for this to be blank
-        Integer projectId = Integer.valueOf(ptm.getParameters().get("projectId"));
+        String projectId = ptm.getParameters().get("projectId");
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(cs.getCardJson(ps.get(projectId).donorCases));
     }
 
     // Front end will need to group by case_id
-    public String getCardJson(List<Integer> caseIds) throws Exception {
+    public String getCardJson(List<String> caseIds) throws Exception {
         return new DBConnector().getCaseBars(caseIds).toJSONString();
     }
 
@@ -86,7 +87,7 @@ public class CaseService extends Service<Case> {
     }
 
     // TODO: Probably refactor to limit repeat code with getAll
-    public List<Case> getForProject(Integer projectId) throws Exception {
+    public List<Case> getForProject(String projectId) throws Exception {
         DSLContext context = new DBConnector().getContext();
         List<Case> cases = new LinkedList<>();
 
@@ -121,7 +122,7 @@ public class CaseService extends Service<Case> {
 
     @Override
     public List<Case> search(String term) throws Exception{
-        List<Integer> ids = new DBConnector().search(DONOR_CASE, DONOR_CASE.ID, DONOR_CASE.NAME, term);
+        List<Integer> ids = new DBConnector().search(DONOR_CASE, DONOR_CASE.ID, DONOR_CASE.NAME, term).stream().map(o -> (Integer)o).collect(Collectors.toList());
         List<Case> cases = new LinkedList<>();
 
         for (Integer id: ids){

@@ -15,6 +15,7 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -62,10 +63,10 @@ public class QCableService extends Service<QCable> {
 
     @Override
     public List<QCable> search(String term) throws Exception {
-        List<Integer> ids = new DBConnector().search(QCABLE, QCABLE.ID, QCABLE.OICR_ALIAS, term);
+        List<String> ids = new DBConnector().search(QCABLE, QCABLE.ID, QCABLE.OICR_ALIAS, term).stream().map(o -> (String)o).collect(Collectors.toList());
         List<QCable> qcables = new LinkedList<>();
 
-        for (Integer id: ids){
+        for (String id: ids){
             qcables.add(get(id));
         }
 
@@ -114,10 +115,10 @@ public class QCableService extends Service<QCable> {
 
     public static void getFilteredQcablesTableParams(HttpServerExchange hse) throws Exception {
         QCableService qs = new QCableService();
-        List<Integer> cases = new LinkedList<>();
+        List<String> cases = new LinkedList<>();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String filterType = ptm.getParameters().get("filterType");
-        Integer filterId = Integer.valueOf(ptm.getParameters().get("filterId"));
+        String filterId = ptm.getParameters().get("filterId");
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         switch(filterType){
             case "project":
@@ -135,14 +136,14 @@ public class QCableService extends Service<QCable> {
     }
 
     public String getTableJsonFromCases(List<Case> cases) throws Exception {
-        List<Integer> ids = new LinkedList<>();
+        List<String> ids = new LinkedList<>();
         for (Case donorCase: cases){
             ids.add(donorCase.id);
         }
         return new DBConnector().getQcableTable(ids).toJSONString();
     }
 
-    public String getTableJsonFromIds(List<Integer> caseIds) throws Exception {
+    public String getTableJsonFromIds(List<String> caseIds) throws Exception {
         return new DBConnector().getQcableTable(caseIds).toJSONString();
     }
 }

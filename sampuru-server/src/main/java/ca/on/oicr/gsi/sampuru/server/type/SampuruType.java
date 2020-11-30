@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class SampuruType {
-    public int id;
 
     protected static <T extends SampuruType> List<T> getAll(Table selfTable, Class<T> targetClass)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {

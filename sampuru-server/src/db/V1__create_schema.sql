@@ -1,37 +1,37 @@
 CREATE TABLE project (
-    id SERIAL PRIMARY KEY,
+    id text PRIMARY KEY,
     name varchar(10) UNIQUE NOT NULL,
     contact_name text,
     contact_email text,
     completion_date timestamp);
  
 CREATE TABLE donor_case (
-    id SERIAL PRIMARY KEY,
-    project_id integer NOT NULL,
+    id text PRIMARY KEY,
+    project_id text NOT NULL,
     name text UNIQUE NOT NULL);
  
 CREATE TABLE qcable (
-    id SERIAL PRIMARY KEY,
+    id text PRIMARY KEY,
     qcable_type text NOT NULL,
-    project_id integer NOT NULL,
-    case_id integer NOT NULL,
+    project_id text NOT NULL,
+    case_id text NOT NULL,
     oicr_alias text UNIQUE NOT NULL,
     status text NOT NULL,
     failure_reason text,
     library_design text,
-    parent_id integer);
+    parent_id text);
  
 CREATE TABLE deliverable_file (
     id SERIAL PRIMARY KEY,
-    project_id integer NOT NULL,
-    case_id integer NOT NULL,
+    project_id text NOT NULL,
+    case_id text NOT NULL,
     content text NOT NULL,
     expiry_date timestamp);
  
 CREATE TABLE changelog (
     id SERIAL PRIMARY KEY,
-    qcable_id integer NOT NULL,
-    case_id integer NOT NULL,
+    qcable_id text NOT NULL,
+    case_id text NOT NULL,
     change_date timestamp NOT NULL,
     content text NOT NULL);
  
@@ -44,7 +44,7 @@ CREATE TABLE notification (
  
 CREATE TABLE project_info_item (
     id SERIAL PRIMARY KEY,
-    project_id integer NOT NULL,
+    project_id text NOT NULL,
     type text NOT NULL,
     content text,
     expected integer,
