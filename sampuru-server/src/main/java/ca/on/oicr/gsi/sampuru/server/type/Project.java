@@ -40,6 +40,10 @@ public class Project extends SampuruType {
         infoItems = row.get(INFO_ITEM_IDS, List.class);
         donorCases = row.get(CASE_IDS, List.class);
         deliverables = row.get(DELIVERABLE_IDS, List.class);
+        casesTotal = row.get(CASES_TOTAL, Integer.class);
+        casesCompleted = row.get(CASES_COMPLETED, Integer.class);
+        qcablesTotal = row.get(QCABLES_TOTAL, Integer.class);
+        qcablesCompleted = row.get(QCABLES_COMPLETED, Integer.class);
     }
 
     public static List<Project> getAll() throws Exception {
