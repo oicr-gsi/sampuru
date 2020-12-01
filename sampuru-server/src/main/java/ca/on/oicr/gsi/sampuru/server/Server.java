@@ -25,15 +25,15 @@ public class Server {
      */
     private final static HttpHandler ROUTES = Handlers.path()
             .addPrefixPath("/api", new RoutingHandler()
-                    // Normal REST endpoints. P sure ALL of these are tech debt
-                    .get("/projects", ProjectService::getAllParams)
-                    .get("/project/{id}", ProjectService::getIdParams) // TODO: update to use Row probably
-                    .get("/cases", CaseService::getAllParams)
-                    .get("/case/{id}", CaseService::getIdParams)
-                    .get("/notifications", NotificationService::getAllParams) //TODO most of these are unrealistic past alpha, get all _for user_
-                    .get("/notification/{id}", NotificationService::getIdParams)
-                    .get("/qcables", QCableService::getAllParams)
-                    .get("/qcable/{id}", QCableService::getIdParams)
+                    // Normal REST endpoints. P sure ALL of these are tech debt. Deeply hateful
+//                    .get("/projects", ProjectService::getAllParams)
+//                    .get("/project/{id}", ProjectService::getIdParams) // TODO: update to use Row probably
+//                    .get("/cases", CaseService::getAllParams)
+//                    .get("/case/{id}", CaseService::getIdParams)
+//                    .get("/notifications", NotificationService::getAllParams) //TODO most of these are unrealistic past alpha, get all _for user_
+//                    .get("/notification/{id}", NotificationService::getIdParams)
+//                    .get("/qcables", QCableService::getAllParams)
+//                    .get("/qcable/{id}", QCableService::getIdParams)
 
                     // Special frontend endpoints
                     .get("/active_projects", ProjectService::getActiveProjectsParams)
