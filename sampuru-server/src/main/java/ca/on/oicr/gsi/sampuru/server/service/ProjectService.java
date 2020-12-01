@@ -106,7 +106,46 @@ public class ProjectService extends Service<Project> {
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
                                 .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
-                                .as(Project.DELIVERABLE_IDS))
+                                .as(Project.DELIVERABLE_IDS),
+                        PostgresDSL.field(context
+                                .selectCount()
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASES_TOTAL),
+                        PostgresDSL.field(context
+                                .selectCount()
+                                .from(context
+                                        .selectDistinct(QCABLE.CASE_ID)
+                                        .from(QCABLE)
+                                        .where(QCABLE.CASE_ID.in(context
+                                                .select(DONOR_CASE.ID)
+                                                .from(DONOR_CASE)
+                                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                                .and(QCABLE.QCABLE_TYPE.eq("final_report"))
+                                                .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
+                                                .andExists(context
+                                                        .select(DELIVERABLE_FILE.ID)
+                                                        .from(DELIVERABLE_FILE)
+                                                        .where(DELIVERABLE_FILE.CASE_ID.in(context
+                                                                .select(QCABLE.CASE_ID)
+                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(context
+                                                                        .select(DONOR_CASE.ID)
+                                                                        .from(DONOR_CASE)
+                                                                        .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                                                        .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
+                                .as(Project.CASES_COMPLETED),
+                        PostgresDSL.field(context
+                                .selectCount()
+                                .from(QCABLE)
+                                .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.QCABLES_TOTAL),
+                        PostgresDSL.field(context
+                                .selectCount()
+                                .from(QCABLE)
+                                .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)
+                                        .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))))
+                                .as(Project.QCABLES_COMPLETED)
+                        )
                 .from(PROJECT)
                 .where(PROJECT.COMPLETION_DATE.isNull())
                 .fetch();
@@ -130,11 +169,11 @@ public class ProjectService extends Service<Project> {
             JSONObject projectObject = new JSONObject();
             projectObject.put("id", activeProject.id);
             projectObject.put("name", activeProject.name);
-            projectObject.put("last_update", JSONObject.escape(activeProject.getLastUpdate().toString()));
-            projectObject.put("cases_total", activeProject.getCasesTotal());
-            projectObject.put("cases_completed", activeProject.getCasesCompleted());
-            projectObject.put("qcables_total", activeProject.getQCablesTotal());
-            projectObject.put("qcables_completed", activeProject.getQCablesCompleted());
+            projectObject.put("last_update", activeProject.lastUpdate == null? "null": JSONObject.escape(activeProject.lastUpdate.toString()));
+            projectObject.put("cases_total", activeProject.casesTotal);
+            projectObject.put("cases_completed", activeProject.casesCompleted);
+            projectObject.put("qcables_total", activeProject.qcablesTotal);
+            projectObject.put("qcables_completed", activeProject.qcablesCompleted);
             jsonArray.add(projectObject);
         }
         return jsonArray.toJSONString();
@@ -235,10 +274,10 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("contact_name", subject.contactName == null? "null": subject.contactName);
         jsonObject.put("contact_email", subject.contactEmail == null? "null": subject.contactEmail);
         jsonObject.put("completion_date", subject.completionDate  == null? "null": JSONObject.escape(subject.completionDate.toString()));
-        jsonObject.put("cases_total", subject.getCasesTotal());
-        jsonObject.put("cases_completed", subject.getCasesCompleted());
-        jsonObject.put("qcables_total", subject.getQCablesTotal());
-        jsonObject.put("qcables_completed", subject.getQCablesCompleted());
+        jsonObject.put("cases_total", subject.casesTotal);
+        jsonObject.put("cases_completed", subject.casesCompleted);
+        jsonObject.put("qcables_total", subject.qcablesTotal);
+        jsonObject.put("qcables_completed", subject.qcablesCompleted);
 
         JSONArray infoItemsArray = new JSONArray();
         for (ProjectInfoItem infoItem: subject.getInfoItems()){

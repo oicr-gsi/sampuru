@@ -152,60 +152,6 @@ public class DBConnector {
         return projectsIdsList;
     }
 
-    // TODO: these aren't killer for now, but would be great to move this to a field of Project to save on db connections
-    public Integer getCasesTotal(Project project) {
-        Result<Record1<Integer>> result = getContext()
-                .selectCount()
-                .from(DONOR_CASE)
-                .where(DONOR_CASE.PROJECT_ID.eq(project.id))
-                .fetch();
-        return result.get(0).value1();
-    }
-
-    public Integer getCasesCompleted(Project project) {
-        DSLContext context = getContext();
-        Result<Record1<Integer>> result = context
-                .selectCount()
-                .from(
-                        context.selectDistinct(QCABLE.CASE_ID)
-                        .from(QCABLE)
-                        .where(QCABLE.CASE_ID
-                                .in(project.donorCases)
-                                .and(QCABLE.QCABLE_TYPE.eq("final_report"))
-                                .and(QCABLE.STATUS.eq(QC_PASSED))
-                                .andExists(context
-                                        .select(DELIVERABLE_FILE.ID)
-                                        .from(DELIVERABLE_FILE)
-                                        .where(DELIVERABLE_FILE.CASE_ID
-                                                .in(context.select(QCABLE.CASE_ID)
-                                                        .from(QCABLE)
-                                                        .where(QCABLE.CASE_ID
-                                                                .in(project.donorCases)
-                                                                .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))
-                )
-                .fetch();
-        return result.get(0).value1();
-    }
-
-
-    public Integer getQCablesTotal(Project project) {
-        Result<Record1<Integer>> result = getContext()
-                .selectCount()
-                .from(QCABLE)
-                .where(QCABLE.PROJECT_ID.eq(project.id))
-                .fetch();
-        return result.get(0).value1();
-    }
-
-    public Integer getQCablesCompleted(Project project) {
-        Result<Record1<Integer>> result = getContext()
-                .selectCount()
-                .from(QCABLE)
-                .where(QCABLE.PROJECT_ID.eq(project.id).and(QCABLE.STATUS.eq(QC_PASSED)))
-                .fetch();
-        return result.get(0).value1();
-    }
-
     public JSONArray getCaseBars(List<String> caseIdsToExpand){
         JSONObjectMap cards = new JSONObjectMap();
         DSLContext context = getContext();
