@@ -298,7 +298,7 @@ export function caseCard(
       steps.push(elementFromTag("div", "col", step.type + ": ", step.completed.toString() + "/" + step.total.toString()));
     });
     caseProgess.push(elementFromTag("div", "row",
-      elementFromTag("div", "col", bar.library_design + ": "), steps));
+      elementFromTag("div", "col", bar.library_design), steps));
   });
 
   const container = elementFromTag("div", "container", caseProgess);

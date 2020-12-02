@@ -169,7 +169,7 @@ public class DBConnector {
             currentCard.put("id", thisId); // This will probably overwrite things many times, w/e
             currentCard.put("name", result.get(CASE_CARD.CASE_NAME)); // same
             JSONObject thisBar = new JSONObject();
-            thisBar.put("library_design", result.get(CASE_CARD.LIBRARY_DESIGN));
+            thisBar.put("library_design", result.get(CASE_CARD.LIBRARY_DESIGN) == null? "": result.get(CASE_CARD.LIBRARY_DESIGN));
             JSONArray steps = new JSONArray();
             JSONObject receiptStep = new JSONObject(),
                     extractionStep = new JSONObject(),
