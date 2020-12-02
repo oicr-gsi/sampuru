@@ -99,8 +99,9 @@ public class Server {
     }
 
     private static void helloWorld(HttpServerExchange hse){
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
-        hse.getResponseSender().send("You found Sampuru!");
+        hse.getResponseSender().send("You found Sampuru! Good job, " + name);
     }
 
     // TODO:
