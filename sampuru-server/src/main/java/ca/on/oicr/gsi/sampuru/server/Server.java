@@ -52,6 +52,7 @@ public class Server {
 
     // see https://stackoverflow.com/questions/39742014/routing-template-format-for-undertow
     private static void doSearch(HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         Service service = null;
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String type = ptm.getParameters().get("type");
@@ -103,7 +104,7 @@ public class Server {
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         hse.getResponseSender().send("You found Sampuru! Good job, " + name);
     }
-    
+
     protected static void handleException (HttpServerExchange hse){
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

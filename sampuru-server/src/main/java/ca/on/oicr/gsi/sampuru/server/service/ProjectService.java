@@ -68,11 +68,13 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getCompletedProjectsParams(HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(ps.getCompletedProjectsJson());
     }
 
+    //TODO: add user to params
     private String getCompletedProjectsJson() throws Exception {
         List<Project> completedProjects = getCompletedProjects();
         JSONArray jsonArray = new JSONArray();
@@ -86,6 +88,7 @@ public class ProjectService extends Service<Project> {
         return jsonArray.toJSONString();
     }
 
+    //TODO: add user to params
     public List<Project> getActiveProjects() throws Exception {
         DSLContext context = new DBConnector().getContext();
         List<Project> newList = new LinkedList<>();
@@ -158,6 +161,7 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getActiveProjectsParams(HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(ps.getActiveProjectsJson(ps.getActiveProjects()));
@@ -317,6 +321,9 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getProjectOverviewParams(HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
+
+        //TODO: different retrieval method?
         Deque<String> idparams = hse.getQueryParameters().get("id");
         if(idparams.size() > 1){
             throw new UnsupportedOperationException("Only takes 1 project ID");

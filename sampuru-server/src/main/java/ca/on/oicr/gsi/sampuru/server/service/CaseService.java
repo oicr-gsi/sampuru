@@ -39,6 +39,7 @@ public class CaseService extends Service<Case> {
     }
 
     public static void getCardsParams(HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         CaseService cs = new CaseService();
         ProjectService ps = new ProjectService();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);

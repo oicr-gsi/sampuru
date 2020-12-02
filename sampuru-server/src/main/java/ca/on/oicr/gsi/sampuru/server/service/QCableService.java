@@ -107,6 +107,7 @@ public class QCableService extends Service<QCable> {
     }
 
     public static void getAllQcablesTableParams(HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         CaseService cs = new CaseService();
         QCableService qs = new QCableService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
@@ -114,6 +115,7 @@ public class QCableService extends Service<QCable> {
     }
 
     public static void getFilteredQcablesTableParams(HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         QCableService qs = new QCableService();
         List<String> cases = new LinkedList<>();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);

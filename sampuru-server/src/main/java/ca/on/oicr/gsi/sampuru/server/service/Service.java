@@ -14,6 +14,7 @@ public abstract class Service<T extends SampuruType> {
         targetClass = newTarget;
     }
 
+    //TODO: Add username to params
     public T get(Object id) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         try {
             return targetClass.getDeclaredConstructor(String.class).newInstance(id);
@@ -22,7 +23,10 @@ public abstract class Service<T extends SampuruType> {
         }
     }
 
+    //TODO: do these have a purpose beyond The Old Endpoints?
+    //TODO: Add username to params
     public static void getIdParams(Service targetService, HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         Deque<String> idparams = hse.getQueryParameters().get("id");
         Set<SampuruType> items = new HashSet<>();
         for(String id: idparams){
@@ -32,14 +36,16 @@ public abstract class Service<T extends SampuruType> {
         hse.getResponseSender().send(targetService.toJson(items));
     }
 
+    //TODO: Add username to params
     public abstract List<T> getAll() throws Exception;
 
     public static void getAllParams(Service targetService, HttpServerExchange hse) throws Exception {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(targetService.toJson(targetService.getAll()));
     }
 
-    // TODO this needs to be filterable
+    //TODO: Add username to params
     public abstract List<T> search(String term) throws Exception;
 
     public abstract String toJson(Collection<? extends  SampuruType> toWrite) throws Exception;

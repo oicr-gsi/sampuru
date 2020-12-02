@@ -77,11 +77,13 @@ public class NotificationService extends Service<Notification> {
     }
 
     public static void getActiveParams(HttpServerExchange hse) {
+        String name = hse.getRequestHeaders().get("X-Remote-User").element();
         NotificationService ns = new NotificationService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(ns.toJson(ns.getActiveNotifications()));
     }
 
+    //TODO: name in params
     private List<Notification> getActiveNotifications() {
         Result<Record> results = new DBConnector().getContext()
                 .select()
