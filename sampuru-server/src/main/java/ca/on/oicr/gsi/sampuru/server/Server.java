@@ -103,8 +103,7 @@ public class Server {
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         hse.getResponseSender().send("You found Sampuru! Good job, " + name);
     }
-
-    // TODO:
+    
     protected static void handleException (HttpServerExchange hse){
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
