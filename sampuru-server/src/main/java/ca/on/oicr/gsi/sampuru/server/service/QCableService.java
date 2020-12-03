@@ -39,20 +39,18 @@ public class QCableService extends Service<QCable> {
     }
 
     @Override
-    public List<QCable> getAll() {
-        DSLContext context = new DBConnector().getContext();
+    public List<QCable> getAll(String username) {
         List<QCable> qcables = new LinkedList<>();
 
         // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
-        Result<Record> results = context
-                .select(QCABLE.asterisk(),
-                        PostgresDSL.array(context
+        Result<Record> results = new DBConnector(username).execute(
+                PostgresDSL.select(QCABLE.asterisk(),
+                        PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
                                 .from(CHANGELOG)
                                 .where(CHANGELOG.CASE_ID.eq(QCABLE.ID)))
                                 .as(QCable.CHANGELOG_IDS))
-                .from(QCABLE)
-                .fetch();
+                .from(QCABLE));
 
         for(Record result: results){
             qcables.add(new QCable(result));
@@ -62,8 +60,8 @@ public class QCableService extends Service<QCable> {
     }
 
     @Override
-    public List<QCable> search(String term) throws Exception {
-        List<String> ids = new DBConnector().search(QCABLE, QCABLE.ID, QCABLE.OICR_ALIAS, term).stream().map(o -> (String)o).collect(Collectors.toList());
+    public List<QCable> search(String term, String username) throws Exception {
+        List<String> ids = new DBConnector(username).search(QCABLE, QCABLE.ID, QCABLE.OICR_ALIAS, term).stream().map(o -> (String)o).collect(Collectors.toList());
         List<QCable> qcables = new LinkedList<>();
 
         for (String id: ids){
@@ -79,31 +77,32 @@ public class QCableService extends Service<QCable> {
     }
 
     public String toJson(Collection<? extends SampuruType> toWrite, boolean expand) throws Exception {
-        JSONArray jsonArray = new JSONArray();
-
-        for(SampuruType item: toWrite){
-            JSONObject jsonObject = new JSONObject();
-            QCable qcable = (QCable)item;
-
-            jsonObject.put("id", qcable.id);
-            jsonObject.put("alias", qcable.OICRAlias);
-            jsonObject.put("status", qcable.status);
-            jsonObject.put("failure_reason", qcable.failureReason  == null? "null": qcable.failureReason);
-            jsonObject.put("library_design", qcable.libraryDesign  == null? "null": qcable.libraryDesign);
-            jsonObject.put("type", qcable.type);
-            jsonObject.put("parent_id", qcable.parentId  == null? "null": qcable.parentId);
-
-            if(expand){
-                List<ChangelogEntry> changelogEntries = qcable.getChangelog();
-                jsonObject.put("changelog", new ChangelogService().toJson(changelogEntries));
-            } else {
-                jsonObject.put("changelog", qcable.changelog);
-            }
-
-            jsonArray.add(jsonObject);
-        }
-
-        return jsonArray.toJSONString();
+        return "what are you doing";
+//        JSONArray jsonArray = new JSONArray();
+//
+//        for(SampuruType item: toWrite){
+//            JSONObject jsonObject = new JSONObject();
+//            QCable qcable = (QCable)item;
+//
+//            jsonObject.put("id", qcable.id);
+//            jsonObject.put("alias", qcable.OICRAlias);
+//            jsonObject.put("status", qcable.status);
+//            jsonObject.put("failure_reason", qcable.failureReason  == null? "null": qcable.failureReason);
+//            jsonObject.put("library_design", qcable.libraryDesign  == null? "null": qcable.libraryDesign);
+//            jsonObject.put("type", qcable.type);
+//            jsonObject.put("parent_id", qcable.parentId  == null? "null": qcable.parentId);
+//
+//            if(expand){
+//                List<ChangelogEntry> changelogEntries = qcable.getChangelog(username);
+//                jsonObject.put("changelog", new ChangelogService().toJson(changelogEntries));
+//            } else {
+//                jsonObject.put("changelog", qcable.changelog);
+//            }
+//
+//            jsonArray.add(jsonObject);
+//        }
+//
+//        return jsonArray.toJSONString();
     }
 
     public static void getAllQcablesTableParams(HttpServerExchange hse) throws Exception {
@@ -111,7 +110,7 @@ public class QCableService extends Service<QCable> {
         CaseService cs = new CaseService();
         QCableService qs = new QCableService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(qs.getTableJsonFromCases(cs.getAll()));
+        hse.getResponseSender().send(qs.getTableJsonFromCases(cs.getAll(name), name));
     }
 
     public static void getFilteredQcablesTableParams(HttpServerExchange hse) throws Exception {
@@ -125,7 +124,7 @@ public class QCableService extends Service<QCable> {
         switch(filterType){
             case "project":
                 ProjectService ps = new ProjectService();
-                cases = ps.get(filterId).donorCases;
+                cases = ps.get(filterId, name).donorCases;
                 break;
             case "case":
                 cases.add(filterId);
@@ -134,18 +133,18 @@ public class QCableService extends Service<QCable> {
                 throw new UnsupportedOperationException("Bad filter type "
                         + filterType +" , supported types are: project, case");
         }
-        hse.getResponseSender().send(qs.getTableJsonFromIds(cases));
+        hse.getResponseSender().send(qs.getTableJsonFromIds(cases, name));
     }
 
-    public String getTableJsonFromCases(List<Case> cases) throws Exception {
+    public String getTableJsonFromCases(List<Case> cases, String username) throws Exception {
         List<String> ids = new LinkedList<>();
         for (Case donorCase: cases){
             ids.add(donorCase.id);
         }
-        return new DBConnector().getQcableTable(ids).toJSONString();
+        return new DBConnector(username).getQcableTable(ids).toJSONString();
     }
 
-    public String getTableJsonFromIds(List<String> caseIds) throws Exception {
-        return new DBConnector().getQcableTable(caseIds).toJSONString();
+    public String getTableJsonFromIds(List<String> caseIds, String username) throws Exception {
+        return new DBConnector(username).getQcableTable(caseIds).toJSONString();
     }
 }

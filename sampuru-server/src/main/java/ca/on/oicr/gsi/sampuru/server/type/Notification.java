@@ -16,8 +16,8 @@ public class Notification extends SampuruType {
     public LocalDateTime resolvedDate;
     public String content;
 
-    public Notification(int newId) throws Exception {
-        getNotificationFromDb(NOTIFICATION.ID, newId);
+    public Notification(int newId, String username) throws Exception {
+        getNotificationFromDb(NOTIFICATION.ID, newId, username);
     }
 
     public Notification(Record row) {
@@ -27,12 +27,12 @@ public class Notification extends SampuruType {
         content = row.get(NOTIFICATION.CONTENT);
     }
 
-    public static List<Notification> getAll() throws Exception {
-        return getAll(NOTIFICATION, Notification.class);
+    public static List<Notification> getAll(String username) throws Exception {
+        return getAll(NOTIFICATION, Notification.class, username);
     }
 
-    private void getNotificationFromDb(TableField field, Object toMatch) throws Exception {
-        DBConnector dbConnector = new DBConnector();
+    private void getNotificationFromDb(TableField field, Object toMatch, String username) throws Exception {
+        DBConnector dbConnector = new DBConnector(username);
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(NOTIFICATION.ID);
         issueDate = dbRecord.get(NOTIFICATION.ISSUE_DATE);

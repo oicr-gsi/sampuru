@@ -52,7 +52,7 @@ public class Server {
 
     // see https://stackoverflow.com/questions/39742014/routing-template-format-for-undertow
     private static void doSearch(HttpServerExchange hse) throws Exception {
-        String name = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         Service service = null;
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String type = ptm.getParameters().get("type");
@@ -81,7 +81,7 @@ public class Server {
             default:
                 throw new Exception("Invalid search type " + type);
         }
-        list = service.search(term);
+        list = service.search(term, username);
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(service.toJson(list));
     }

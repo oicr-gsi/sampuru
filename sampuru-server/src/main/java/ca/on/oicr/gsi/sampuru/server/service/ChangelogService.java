@@ -7,6 +7,7 @@ import io.undertow.server.HttpServerExchange;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import tables_generated.tables.Changelog;
@@ -33,14 +34,12 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     @Override
-    public List<ChangelogEntry> getAll() throws Exception {
-        DSLContext context = new DBConnector().getContext();
+    public List<ChangelogEntry> getAll(String username) throws Exception {
         List<ChangelogEntry> changelogs = new LinkedList<>();
 
-        Result<Record> results = context
-                .select()
-                .from(CHANGELOG)
-                .fetch();
+        Result<Record> results = new DBConnector(username).execute(
+                PostgresDSL.select()
+                .from(CHANGELOG));
 
         for (Record result: results){
             changelogs.add(new ChangelogEntry(result));
@@ -49,12 +48,12 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     @Override
-    public List<ChangelogEntry> search(String term) throws Exception{
-        List<Integer> ids = new DBConnector().search(CHANGELOG, CHANGELOG.ID, CHANGELOG.CONTENT, term).stream().map(o -> (Integer)o).collect(Collectors.toList());
+    public List<ChangelogEntry> search(String term, String username) throws Exception{
+        List<Integer> ids = new DBConnector(username).search(CHANGELOG, CHANGELOG.ID, CHANGELOG.CONTENT, term).stream().map(o -> (Integer)o).collect(Collectors.toList());
         List<ChangelogEntry> changelogs = new LinkedList<>();
 
         for (Integer id: ids){
-            changelogs.add(get(id));
+            changelogs.add(get(id, username));
         }
 
         return changelogs;

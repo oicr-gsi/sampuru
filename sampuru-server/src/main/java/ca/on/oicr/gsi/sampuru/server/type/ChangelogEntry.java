@@ -13,8 +13,8 @@ public class ChangelogEntry extends SampuruType {
     public LocalDateTime changeDate;
     public String content;
 
-    public ChangelogEntry(int newId) throws Exception {
-        getChangelogEntryFromDb(CHANGELOG.ID, newId);
+    public ChangelogEntry(int newId, String username) throws Exception {
+        getChangelogEntryFromDb(CHANGELOG.ID, newId, username);
     }
 
     public ChangelogEntry(Record row) {
@@ -23,8 +23,8 @@ public class ChangelogEntry extends SampuruType {
         content = row.get(CHANGELOG.CONTENT);
     }
 
-    private void getChangelogEntryFromDb(TableField field, Object toMatch) throws Exception {
-        DBConnector dbConnector = new DBConnector();
+    private void getChangelogEntryFromDb(TableField field, Object toMatch, String username) throws Exception {
+        DBConnector dbConnector = new DBConnector(username);
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(CHANGELOG.ID);
         changeDate = dbRecord.get(CHANGELOG.CHANGE_DATE);

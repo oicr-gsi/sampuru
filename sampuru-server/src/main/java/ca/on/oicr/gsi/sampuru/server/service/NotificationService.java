@@ -8,6 +8,7 @@ import io.undertow.util.Headers;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -34,11 +35,10 @@ public class NotificationService extends Service<Notification> {
     }
 
     @Override
-    public List<Notification> getAll() throws Exception {
-        DSLContext context = new DBConnector().getContext();
+    public List<Notification> getAll(String username) throws Exception {
         List<Notification> notifications = new LinkedList<>();
 
-        Result<Record> results = context.select().from(NOTIFICATION).fetch();
+        Result<Record> results = new DBConnector(username).execute(PostgresDSL.select().from(NOTIFICATION));
 
         for(Record result: results){
             notifications.add(new Notification(result));
@@ -48,12 +48,12 @@ public class NotificationService extends Service<Notification> {
     }
 
     @Override
-    public List<Notification> search(String term) throws Exception {
-        List<Integer> ids = new DBConnector().search(NOTIFICATION, NOTIFICATION.ID, NOTIFICATION.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
+    public List<Notification> search(String term, String username) throws Exception {
+        List<Integer> ids = new DBConnector(username).search(NOTIFICATION, NOTIFICATION.ID, NOTIFICATION.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
         List<Notification> notifications = new LinkedList<>();
 
         for (Integer id: ids){
-            notifications.add(get(id));
+            notifications.add(get(id, username));
         }
 
         return notifications;
@@ -77,19 +77,18 @@ public class NotificationService extends Service<Notification> {
     }
 
     public static void getActiveParams(HttpServerExchange hse) {
-        String name = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         NotificationService ns = new NotificationService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ns.toJson(ns.getActiveNotifications()));
+        hse.getResponseSender().send(ns.toJson(ns.getActiveNotifications(username)));
     }
 
     //TODO: name in params
-    private List<Notification> getActiveNotifications() {
-        Result<Record> results = new DBConnector().getContext()
-                .select()
+    private List<Notification> getActiveNotifications(String username) {
+        Result<Record> results = new DBConnector(username).execute(
+                PostgresDSL.select()
                 .from(NOTIFICATION)
-                .where(NOTIFICATION.RESOLVED_DATE.isNull())
-                .fetch();
+                .where(NOTIFICATION.RESOLVED_DATE.isNull()));
         List<Notification> newList = new LinkedList<>();
         for(Record result: results){
             newList.add(new Notification(result));

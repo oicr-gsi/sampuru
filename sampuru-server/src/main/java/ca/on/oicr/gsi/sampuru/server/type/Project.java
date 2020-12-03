@@ -27,8 +27,8 @@ public class Project extends SampuruType {
     public List<String> donorCases = new LinkedList<>();
     public int casesTotal, casesCompleted, qcablesTotal, qcablesCompleted;
 
-    public Project(String newId) throws Exception {
-        getProjectFromDb(PROJECT.ID, newId);
+    public Project(String newId, String username) throws Exception {
+        getProjectFromDb(PROJECT.ID, newId, username);
     }
 
     public Project(Record row) {
@@ -46,32 +46,32 @@ public class Project extends SampuruType {
         qcablesCompleted = row.get(QCABLES_COMPLETED, Integer.class);
     }
 
-    public static List<Project> getAll() throws Exception {
-        return getAll(PROJECT, Project.class);
+    public static List<Project> getAll(String username) throws Exception {
+        return getAll(PROJECT, Project.class, username);
     }
 
-    public List<ProjectInfoItem> getInfoItems() throws Exception {
+    public List<ProjectInfoItem> getInfoItems(String username) throws Exception {
         List<ProjectInfoItem> projectInfoItems = new LinkedList<>();
         for(Integer i: infoItems){
-            projectInfoItems.add(new ProjectInfoItem(i));
+            projectInfoItems.add(new ProjectInfoItem(i, username));
         }
         return projectInfoItems;
     }
 
-    public List<Case> getCases() throws Exception {
-        return new CaseService().getForProject(this.id);
+    public List<Case> getCases(String username) throws Exception {
+        return new CaseService().getForProject(this.id, username);
     }
 
-    public List<Deliverable> getDeliverables() throws Exception {
+    public List<Deliverable> getDeliverables(String username) throws Exception {
         List<Deliverable> deliverableList = new LinkedList<>();
         for (Integer i: deliverables){
-            deliverableList.add(new Deliverable(i));
+            deliverableList.add(new Deliverable(i, username));
         }
         return deliverableList;
     }
 
-    private void getProjectFromDb(TableField field, Object toMatch) throws Exception {
-        DBConnector dbConnector = new DBConnector();
+    private void getProjectFromDb(TableField field, Object toMatch, String username) throws Exception {
+        DBConnector dbConnector = new DBConnector(username);
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(PROJECT.ID);
         name = dbRecord.get(PROJECT.NAME);
@@ -84,12 +84,12 @@ public class Project extends SampuruType {
         deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
     }
 
-    public List<QCable> getFailedQCables() throws Exception {
-        List<String> failedQCablesIds = new DBConnector().getFailedQCablesForProject(this.id);
+    public List<QCable> getFailedQCables(String username) throws Exception {
+        List<String> failedQCablesIds = new DBConnector(username).getFailedQCablesForProject(this.id);
         List<QCable> failedQCables = new LinkedList<>();
 
         for(String failureId: failedQCablesIds){
-            failedQCables.add(new QCable(failureId));
+            failedQCables.add(new QCable(failureId, username));
         }
 
         return failedQCables;

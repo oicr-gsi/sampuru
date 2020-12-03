@@ -22,22 +22,24 @@ public class DBConnector {
     public static final String QC_FAILED = "failed";
     public static final String QC_PENDING = "pending";
     private Properties properties = Server.properties;
-    private String userName = properties.getProperty("dbUser");
+    private String dbUser = properties.getProperty("dbUser");
     private String pw = properties.getProperty("dbPassword");
     private String url = properties.getProperty("dbUrl");
     private static PGConnectionPoolDataSource pgDataSource;
+    private String username;
 
-    public DBConnector() {
+    public DBConnector(String newUsername) {
         if (pgDataSource == null) {
             PGConnectionPoolDataSource pgDataSource = new PGConnectionPoolDataSource();
             pgDataSource.setUrl(url);
-            pgDataSource.setUser(userName);
+            pgDataSource.setUser(dbUser);
             pgDataSource.setPassword(pw);
             this.pgDataSource = pgDataSource;
         }
+        this.username = newUsername;
     }
 
-    public Connection getConnection() {
+    private Connection getConnection() {
         try {
             return pgDataSource.getConnection();
         } catch (SQLException se) {
@@ -45,14 +47,19 @@ public class DBConnector {
         }
     }
 
-    public DSLContext getContext() {
+    private DSLContext getContext() {
         return getContext(getConnection());
     }
 
-    public DSLContext getContext(Connection connection){
+    private DSLContext getContext(Connection connection){
         return DSL.using(connection, SQLDialect.POSTGRES);
     }
 
+    public Result execute(Select select){
+        return getContext().fetch(select);
+    }
+
+    //TODO: filter by username
     public Record getUniqueRow(TableField field, Object toMatch) throws Exception {
         String tableName = field.getTable().getName();
         Result<Record> rowResult = getContext().select().from(field.getTable()).where(field.eq(toMatch)).fetch();
@@ -73,6 +80,7 @@ public class DBConnector {
      * @return LinkedList of SampuruType specified
      * @throws Exception
      */
+    //TODO: filter by username
     public <T extends SampuruType> List<T> getMany(TableField idField, TableField matchField, Object toMatch, Class<T> toCreate)
             throws Exception {
         List<T> newList = new LinkedList<>();
@@ -90,6 +98,7 @@ public class DBConnector {
         return newList;
     }
 
+    //TODO: filter by username
     public List<Integer> getAllIds(Table getFrom){
         List<Integer> newList = new LinkedList<>();
         Field<Integer> idField = getFrom.field("id");
@@ -103,6 +112,7 @@ public class DBConnector {
         return newList;
     }
 
+    //TODO: filter by username?? maybe??
     public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
         List<Object> newList = new LinkedList<>();
         Field<Object> idField = getFrom.field("id");
@@ -120,6 +130,7 @@ public class DBConnector {
         return newList;
     }
 
+    //TODO: filter by username
     public List<String> getCompletedProjectIds() throws Exception {
         List<String> projectsIdsList = new LinkedList<>();
 
@@ -136,6 +147,7 @@ public class DBConnector {
         return projectsIdsList;
     }
 
+    //TODO: filter by username
     public List<String> getActiveProjectIds() throws Exception {
         List<String> projectsIdsList = new LinkedList<>();
 
@@ -152,6 +164,7 @@ public class DBConnector {
         return projectsIdsList;
     }
 
+    //TODO: filter by username??
     public JSONArray getCaseBars(List<String> caseIdsToExpand){
         JSONObjectMap cards = new JSONObjectMap();
         DSLContext context = getContext();
@@ -275,6 +288,7 @@ public class DBConnector {
 //        return result.get(0).value1();
     }
 
+    //TODO: filter by username??
     public List<String> getFailedQCablesForProject(String id) {
         List<String> ids = new LinkedList<>();
         Result<Record1<String>> result = getContext()
@@ -291,6 +305,7 @@ public class DBConnector {
         return ids;
     }
 
+    //TODO: filter by username
     public JSONObject getSankeyTransitions(String projectId) throws SQLException {
         JSONObject jsonObject = new JSONObject();
         Result<Record> shouldBeSingularResult = getContext()
@@ -359,6 +374,7 @@ public class DBConnector {
         return jsonObject;
     }
 
+    //TODO: filter by username
     public JSONArray getQcableTable(List<String> caseIds){
         JSONArray jsonArray = new JSONArray();
         Result<Record> result = getContext()
@@ -392,6 +408,7 @@ public class DBConnector {
         return jsonArray;
     }
 
+    //TODO: filter by username
     public List<Object> search(Table targetTable, TableField idField, TableField contentField, String term){
         List<Object> items = new LinkedList<>();
         Result<Record> results = getContext()

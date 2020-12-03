@@ -7,6 +7,7 @@ import io.undertow.server.HttpServerExchange;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -33,13 +34,11 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     @Override
-    public List<Deliverable> getAll() throws Exception {
-        DSLContext context = new DBConnector().getContext();
+    public List<Deliverable> getAll(String username) throws Exception {
         List<Deliverable> deliverables = new LinkedList<>();
 
-        Result<Record> results = context.select()
-                .from(DELIVERABLE_FILE)
-                .fetch();
+        Result<Record> results = new DBConnector(username).execute(PostgresDSL.select()
+                .from(DELIVERABLE_FILE));
 
         for(Record result: results){
             deliverables.add(new Deliverable(result));
@@ -48,12 +47,12 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     @Override
-    public List<Deliverable> search(String term) throws Exception {
-        List<Integer> ids = new DBConnector().search(DELIVERABLE_FILE, DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
+    public List<Deliverable> search(String term, String username) throws Exception {
+        List<Integer> ids = new DBConnector(username).search(DELIVERABLE_FILE, DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
         List<Deliverable> deliverables = new LinkedList<>();
 
         for (Integer id: ids){
-            deliverables.add(get(id));
+            deliverables.add(get(id, username));
         }
 
         return deliverables;
