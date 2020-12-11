@@ -33,7 +33,7 @@ public class Server {
                     .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
                     .get("/notifications-active", NotificationService::getActiveParams)
                     .get("/notifications-historic", NotificationService::getAllParams) // This is the same as the all endpoint was, just want naming consistency
-                    .get("/search/{type}/{term}", Server::doSearch) //BROKEN for projects
+                    .get("/search/{type}/{term}", Server::doSearch)
                     .get("/home", Server::helloWorld)
             )
             .addPrefixPath("/", new ResourceHandler(new ClassPathResourceManager(Server.class.getClassLoader(), "static"))
