@@ -157,7 +157,7 @@ public class Project extends SampuruType {
     }
 
     public List<QCable> getFailedQCables(String username) throws Exception {
-        List<String> failedQCablesIds = new DBConnector().getFailedQCablesForProject(this.id);
+        List<String> failedQCablesIds = new DBConnector().getFailedQCablesForProject(this.id, username);
         List<QCable> failedQCables = new LinkedList<>();
 
         for(String failureId: failedQCablesIds){

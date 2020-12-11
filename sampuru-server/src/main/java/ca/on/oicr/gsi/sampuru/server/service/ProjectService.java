@@ -338,7 +338,7 @@ public class ProjectService extends Service<Project> {
         }
         jsonObject.put("failures", failureArray);
 
-        jsonObject.put("sankey_transitions", new DBConnector().getSankeyTransitions(subject.id));
+        jsonObject.put("sankey_transitions", new DBConnector().getSankeyTransitions(subject.id, username));
 
         return jsonObject.toJSONString();
     }
