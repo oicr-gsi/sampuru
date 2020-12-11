@@ -14,12 +14,11 @@ public abstract class Service<T extends SampuruType> {
         targetClass = newTarget;
     }
 
-    //TODO: filter by username
     public T get(Object id, String username) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         try {
-            return targetClass.getDeclaredConstructor(String.class).newInstance(id);
+            return targetClass.getDeclaredConstructor(String.class, String.class).newInstance(id, username);
         } catch (NoSuchMethodException nsme){
-            return targetClass.getDeclaredConstructor(int.class).newInstance(id);
+            return targetClass.getDeclaredConstructor(int.class, String.class).newInstance(id, username);
         }
     }
 
@@ -32,20 +31,19 @@ public abstract class Service<T extends SampuruType> {
             items.add(targetService.get(id, username));
         }
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(targetService.toJson(items));
+        hse.getResponseSender().send(targetService.toJson(items, username));
     }
 
     public abstract List<T> getAll(String username) throws Exception;
 
-    //TODO: filter by username
     public static void getAllParams(Service targetService, HttpServerExchange hse) throws Exception {
         String username = hse.getRequestHeaders().get("X-Remote-User").element();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(targetService.toJson(targetService.getAll(username)));
+        hse.getResponseSender().send(targetService.toJson(targetService.getAll(username), username));
     }
 
-    public abstract List<T> search(String term, String username) throws Exception;
+    public abstract List<T> search(String term, String username);
 
-    public abstract String toJson(Collection<? extends  SampuruType> toWrite) throws Exception;
+    public abstract String toJson(Collection<? extends  SampuruType> toWrite, String username) throws Exception;
 
 }

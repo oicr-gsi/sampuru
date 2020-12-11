@@ -25,30 +25,22 @@ public class Server {
      */
     private final static HttpHandler ROUTES = Handlers.path()
             .addPrefixPath("/api", new RoutingHandler()
-                    // Normal REST endpoints. P sure ALL of these are tech debt. Deeply hateful
-//                    .get("/projects", ProjectService::getAllParams)
-//                    .get("/project/{id}", ProjectService::getIdParams) // TODO: update to use Row probably
-//                    .get("/cases", CaseService::getAllParams)
-//                    .get("/case/{id}", CaseService::getIdParams)
-//                    .get("/notifications", NotificationService::getAllParams) //TODO most of these are unrealistic past alpha, get all _for user_
-//                    .get("/notification/{id}", NotificationService::getIdParams)
-//                    .get("/qcables", QCableService::getAllParams)
-//                    .get("/qcable/{id}", QCableService::getIdParams)
-
-                    // Special frontend endpoints
+                    // Special frontend endpoints. I've killed the normal REST endpoints
                     .get("/active_projects", ProjectService::getActiveProjectsParams)
                     .get("/completed_projects", ProjectService::getCompletedProjectsParams)
                     .get("/cases_cards/{projectId}", CaseService::getCardsParams)
-                    .get("/qcables_table", QCableService::getAllQcablesTableParams)
                     .get("/qcables_table/{filterType}/{filterId}", QCableService::getFilteredQcablesTableParams)
                     .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
                     .get("/notifications-active", NotificationService::getActiveParams)
-                    .get("/notifications-historic", NotificationService::getAllParams) // This is the same as the all endpoint, just want naming consistency
-                    .get("/search/{type}/{term}", Server::doSearch)
+                    .get("/notifications-historic", NotificationService::getAllParams) // This is the same as the all endpoint was, just want naming consistency
+                    .get("/search/{type}/{term}", Server::doSearch) //BROKEN for projects
                     .get("/home", Server::helloWorld)
             )
             .addPrefixPath("/", new ResourceHandler(new ClassPathResourceManager(Server.class.getClassLoader(), "static"))
                     .setWelcomeFiles("index.html"));
+
+    private final static HttpHandler ROOT = Handlers.exceptionHandler(ROUTES)
+            .addExceptionHandler(Exception.class, Server::handleException);
 
     // see https://stackoverflow.com/questions/39742014/routing-template-format-for-undertow
     private static void doSearch(HttpServerExchange hse) throws Exception {
@@ -83,11 +75,8 @@ public class Server {
         }
         list = service.search(term, username);
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(service.toJson(list));
+        hse.getResponseSender().send(service.toJson(list, username));
     }
-
-    private final static HttpHandler ROOT = Handlers.exceptionHandler(ROUTES)
-            .addExceptionHandler(Exception.class, Server::handleException);
 
     //TODO: No error handling for, eg, /qcable/10000000
     public static void main(String[] args){

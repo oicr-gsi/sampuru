@@ -25,7 +25,7 @@ public class Deliverable extends SampuruType {
     }
 
     private void getDeliverableFromDb(TableField field, Object toMatch, String username) throws Exception {
-        DBConnector dbConnector = new DBConnector(username);
+        DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(DELIVERABLE_FILE.ID);
         content = dbRecord.get(DELIVERABLE_FILE.CONTENT);

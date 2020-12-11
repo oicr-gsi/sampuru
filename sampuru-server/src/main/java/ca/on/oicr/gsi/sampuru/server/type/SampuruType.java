@@ -11,7 +11,7 @@ public abstract class SampuruType {
 
     protected static <T extends SampuruType> List<T> getAll(Table selfTable, Class<T> targetClass, String username)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        DBConnector dbConnector = new DBConnector(username);
+        DBConnector dbConnector = new DBConnector();
         List<Integer> ids = dbConnector.getAllIds(selfTable);
         List<T> newList = new LinkedList<>();
 

@@ -17,8 +17,16 @@ public class ProjectInfoItem extends SampuruType {
         getProjectInfoItemFromDb(PROJECT_INFO_ITEM.ID, newId, username);
     }
 
+    public ProjectInfoItem(Record row) {
+        this.id = row.get(PROJECT_INFO_ITEM.ID);
+        this.entryType = row.get(PROJECT_INFO_ITEM.TYPE);
+        this.content = row.get(PROJECT_INFO_ITEM.CONTENT);
+        this.expected = row.get(PROJECT_INFO_ITEM.EXPECTED);
+        this.received = row.get(PROJECT_INFO_ITEM.RECEIVED);
+    }
+
     private void getProjectInfoItemFromDb(TableField field, Object toMatch, String username) throws Exception {
-        DBConnector dbConnector = new DBConnector(username);
+        DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(PROJECT_INFO_ITEM.ID);
         entryType = dbRecord.get(PROJECT_INFO_ITEM.TYPE);

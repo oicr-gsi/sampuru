@@ -2,6 +2,7 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
+import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import org.jooq.DSLContext;
@@ -37,7 +38,7 @@ public class DeliverableService extends Service<Deliverable> {
     public List<Deliverable> getAll(String username) throws Exception {
         List<Deliverable> deliverables = new LinkedList<>();
 
-        Result<Record> results = new DBConnector(username).execute(PostgresDSL.select()
+        Result<Record> results = new DBConnector().execute(PostgresDSL.select()
                 .from(DELIVERABLE_FILE));
 
         for(Record result: results){
@@ -47,19 +48,30 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     @Override
-    public List<Deliverable> search(String term, String username) throws Exception {
-        List<Integer> ids = new DBConnector(username).search(DELIVERABLE_FILE, DELIVERABLE_FILE.ID, DELIVERABLE_FILE.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
+    public List<Deliverable> search(String term, String username) {
         List<Deliverable> deliverables = new LinkedList<>();
-
-        for (Integer id: ids){
-            deliverables.add(get(id, username));
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select()
+                .from(DELIVERABLE_FILE)
+                .where(DELIVERABLE_FILE.CONTENT.like("%"+term+"%")
+                        .and(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))));
+        for(Record result: results){
+            deliverables.add(new Deliverable(result));
         }
 
         return deliverables;
     }
 
     @Override
-    public String toJson(Collection<? extends SampuruType> toWrite){
+    public String toJson(Collection<? extends SampuruType> toWrite, String username){
         JSONArray jsonArray = new JSONArray();
 
         for(SampuruType item: toWrite){

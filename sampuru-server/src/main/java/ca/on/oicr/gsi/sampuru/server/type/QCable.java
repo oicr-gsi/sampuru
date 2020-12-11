@@ -50,7 +50,7 @@ public class QCable extends SampuruType {
     }
 
     private void getQCableFromDb(TableField field, Object toMatch, String username) throws Exception {
-        DBConnector dbConnector = new DBConnector(username);
+        DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(QCABLE.ID);
         OICRAlias = dbRecord.get(QCABLE.OICR_ALIAS);

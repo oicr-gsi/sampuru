@@ -24,7 +24,7 @@ public class Case extends SampuruType {
         getCaseFromDb(DONOR_CASE.ID, newId, username);
     }
 
-    public Case(Record row) throws Exception {
+    public Case(Record row) {
         id = row.get(DONOR_CASE.ID);
         name = row.get(DONOR_CASE.NAME);
 
@@ -62,7 +62,7 @@ public class Case extends SampuruType {
     }
 
     private void getCaseFromDb(TableField field, Object toMatch, String username) throws Exception {
-        DBConnector dbConnector = new DBConnector(username);
+        DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(DONOR_CASE.ID);
         name = dbRecord.get(DONOR_CASE.NAME);

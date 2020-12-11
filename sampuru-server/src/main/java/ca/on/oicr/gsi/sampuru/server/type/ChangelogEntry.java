@@ -24,7 +24,7 @@ public class ChangelogEntry extends SampuruType {
     }
 
     private void getChangelogEntryFromDb(TableField field, Object toMatch, String username) throws Exception {
-        DBConnector dbConnector = new DBConnector(username);
+        DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(CHANGELOG.ID);
         changeDate = dbRecord.get(CHANGELOG.CHANGE_DATE);

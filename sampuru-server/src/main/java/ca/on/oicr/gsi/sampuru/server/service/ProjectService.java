@@ -4,7 +4,9 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Record;
 import org.jooq.util.postgres.PostgresDSL;
@@ -38,7 +40,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getCompletedProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = new DBConnector(username).execute(
+        Result<Record> results = new DBConnector().execute(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -56,7 +58,16 @@ public class ProjectService extends Service<Project> {
                                 .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.DELIVERABLE_IDS))
                 .from(PROJECT)
-                .where(PROJECT.COMPLETION_DATE.isNotNull()));
+                .where(PROJECT.COMPLETION_DATE.isNotNull()
+                        .and(PROJECT.ID.in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username))))
+                                .or(DBConnector.ADMIN_ROLE
+                                        .in(PostgresDSL
+                                                .select(USER_ACCESS.PROJECT)
+                                                .from(USER_ACCESS)
+                                                .where(USER_ACCESS.USERNAME.eq(username))))));
 
         for (Record result: results) {
             newList.add(new Project(result));
@@ -85,11 +96,10 @@ public class ProjectService extends Service<Project> {
         return jsonArray.toJSONString();
     }
 
-    //TODO: add user to params
     public List<Project> getActiveProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = new DBConnector(username).execute(
+        Result<Record> results = new DBConnector().execute(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -146,8 +156,16 @@ public class ProjectService extends Service<Project> {
                                 .as(Project.QCABLES_COMPLETED)
                         )
                 .from(PROJECT)
-                .where(PROJECT.COMPLETION_DATE.isNull()));
-
+                .where(PROJECT.COMPLETION_DATE.isNull()
+                        .and(PROJECT.ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE
+                                .in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username))))));
         for (Record result: results) {
             newList.add(new Project(result));
         }
@@ -182,7 +200,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getAll(String username) {
         List<Project> projects = new LinkedList<>();
 
-        Result<Record> results = new DBConnector(username).execute(
+        Result<Record> results = new DBConnector().execute(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -208,61 +226,72 @@ public class ProjectService extends Service<Project> {
     }
 
     @Override
-    public List<Project> search(String term, String username) throws Exception {
-        List<String> ids = new DBConnector(username).search(PROJECT, PROJECT.ID, PROJECT.NAME, term).stream().map(o -> (String)o).collect(Collectors.toList());
+    public List<Project> search(String term, String username) {
         List<Project> projects = new LinkedList<>();
-
-        for (String id: ids){
-            projects.add(get(id, username));
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select()
+                .from(PROJECT)
+                .where(PROJECT.ID.like("%"+term+"%")
+                        .and(PROJECT.ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))));
+        for(Record result: results){
+            projects.add(new Project(result));
         }
 
         return projects;
     }
 
+
     @Override
-    public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
-        return toJson(toWrite, false);
+    public String toJson(Collection<? extends SampuruType> toWrite, String username) throws Exception {
+        return toJson(toWrite, false, username);
     }
 
-    public String toJson(Collection<? extends SampuruType> toWrite, boolean expand) throws Exception {
-        return "don't call this";
-//        JSONArray jsonArray = new JSONArray();
-//
-//        for(SampuruType item: toWrite){
-//            Project project = (Project)item;
-//            JSONObject jsonObject = new JSONObject();
-//
-//            jsonObject.put("id", project.id);
-//            jsonObject.put("name", project.name);
-//            jsonObject.put("contact_name", project.contactName == null? "null": project.contactName);
-//            jsonObject.put("contact_email", project.contactEmail == null? "null": project.contactEmail);
-//            jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
-//
-//            if(expand){
-//                JSONArray infoItemsArray = new JSONArray();
-//                for (ProjectInfoItem infoItem: project.getInfoItems(username)){
-//                    JSONObject infoItemObj = new JSONObject();
-//                    infoItemObj.put("id", infoItem.id);
-//                    infoItemObj.put("entry_type", infoItem.entryType);
-//                    infoItemObj.put("content", infoItem.content);
-//                    infoItemObj.put("expected", infoItem.expected == null? "null": infoItem.expected);
-//                    infoItemObj.put("received", infoItem.received == null? "null": infoItem.received);
-//                    infoItemsArray.add(infoItemObj);
-//                }
-//                jsonObject.put("info_items", infoItemsArray);
-//
-//                jsonObject.put("donor_cases", new CaseService().toJson(project.getCases(), true));
-//                jsonObject.put("deliverables", new DeliverableService().toJson(project.getDeliverables()));
-//            } else {
-//                jsonObject.put("info_items", project.infoItems);
-//                jsonObject.put("donor_cases", project.donorCases);
-//                jsonObject.put("deliverables", project.deliverables);
-//            }
-//
-//            jsonArray.add(jsonObject);
-//        }
-//
-//        return jsonArray.toJSONString();
+    public String toJson(Collection<? extends SampuruType> toWrite, boolean expand, String username) throws Exception {
+        JSONArray jsonArray = new JSONArray();
+
+        for(SampuruType item: toWrite){
+            Project project = (Project)item;
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put("id", project.id);
+            jsonObject.put("name", project.name);
+            jsonObject.put("contact_name", project.contactName == null? "null": project.contactName);
+            jsonObject.put("contact_email", project.contactEmail == null? "null": project.contactEmail);
+            jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
+
+            if(expand){
+                JSONArray infoItemsArray = new JSONArray();
+                for (ProjectInfoItem infoItem: project.getInfoItems(username)){
+                    JSONObject infoItemObj = new JSONObject();
+                    infoItemObj.put("id", infoItem.id);
+                    infoItemObj.put("entry_type", infoItem.entryType);
+                    infoItemObj.put("content", infoItem.content);
+                    infoItemObj.put("expected", infoItem.expected == null? "null": infoItem.expected);
+                    infoItemObj.put("received", infoItem.received == null? "null": infoItem.received);
+                    infoItemsArray.add(infoItemObj);
+                }
+                jsonObject.put("info_items", infoItemsArray);
+
+                jsonObject.put("donor_cases", new CaseService().toJson(project.getCases(username), true, username));
+                jsonObject.put("deliverables", new DeliverableService().toJson(project.getDeliverables(username), username));
+            } else {
+                jsonObject.put("info_items", project.infoItems);
+                jsonObject.put("donor_cases", project.donorCases);
+                jsonObject.put("deliverables", project.deliverables);
+            }
+
+            jsonArray.add(jsonObject);
+        }
+
+        return jsonArray.toJSONString();
     }
 
     public String getProjectOverviewJson(Project subject, String username) throws Exception {
@@ -309,24 +338,18 @@ public class ProjectService extends Service<Project> {
         }
         jsonObject.put("failures", failureArray);
 
-        jsonObject.put("sankey_transitions", new DBConnector(username).getSankeyTransitions(subject.id));
+        jsonObject.put("sankey_transitions", new DBConnector().getSankeyTransitions(subject.id));
 
         return jsonObject.toJSONString();
     }
 
     public static void getProjectOverviewParams(HttpServerExchange hse) throws Exception {
         String username = hse.getRequestHeaders().get("X-Remote-User").element();
-
-        //TODO: different retrieval method?
-        Deque<String> idparams = hse.getQueryParameters().get("id");
-        if(idparams.size() > 1){
-            throw new UnsupportedOperationException("Only takes 1 project ID");
-        } else if(idparams.isEmpty()){
-            throw new UnsupportedOperationException("Got no project IDs");
-        }
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        String idparam = ptm.getParameters().get("id");
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        // TODO: both needing username is a red flag
-        hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(idparams.getFirst(), username), username));
+        // TODO: please refactor, i think this is the last holdout using get()
+        hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(idparam, username), username));
     }
 }

@@ -3,7 +3,9 @@ package ca.on.oicr.gsi.sampuru.server.type;
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.service.CaseService;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.TableField;
+import org.jooq.util.postgres.PostgresDSL;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -50,29 +52,99 @@ public class Project extends SampuruType {
         return getAll(PROJECT, Project.class, username);
     }
 
-    public List<ProjectInfoItem> getInfoItems(String username) throws Exception {
-        List<ProjectInfoItem> projectInfoItems = new LinkedList<>();
-        for(Integer i: infoItems){
-            projectInfoItems.add(new ProjectInfoItem(i, username));
+    public List<Case> getCases(String username) {
+        List<Case> cases = new LinkedList<>();
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select()
+                .from(DONOR_CASE)
+                .where(DONOR_CASE.PROJECT_ID.in(donorCases)
+                        .and(DONOR_CASE.PROJECT_ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))));
+
+        for(Record result: results){
+            cases.add(new Case(result));
         }
+
+        return cases;
+    }
+
+    public List<ProjectInfoItem> getInfoItems(String username) {
+        List<ProjectInfoItem> projectInfoItems = new LinkedList<>();
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select()
+                .from(PROJECT_INFO_ITEM)
+                .where(PROJECT_INFO_ITEM.ID.in(infoItems)
+                        .and(PROJECT_INFO_ITEM.PROJECT_ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))));
+
+        for(Record result: results){
+            projectInfoItems.add(new ProjectInfoItem(result));
+        }
+
         return projectInfoItems;
     }
 
-    public List<Case> getCases(String username) throws Exception {
-        return new CaseService().getForProject(this.id, username);
-    }
-
-    public List<Deliverable> getDeliverables(String username) throws Exception {
+    public List<Deliverable> getDeliverables(String username) {
         List<Deliverable> deliverableList = new LinkedList<>();
-        for (Integer i: deliverables){
-            deliverableList.add(new Deliverable(i, username));
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select()
+                .from(DELIVERABLE_FILE)
+                .where(DELIVERABLE_FILE.PROJECT_ID.eq(this.id)
+                        .and(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))));
+
+        for(Record result: results){
+            deliverableList.add(new Deliverable(result));
         }
+
         return deliverableList;
     }
 
     private void getProjectFromDb(TableField field, Object toMatch, String username) throws Exception {
-        DBConnector dbConnector = new DBConnector(username);
-        Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
+        DBConnector dbConnector = new DBConnector();
+
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select()
+                .from(PROJECT)
+                .where(PROJECT.ID.eq((String)toMatch)
+                        .and(PROJECT.ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))));
+
+        if(results.isEmpty()){
+            throw new Exception("Project does not exist or no permission"); // TODO: more precise exception
+        } else if (results.size() > 1){
+            throw new Exception("Found >1 record for Project identifier " + toMatch); // TODO: more precise exception
+        }
+
+        Record dbRecord = results.get(0);
+
         id = dbRecord.get(PROJECT.ID);
         name = dbRecord.get(PROJECT.NAME);
         contactName = dbRecord.get(PROJECT.CONTACT_NAME);
@@ -85,7 +157,7 @@ public class Project extends SampuruType {
     }
 
     public List<QCable> getFailedQCables(String username) throws Exception {
-        List<String> failedQCablesIds = new DBConnector(username).getFailedQCablesForProject(this.id);
+        List<String> failedQCablesIds = new DBConnector().getFailedQCablesForProject(this.id);
         List<QCable> failedQCables = new LinkedList<>();
 
         for(String failureId: failedQCablesIds){
