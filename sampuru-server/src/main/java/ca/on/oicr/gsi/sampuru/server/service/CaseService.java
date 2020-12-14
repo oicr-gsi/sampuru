@@ -251,7 +251,22 @@ public class CaseService extends Service<Case> {
         List<Case> cases = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.execute(PostgresDSL
-                .select()
+                .select(DONOR_CASE.asterisk(),
+                        PostgresDSL.array(PostgresDSL
+                                .select(QCABLE.ID)
+                                .from(QCABLE)
+                                .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.QCABLE_IDS),
+                        PostgresDSL.array(PostgresDSL
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.DELIVERABLE_IDS),
+                        PostgresDSL.array(PostgresDSL
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(DONOR_CASE.ID)))
+                                .as(Case.CHANGELOG_IDS))
                 .from(DONOR_CASE)
                 .where(DONOR_CASE.PROJECT_ID.like("%"+term+"%")
                         .and(DONOR_CASE.PROJECT_ID.in(PostgresDSL

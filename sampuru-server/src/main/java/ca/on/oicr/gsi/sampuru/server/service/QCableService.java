@@ -64,7 +64,12 @@ public class QCableService extends Service<QCable> {
         List<QCable> qcables = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.execute(PostgresDSL
-                .select()
+                .select(QCABLE.asterisk(),
+                        PostgresDSL.array(PostgresDSL
+                                .select(CHANGELOG.ID)
+                                .from(CHANGELOG)
+                                .where(CHANGELOG.CASE_ID.eq(QCABLE.ID)))
+                                .as(QCable.CHANGELOG_IDS))
                 .from(QCABLE)
                 .where(QCABLE.PROJECT_ID.like("%"+term+"%")
                         .and(QCABLE.PROJECT_ID.in(PostgresDSL

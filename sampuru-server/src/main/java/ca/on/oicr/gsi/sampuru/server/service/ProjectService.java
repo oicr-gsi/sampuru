@@ -230,7 +230,60 @@ public class ProjectService extends Service<Project> {
         List<Project> projects = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.execute(PostgresDSL
-                .select()
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(PostgresDSL
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(PostgresDSL
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(PostgresDSL
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASES_TOTAL),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(PostgresDSL
+                                        .selectDistinct(QCABLE.CASE_ID)
+                                        .from(QCABLE)
+                                        .where(QCABLE.CASE_ID.in(PostgresDSL
+                                                .select(DONOR_CASE.ID)
+                                                .from(DONOR_CASE)
+                                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                                .and(QCABLE.QCABLE_TYPE.eq("final_report"))
+                                                .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
+                                                .andExists(PostgresDSL
+                                                        .select(DELIVERABLE_FILE.ID)
+                                                        .from(DELIVERABLE_FILE)
+                                                        .where(DELIVERABLE_FILE.CASE_ID.in(PostgresDSL
+                                                                .select(QCABLE.CASE_ID)
+                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(PostgresDSL
+                                                                        .select(DONOR_CASE.ID)
+                                                                        .from(DONOR_CASE)
+                                                                        .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                                                        .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
+                                .as(Project.CASES_COMPLETED),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(QCABLE)
+                                .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.QCABLES_TOTAL),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(QCABLE)
+                                .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)
+                                        .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))))
+                                .as(Project.QCABLES_COMPLETED))
                 .from(PROJECT)
                 .where(PROJECT.ID.like("%"+term+"%")
                         .and(PROJECT.ID.in(PostgresDSL
