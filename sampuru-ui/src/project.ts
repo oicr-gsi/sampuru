@@ -1,6 +1,7 @@
-import {busyDialog, Card, elementFromTag, staticCard, navbar} from "./html.js";
-import {fetchAsPromise} from "./io.js";
-import {ProjectInfo} from "./data-transfer-objects.js";
+import {busyDialog, Card, elementFromTag, staticCard, navbar} from "./html";
+import {fetchAsPromise} from "./io";
+import {ProjectInfo} from "./data-transfer-objects";
+import {sankeyPlot} from "./sankey";
 
 const projectId = sessionStorage.getItem("project-overview-id");
 
@@ -26,8 +27,12 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   const contactCard: Card = {contents: contact.element, header: "Contact Information",
     title: projectInfo.name + " Contact Information", tagId: projectInfo.name + "-contact"};
 
-  const qcables = elementFromTag("p", null, JSON.stringify(projectInfo.sankey_transitions));
-  const qcablesCard: Card = {contents: qcables.element, header: "QCables",
+
+  const sankeyContainer = document.createElement("div");
+  sankeyContainer.id = "sankey-container";
+  //`.${sankeyContainer.className} `
+  sankeyPlot(projectInfo.sankey_transitions,`#${sankeyContainer.id}`);
+  const qcablesCard: Card = {contents: sankeyContainer, header: "QCables",
     title: projectInfo.name + " QCables", tagId: projectInfo.name + "-qcables"};
 
   const failures = elementFromTag("div", null, projectInfo.failures.join("\n"));

@@ -28,12 +28,12 @@ export interface ProjectJSON {
  */
 
 export interface SankeyTransition {
-  receipt: {total: number, pending: number, passed: number, failed: number},
-  extraction: {total: number, pending: number, passed: number, failed: number},
-  library_preparation: {total: number, pending: number, passed: number, failed: number},
-  low_pass_sequencing: {total: number, pending: number, passed: number, failed: number},
-  full_depth_sequencing: {total: number, pending: number, passed: number, failed: number},
-  informatics_interpretation: {total: number, pending: number, passed: number, failed: number},
+  receipt: {total: number, pending: number, extraction: number, failed: number},
+  extraction: {total: number, pending: number, library_preparation: number, failed: number},
+  library_preparation: {total: number, pending: number, low_pass_sequencing: number, failed: number},
+  low_pass_sequencing: {total: number, pending: number, full_depth_sequencing: number, failed: number},
+  full_depth_sequencing: {total: number, pending: number, informatics_interpretation: number, failed: number},
+  informatics_interpretation: {total: number, pending: number, final_report: number, failed: number},
   final_report: {total: number, pending: number, passed: number, failed: number},
 }
 
