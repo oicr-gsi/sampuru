@@ -86,30 +86,6 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
 
   data.forEach((d) => console.log("preprocess: " + d.source));
   return data;
-
-  /*
-  let csv: string;
-  // Create csv string from object
-  sankeyCsv.forEach((row, index, csvArray) => {
-    let csvKeys = (Object.keys(row) as Array<keyof SankeyCsv>);
-    let counter = 0;
-    // First row? Generate headings
-    if (index == 0) {
-      csvKeys.forEach(key => {
-        csv += key + (counter+1 < csvKeys.length ? ',' : '\r\n') // Prevent a comma at the last cell
-        counter++;
-      })
-    } else {
-      csvKeys.forEach(key => {
-        csv += row[key] + (counter+1 < csvKeys.length ? ',' : '\r\n') // Prevent a comma at the last cell
-        counter++;
-      })
-    }
-    counter = 0; // Reset counter
-  });
-
-  //todo: need to pass csv value outside of for loop*/
-
 }
 
 /**
