@@ -194,7 +194,7 @@ public class CaseService extends Service<Case> {
                         PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
-                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -229,7 +229,7 @@ public class CaseService extends Service<Case> {
                         PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
-                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -260,7 +260,7 @@ public class CaseService extends Service<Case> {
                         PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
-                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
