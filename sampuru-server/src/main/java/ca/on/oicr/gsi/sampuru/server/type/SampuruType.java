@@ -9,14 +9,14 @@ import java.util.List;
 
 public abstract class SampuruType {
 
-    protected static <T extends SampuruType> List<T> getAll(Table selfTable, Class<T> targetClass)
+    protected static <T extends SampuruType> List<T> getAll(Table selfTable, Class<T> targetClass, String username)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         DBConnector dbConnector = new DBConnector();
         List<Integer> ids = dbConnector.getAllIds(selfTable);
         List<T> newList = new LinkedList<>();
 
         for (Integer id: ids){
-            newList.add(targetClass.getDeclaredConstructor(int.class).newInstance(id));
+            newList.add(targetClass.getDeclaredConstructor(int.class, String.class).newInstance(id, username));
         }
 
         return newList;

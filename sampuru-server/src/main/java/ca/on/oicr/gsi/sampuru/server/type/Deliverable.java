@@ -14,8 +14,8 @@ public class Deliverable extends SampuruType {
     public String content;
     public LocalDateTime expiryDate;
 
-    public Deliverable(int newId) throws Exception {
-        getDeliverableFromDb(DELIVERABLE_FILE.ID, newId);
+    public Deliverable(int newId, String username) throws Exception {
+        getDeliverableFromDb(DELIVERABLE_FILE.ID, newId, username);
     }
 
     public Deliverable(Record row) {
@@ -24,7 +24,7 @@ public class Deliverable extends SampuruType {
         expiryDate = row.get(DELIVERABLE_FILE.EXPIRY_DATE);
     }
 
-    private void getDeliverableFromDb(TableField field, Object toMatch) throws Exception {
+    private void getDeliverableFromDb(TableField field, Object toMatch, String username) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(DELIVERABLE_FILE.ID);

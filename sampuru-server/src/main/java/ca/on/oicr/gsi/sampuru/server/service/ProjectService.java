@@ -4,7 +4,9 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Record;
 import org.jooq.util.postgres.PostgresDSL;
@@ -35,30 +37,37 @@ public class ProjectService extends Service<Project> {
     }
 
     // TODO: Some real good repeat code b/w this and getActiveProjects - refactor me
-    public List<Project> getCompletedProjects() throws Exception {
-        DSLContext context = new DBConnector().getContext();
+    public List<Project> getCompletedProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = context
-                .select(PROJECT.asterisk(),
-                        PostgresDSL.array(context
+        Result<Record> results = new DBConnector().execute(
+                PostgresDSL.select(PROJECT.asterisk(),
+                        PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
                                 .from(DONOR_CASE)
                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.CASE_IDS),
-                        PostgresDSL.array(context
+                        PostgresDSL.array(PostgresDSL
                                 .select(PROJECT_INFO_ITEM.ID)
                                 .from(PROJECT_INFO_ITEM)
                                 .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.INFO_ITEM_IDS),
-                        PostgresDSL.array(context
+                        PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
                                 .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.DELIVERABLE_IDS))
                 .from(PROJECT)
-                .where(PROJECT.COMPLETION_DATE.isNotNull())
-                .fetch();
+                .where(PROJECT.COMPLETION_DATE.isNotNull()
+                        .and(PROJECT.ID.in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username))))
+                                .or(DBConnector.ADMIN_ROLE
+                                        .in(PostgresDSL
+                                                .select(USER_ACCESS.PROJECT)
+                                                .from(USER_ACCESS)
+                                                .where(USER_ACCESS.USERNAME.eq(username))))));
 
         for (Record result: results) {
             newList.add(new Project(result));
@@ -68,13 +77,14 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getCompletedProjectsParams(HttpServerExchange hse) throws Exception {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ps.getCompletedProjectsJson());
+        hse.getResponseSender().send(ps.getCompletedProjectsJson(username));
     }
 
-    private String getCompletedProjectsJson() throws Exception {
-        List<Project> completedProjects = getCompletedProjects();
+    private String getCompletedProjectsJson(String username) throws Exception {
+        List<Project> completedProjects = getCompletedProjects(username);
         JSONArray jsonArray = new JSONArray();
         for (Project completedProject: completedProjects){
             JSONObject projectObject = new JSONObject();
@@ -86,60 +96,59 @@ public class ProjectService extends Service<Project> {
         return jsonArray.toJSONString();
     }
 
-    public List<Project> getActiveProjects() throws Exception {
-        DSLContext context = new DBConnector().getContext();
+    public List<Project> getActiveProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = context
-                .select(PROJECT.asterisk(),
-                        PostgresDSL.array(context
+        Result<Record> results = new DBConnector().execute(
+                PostgresDSL.select(PROJECT.asterisk(),
+                        PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
                                 .from(DONOR_CASE)
                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.CASE_IDS),
-                        PostgresDSL.array(context
+                        PostgresDSL.array(PostgresDSL
                                 .select(PROJECT_INFO_ITEM.ID)
                                 .from(PROJECT_INFO_ITEM)
                                 .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.INFO_ITEM_IDS),
-                        PostgresDSL.array(context
+                        PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
                                 .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.DELIVERABLE_IDS),
-                        PostgresDSL.field(context
+                        PostgresDSL.field(PostgresDSL
                                 .selectCount()
                                 .from(DONOR_CASE)
                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.CASES_TOTAL),
-                        PostgresDSL.field(context
+                        PostgresDSL.field(PostgresDSL
                                 .selectCount()
-                                .from(context
+                                .from(PostgresDSL
                                         .selectDistinct(QCABLE.CASE_ID)
                                         .from(QCABLE)
-                                        .where(QCABLE.CASE_ID.in(context
+                                        .where(QCABLE.CASE_ID.in(PostgresDSL
                                                 .select(DONOR_CASE.ID)
                                                 .from(DONOR_CASE)
                                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                                 .and(QCABLE.QCABLE_TYPE.eq("final_report"))
                                                 .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
-                                                .andExists(context
+                                                .andExists(PostgresDSL
                                                         .select(DELIVERABLE_FILE.ID)
                                                         .from(DELIVERABLE_FILE)
-                                                        .where(DELIVERABLE_FILE.CASE_ID.in(context
+                                                        .where(DELIVERABLE_FILE.CASE_ID.in(PostgresDSL
                                                                 .select(QCABLE.CASE_ID)
-                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(context
+                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(PostgresDSL
                                                                         .select(DONOR_CASE.ID)
                                                                         .from(DONOR_CASE)
                                                                         .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                                                         .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
                                 .as(Project.CASES_COMPLETED),
-                        PostgresDSL.field(context
+                        PostgresDSL.field(PostgresDSL
                                 .selectCount()
                                 .from(QCABLE)
                                 .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.QCABLES_TOTAL),
-                        PostgresDSL.field(context
+                        PostgresDSL.field(PostgresDSL
                                 .selectCount()
                                 .from(QCABLE)
                                 .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)
@@ -147,9 +156,16 @@ public class ProjectService extends Service<Project> {
                                 .as(Project.QCABLES_COMPLETED)
                         )
                 .from(PROJECT)
-                .where(PROJECT.COMPLETION_DATE.isNull())
-                .fetch();
-
+                .where(PROJECT.COMPLETION_DATE.isNull()
+                        .and(PROJECT.ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE
+                                .in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username))))));
         for (Record result: results) {
             newList.add(new Project(result));
         }
@@ -158,9 +174,10 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getActiveProjectsParams(HttpServerExchange hse) throws Exception {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ps.getActiveProjectsJson(ps.getActiveProjects()));
+        hse.getResponseSender().send(ps.getActiveProjectsJson(ps.getActiveProjects(username)));
     }
 
     private String getActiveProjectsJson(List<Project> activeProjects) throws Exception {
@@ -180,29 +197,27 @@ public class ProjectService extends Service<Project> {
     }
 
     @Override
-    public List<Project> getAll() {
-        DSLContext context = new DBConnector().getContext();
+    public List<Project> getAll(String username) {
         List<Project> projects = new LinkedList<>();
 
-        Result<Record> results = context
-                .select(PROJECT.asterisk(),
-                        PostgresDSL.array(context
+        Result<Record> results = new DBConnector().execute(
+                PostgresDSL.select(PROJECT.asterisk(),
+                        PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
                                 .from(DONOR_CASE)
                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.CASE_IDS),
-                        PostgresDSL.array(context
+                        PostgresDSL.array(PostgresDSL
                                 .select(PROJECT_INFO_ITEM.ID)
                                 .from(PROJECT_INFO_ITEM)
                                 .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.INFO_ITEM_IDS),
-                        PostgresDSL.array(context
+                        PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
                                 .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.DELIVERABLE_IDS))
-                .from(PROJECT)
-                .fetch();
+                .from(PROJECT));
 
         for(Record result: results){
             projects.add(new Project(result));
@@ -211,23 +226,88 @@ public class ProjectService extends Service<Project> {
     }
 
     @Override
-    public List<Project> search(String term) throws Exception {
-        List<String> ids = new DBConnector().search(PROJECT, PROJECT.ID, PROJECT.NAME, term).stream().map(o -> (String)o).collect(Collectors.toList());
+    public List<Project> search(String term, String username) {
         List<Project> projects = new LinkedList<>();
-
-        for (String id: ids){
-            projects.add(get(id));
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select(PROJECT.asterisk(),
+                        PostgresDSL.array(PostgresDSL
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASE_IDS),
+                        PostgresDSL.array(PostgresDSL
+                                .select(PROJECT_INFO_ITEM.ID)
+                                .from(PROJECT_INFO_ITEM)
+                                .where(PROJECT_INFO_ITEM.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.INFO_ITEM_IDS),
+                        PostgresDSL.array(PostgresDSL
+                                .select(DELIVERABLE_FILE.ID)
+                                .from(DELIVERABLE_FILE)
+                                .where(DELIVERABLE_FILE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.DELIVERABLE_IDS),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.CASES_TOTAL),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(PostgresDSL
+                                        .selectDistinct(QCABLE.CASE_ID)
+                                        .from(QCABLE)
+                                        .where(QCABLE.CASE_ID.in(PostgresDSL
+                                                .select(DONOR_CASE.ID)
+                                                .from(DONOR_CASE)
+                                                .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                                .and(QCABLE.QCABLE_TYPE.eq("final_report"))
+                                                .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
+                                                .andExists(PostgresDSL
+                                                        .select(DELIVERABLE_FILE.ID)
+                                                        .from(DELIVERABLE_FILE)
+                                                        .where(DELIVERABLE_FILE.CASE_ID.in(PostgresDSL
+                                                                .select(QCABLE.CASE_ID)
+                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(PostgresDSL
+                                                                        .select(DONOR_CASE.ID)
+                                                                        .from(DONOR_CASE)
+                                                                        .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
+                                                                        .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
+                                .as(Project.CASES_COMPLETED),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(QCABLE)
+                                .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)))
+                                .as(Project.QCABLES_TOTAL),
+                        PostgresDSL.field(PostgresDSL
+                                .selectCount()
+                                .from(QCABLE)
+                                .where(QCABLE.PROJECT_ID.eq(PROJECT.ID)
+                                        .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))))
+                                .as(Project.QCABLES_COMPLETED))
+                .from(PROJECT)
+                .where(PROJECT.ID.like("%"+term+"%")
+                        .and(PROJECT.ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))));
+        for(Record result: results){
+            projects.add(new Project(result));
         }
 
         return projects;
     }
 
+
     @Override
-    public String toJson(Collection<? extends SampuruType> toWrite) throws Exception {
-        return toJson(toWrite, false);
+    public String toJson(Collection<? extends SampuruType> toWrite, String username) throws Exception {
+        return toJson(toWrite, false, username);
     }
 
-    public String toJson(Collection<? extends SampuruType> toWrite, boolean expand) throws Exception {
+    public String toJson(Collection<? extends SampuruType> toWrite, boolean expand, String username) throws Exception {
         JSONArray jsonArray = new JSONArray();
 
         for(SampuruType item: toWrite){
@@ -242,7 +322,7 @@ public class ProjectService extends Service<Project> {
 
             if(expand){
                 JSONArray infoItemsArray = new JSONArray();
-                for (ProjectInfoItem infoItem: project.getInfoItems()){
+                for (ProjectInfoItem infoItem: project.getInfoItems(username)){
                     JSONObject infoItemObj = new JSONObject();
                     infoItemObj.put("id", infoItem.id);
                     infoItemObj.put("entry_type", infoItem.entryType);
@@ -253,8 +333,8 @@ public class ProjectService extends Service<Project> {
                 }
                 jsonObject.put("info_items", infoItemsArray);
 
-                jsonObject.put("donor_cases", new CaseService().toJson(project.getCases(), true));
-                jsonObject.put("deliverables", new DeliverableService().toJson(project.getDeliverables()));
+                jsonObject.put("donor_cases", new CaseService().toJson(project.getCases(username), true, username));
+                jsonObject.put("deliverables", new DeliverableService().toJson(project.getDeliverables(username), username));
             } else {
                 jsonObject.put("info_items", project.infoItems);
                 jsonObject.put("donor_cases", project.donorCases);
@@ -267,7 +347,7 @@ public class ProjectService extends Service<Project> {
         return jsonArray.toJSONString();
     }
 
-    public String getProjectOverviewJson(Project subject) throws Exception {
+    public String getProjectOverviewJson(Project subject, String username) throws Exception {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", subject.id);
         jsonObject.put("name", subject.name);
@@ -280,7 +360,7 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("qcables_completed", subject.qcablesCompleted);
 
         JSONArray infoItemsArray = new JSONArray();
-        for (ProjectInfoItem infoItem: subject.getInfoItems()){
+        for (ProjectInfoItem infoItem: subject.getInfoItems(username)){
             JSONObject infoItemObj = new JSONObject();
             infoItemObj.put("id", infoItem.id);
             infoItemObj.put("entry_type", infoItem.entryType);
@@ -292,7 +372,7 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("info_items", infoItemsArray);
 
         JSONArray deliverablesArray = new JSONArray();
-        for (Deliverable deliverable: subject.getDeliverables()){
+        for (Deliverable deliverable: subject.getDeliverables(username)){
             JSONObject deliverableObj = new JSONObject();
             deliverableObj.put("id", deliverable.id);
             deliverableObj.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
@@ -302,7 +382,7 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("deliverables", deliverablesArray);
 
         JSONArray failureArray = new JSONArray();
-        for(QCable failedQCable: subject.getFailedQCables()){
+        for(QCable failedQCable: subject.getFailedQCables(username)){
             JSONObject failureObj = new JSONObject();
             failureObj.put("id", failedQCable.id);
             failureObj.put("alias", failedQCable.OICRAlias);
@@ -311,20 +391,18 @@ public class ProjectService extends Service<Project> {
         }
         jsonObject.put("failures", failureArray);
 
-        jsonObject.put("sankey_transitions", new DBConnector().getSankeyTransitions(subject.id));
+        jsonObject.put("sankey_transitions", new DBConnector().getSankeyTransitions(subject.id, username));
 
         return jsonObject.toJSONString();
     }
 
     public static void getProjectOverviewParams(HttpServerExchange hse) throws Exception {
-        Deque<String> idparams = hse.getQueryParameters().get("id");
-        if(idparams.size() > 1){
-            throw new UnsupportedOperationException("Only takes 1 project ID");
-        } else if(idparams.isEmpty()){
-            throw new UnsupportedOperationException("Got no project IDs");
-        }
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        String idparam = ptm.getParameters().get("id");
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(idparams.getFirst())));
+        // TODO: please refactor, i think this is the last holdout using get()
+        hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(idparam, username), username));
     }
 }

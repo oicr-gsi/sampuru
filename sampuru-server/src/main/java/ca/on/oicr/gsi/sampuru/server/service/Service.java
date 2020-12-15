@@ -14,34 +14,36 @@ public abstract class Service<T extends SampuruType> {
         targetClass = newTarget;
     }
 
-    public T get(Object id) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public T get(Object id, String username) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         try {
-            return targetClass.getDeclaredConstructor(String.class).newInstance(id);
+            return targetClass.getDeclaredConstructor(String.class, String.class).newInstance(id, username);
         } catch (NoSuchMethodException nsme){
-            return targetClass.getDeclaredConstructor(int.class).newInstance(id);
+            return targetClass.getDeclaredConstructor(int.class, String.class).newInstance(id, username);
         }
     }
 
+    //TODO: do these have a purpose beyond The Old Endpoints?
     public static void getIdParams(Service targetService, HttpServerExchange hse) throws Exception {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         Deque<String> idparams = hse.getQueryParameters().get("id");
         Set<SampuruType> items = new HashSet<>();
         for(String id: idparams){
-            items.add(targetService.get(id));
+            items.add(targetService.get(id, username));
         }
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(targetService.toJson(items));
+        hse.getResponseSender().send(targetService.toJson(items, username));
     }
 
-    public abstract List<T> getAll() throws Exception;
+    public abstract List<T> getAll(String username) throws Exception;
 
     public static void getAllParams(Service targetService, HttpServerExchange hse) throws Exception {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(targetService.toJson(targetService.getAll()));
+        hse.getResponseSender().send(targetService.toJson(targetService.getAll(username), username));
     }
 
-    // TODO this needs to be filterable
-    public abstract List<T> search(String term) throws Exception;
+    public abstract List<T> search(String term, String username);
 
-    public abstract String toJson(Collection<? extends  SampuruType> toWrite) throws Exception;
+    public abstract String toJson(Collection<? extends  SampuruType> toWrite, String username) throws Exception;
 
 }

@@ -22,8 +22,8 @@ public class QCable extends SampuruType {
     public String parentId;
     public List<Integer> changelog;
 
-    public QCable(String newId) throws Exception {
-        getQCableFromDb(QCABLE.ID, newId);
+    public QCable(String newId, String username) throws Exception {
+        getQCableFromDb(QCABLE.ID, newId, username);
     }
 
     public QCable(Record row) {
@@ -37,19 +37,19 @@ public class QCable extends SampuruType {
         changelog = row.get(CHANGELOG_IDS, List.class);
     }
 
-    public static List<QCable> getAll() throws Exception {
-        return getAll(QCABLE, QCable.class);
+    public static List<QCable> getAll(String username) throws Exception {
+        return getAll(QCABLE, QCable.class, username);
     }
 
-    public List<ChangelogEntry> getChangelog() throws Exception {
+    public List<ChangelogEntry> getChangelog(String username) throws Exception {
         List<ChangelogEntry> newList = new LinkedList<>();
         for(Integer changelogId: changelog){
-            newList.add(new ChangelogEntry(changelogId));
+            newList.add(new ChangelogEntry(changelogId, username));
         }
         return newList;
     }
 
-    private void getQCableFromDb(TableField field, Object toMatch) throws Exception {
+    private void getQCableFromDb(TableField field, Object toMatch, String username) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(QCABLE.ID);

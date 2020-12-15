@@ -20,11 +20,11 @@ public class Case extends SampuruType {
     public List<String> qcables;
     public List<Integer> changelog;
 
-    public Case(String newId) throws Exception {
-        getCaseFromDb(DONOR_CASE.ID, newId);
+    public Case(String newId, String username) throws Exception {
+        getCaseFromDb(DONOR_CASE.ID, newId, username);
     }
 
-    public Case(Record row) throws Exception {
+    public Case(Record row) {
         id = row.get(DONOR_CASE.ID);
         name = row.get(DONOR_CASE.NAME);
 
@@ -33,35 +33,35 @@ public class Case extends SampuruType {
         changelog = row.get(CHANGELOG_IDS, List.class);
     }
 
-    public static List<Case> getAll() throws Exception {
-        return getAll(DONOR_CASE, Case.class);
+    public static List<Case> getAll(String username) throws Exception {
+        return getAll(DONOR_CASE, Case.class, username);
     }
 
-    public List<QCable> getQcables() throws Exception {
+    public List<QCable> getQcables(String username) throws Exception {
         List<QCable> newList = new LinkedList<>();
         for (String qcId: qcables){
-            newList.add(new QCable(qcId));
+            newList.add(new QCable(qcId, username));
         }
         return newList;
     }
 
-    public List<Deliverable> getDeliverables() throws Exception {
+    public List<Deliverable> getDeliverables(String username) throws Exception {
         List<Deliverable> newList = new LinkedList<>();
         for (Integer deliverableId: deliverables){
-            newList.add(new Deliverable(deliverableId));
+            newList.add(new Deliverable(deliverableId, username));
         }
         return newList;
     }
 
-    public List<ChangelogEntry> getChangelog() throws Exception {
+    public List<ChangelogEntry> getChangelog(String username) throws Exception {
         List<ChangelogEntry> newList = new LinkedList<>();
         for(Integer changelogId: changelog){
-            newList.add(new ChangelogEntry(changelogId));
+            newList.add(new ChangelogEntry(changelogId, username));
         }
         return newList;
     }
 
-    private void getCaseFromDb(TableField field, Object toMatch) throws Exception {
+    private void getCaseFromDb(TableField field, Object toMatch, String username) throws Exception {
         DBConnector dbConnector = new DBConnector();
         Record dbRecord = dbConnector.getUniqueRow(field, toMatch);
         id = dbRecord.get(DONOR_CASE.ID);

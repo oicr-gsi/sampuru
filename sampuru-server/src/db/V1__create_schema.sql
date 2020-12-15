@@ -37,7 +37,7 @@ CREATE TABLE changelog (
  
 CREATE TABLE notification (
     id SERIAL PRIMARY KEY,
-    user_id integer NOT NULL,
+    user_id text NOT NULL,
     issue_date timestamp NOT NULL,
     resolved_date timestamp,
     content text NOT NULL);

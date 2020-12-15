@@ -2,12 +2,14 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Notification;
+import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -30,15 +32,17 @@ public class NotificationService extends Service<Notification> {
     }
 
     public static void getAllParams(HttpServerExchange hse) throws Exception {
-        getAllParams(new NotificationService(), hse);
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        NotificationService ns = new NotificationService();
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        hse.getResponseSender().send(ns.toJson(ns.getAll(username), username));
     }
 
     @Override
-    public List<Notification> getAll() throws Exception {
-        DSLContext context = new DBConnector().getContext();
+    public List<Notification> getAll(String username) throws Exception {
         List<Notification> notifications = new LinkedList<>();
 
-        Result<Record> results = context.select().from(NOTIFICATION).fetch();
+        Result<Record> results = new DBConnector().execute(PostgresDSL.select().from(NOTIFICATION).where(NOTIFICATION.USER_ID.eq(username)));
 
         for(Record result: results){
             notifications.add(new Notification(result));
@@ -48,19 +52,23 @@ public class NotificationService extends Service<Notification> {
     }
 
     @Override
-    public List<Notification> search(String term) throws Exception {
-        List<Integer> ids = new DBConnector().search(NOTIFICATION, NOTIFICATION.ID, NOTIFICATION.CONTENT, term).stream().map(o->(Integer)o).collect(Collectors.toList());
+    public List<Notification> search(String term, String username) {
         List<Notification> notifications = new LinkedList<>();
-
-        for (Integer id: ids){
-            notifications.add(get(id));
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> results = dbConnector.execute(PostgresDSL
+                .select()
+                .from(NOTIFICATION
+                .where(NOTIFICATION.CONTENT.like("%"+term+"%")
+                        .and(NOTIFICATION.USER_ID.eq(username)))));
+        for(Record result: results){
+            notifications.add(new Notification(result));
         }
 
         return notifications;
     }
 
     @Override
-    public String toJson(Collection<? extends SampuruType> toWrite){
+    public String toJson(Collection<? extends SampuruType> toWrite, String username){
         JSONArray jsonArray = new JSONArray();
 
         for (SampuruType item: toWrite){
@@ -77,17 +85,17 @@ public class NotificationService extends Service<Notification> {
     }
 
     public static void getActiveParams(HttpServerExchange hse) {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         NotificationService ns = new NotificationService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ns.toJson(ns.getActiveNotifications()));
+        hse.getResponseSender().send(ns.toJson(ns.getActiveNotifications(username), username));
     }
 
-    private List<Notification> getActiveNotifications() {
-        Result<Record> results = new DBConnector().getContext()
-                .select()
+    private List<Notification> getActiveNotifications(String username) {
+        Result<Record> results = new DBConnector().execute(
+                PostgresDSL.select()
                 .from(NOTIFICATION)
-                .where(NOTIFICATION.RESOLVED_DATE.isNull())
-                .fetch();
+                .where(NOTIFICATION.RESOLVED_DATE.isNull().and(NOTIFICATION.USER_ID.eq(username))));
         List<Notification> newList = new LinkedList<>();
         for(Record result: results){
             newList.add(new Notification(result));
