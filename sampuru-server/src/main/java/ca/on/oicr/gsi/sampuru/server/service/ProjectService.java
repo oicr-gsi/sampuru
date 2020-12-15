@@ -135,13 +135,7 @@ public class ProjectService extends Service<Project> {
                                                 .andExists(PostgresDSL
                                                         .select(DELIVERABLE_FILE.ID)
                                                         .from(DELIVERABLE_FILE)
-                                                        .where(DELIVERABLE_FILE.CASE_ID.in(PostgresDSL
-                                                                .select(QCABLE.CASE_ID)
-                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(PostgresDSL
-                                                                        .select(DONOR_CASE.ID)
-                                                                        .from(DONOR_CASE)
-                                                                        .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
-                                                                        .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
+                                                        .where(QCABLE.CASE_ID.in(DELIVERABLE_FILE.CASE_ID))))))
                                 .as(Project.CASES_COMPLETED),
                         PostgresDSL.field(PostgresDSL
                                 .selectCount()
@@ -265,13 +259,7 @@ public class ProjectService extends Service<Project> {
                                                 .andExists(PostgresDSL
                                                         .select(DELIVERABLE_FILE.ID)
                                                         .from(DELIVERABLE_FILE)
-                                                        .where(DELIVERABLE_FILE.CASE_ID.in(PostgresDSL
-                                                                .select(QCABLE.CASE_ID)
-                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(PostgresDSL
-                                                                        .select(DONOR_CASE.ID)
-                                                                        .from(DONOR_CASE)
-                                                                        .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
-                                                                        .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
+                                                        .where(QCABLE.CASE_ID.in(DELIVERABLE_FILE.CASE_ID))))))
                                 .as(Project.CASES_COMPLETED),
                         PostgresDSL.field(PostgresDSL
                                 .selectCount()
@@ -376,7 +364,8 @@ public class ProjectService extends Service<Project> {
             JSONObject deliverableObj = new JSONObject();
             deliverableObj.put("id", deliverable.id);
             deliverableObj.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
-            deliverableObj.put("content", deliverable.content);
+            deliverableObj.put("location", deliverable.location);
+            deliverableObj.put("notes", deliverable.notes);
             infoItemsArray.add(deliverableObj);
         }
         jsonObject.put("deliverables", deliverablesArray);

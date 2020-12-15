@@ -38,7 +38,8 @@ public class DeliverableService extends Service<Deliverable> {
     public List<Deliverable> getAll(String username) throws Exception {
         List<Deliverable> deliverables = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(PostgresDSL.select()
+        Result<Record> results = new DBConnector().execute(PostgresDSL
+                .select()
                 .from(DELIVERABLE_FILE));
 
         for(Record result: results){
@@ -54,7 +55,7 @@ public class DeliverableService extends Service<Deliverable> {
         Result<Record> results = dbConnector.execute(PostgresDSL
                 .select()
                 .from(DELIVERABLE_FILE)
-                .where(DELIVERABLE_FILE.CONTENT.like("%"+term+"%")
+                .where(DELIVERABLE_FILE.LOCATION.like("%"+term+"%")
                         .and(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
@@ -79,7 +80,8 @@ public class DeliverableService extends Service<Deliverable> {
             Deliverable deliverable = (Deliverable)item;
 
             jsonObject.put("id", deliverable.id);
-            jsonObject.put("content", deliverable.content);
+            jsonObject.put("location", deliverable.location);
+            jsonObject.put("notes", deliverable.notes);
             jsonObject.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
 
             jsonArray.add(jsonObject);
