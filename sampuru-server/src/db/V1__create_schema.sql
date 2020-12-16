@@ -55,8 +55,6 @@ ALTER TABLE qcable ADD CONSTRAINT qcable_project_id_match FOREIGN KEY (project_i
 ALTER TABLE qcable ADD CONSTRAINT qcable_case_id_match FOREIGN KEY (case_id) REFERENCES donor_case (id) ON DELETE CASCADE;
 ALTER TABLE deliverable_file ADD CONSTRAINT deliverable_project_id_match FOREIGN KEY (project_id) REFERENCES project (id);
 ALTER TABLE deliverable_file ADD CONSTRAINT deliverable_case_id_match FOREIGN KEY (case_id) REFERENCES donor_case (id);
-ALTER TABLE changelog ADD CONSTRAINT changelog_case_id_match FOREIGN KEY (case_id) REFERENCES donor_case (id);
-ALTER TABLE changelog ADD CONSTRAINT changelog_qcable_id_match FOREIGN KEY (qcable_id) REFERENCES qcable (id);
 ALTER TABLE project_info_item ADD CONSTRAINT project_info_item_project_id_match FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE;
 ALTER TABLE qcable ADD CONSTRAINT qcable_parent_id_match FOREIGN KEY (parent_id) REFERENCES qcable (id);
 
