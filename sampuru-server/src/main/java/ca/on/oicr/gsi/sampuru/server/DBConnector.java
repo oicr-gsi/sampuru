@@ -212,6 +212,7 @@ public class DBConnector {
                 .and(SANKEY_TRANSITION.PROJECT_ID.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))
                 .or(DBConnector.ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))))));
 
+        if(shouldBeSingularResult.isEmpty()) return jsonObject;
         if(shouldBeSingularResult.size() > 1) throw new SQLException(">1 row retrieved for sankey transitions with project id " + projectId);
         Record result = shouldBeSingularResult.get(0);
 
