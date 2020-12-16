@@ -30,7 +30,7 @@ CREATE TABLE deliverable_file (
  
 CREATE TABLE changelog (
     id SERIAL PRIMARY KEY,
-    qcable_id text NOT NULL,
+    qcable_id text,
     case_id text NOT NULL,
     change_date timestamp NOT NULL,
     content text NOT NULL);
