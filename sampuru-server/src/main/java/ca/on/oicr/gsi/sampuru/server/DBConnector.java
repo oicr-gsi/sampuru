@@ -282,6 +282,14 @@ public class DBConnector {
             }
             return super.get(key);
         }
+
+        public JSONObject toJSONObject(){
+            JSONObject jsonObject = new JSONObject();
+            for(String key: this.keySet()){
+                jsonObject.put(key, this.get(key));
+            }
+            return jsonObject;
+        }
     }
 
     public static class JSONObjectMap extends HashMap<String, JSONObject>{
