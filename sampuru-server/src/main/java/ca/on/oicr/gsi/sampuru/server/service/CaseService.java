@@ -62,12 +62,12 @@ public class CaseService extends Service<Case> {
                         .and(DONOR_CASE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE
                                 .in(PostgresDSL
                                         .select(USER_ACCESS.PROJECT)
                                         .from(USER_ACCESS)
-                                        .where(USER_ACCESS.USERNAME.eq(username)))))));
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
 
         for(Record result: cardResults){
             String thisId = result.get(CASE_CARD.CASE_ID);
@@ -147,12 +147,12 @@ public class CaseService extends Service<Case> {
                         .and(DONOR_CASE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE
                                 .in(PostgresDSL
                                         .select(USER_ACCESS.PROJECT)
                                         .from(USER_ACCESS)
-                                        .where(USER_ACCESS.USERNAME.eq(username)))))));
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
         for(Record result: changelogResults){
             String thisId = result.get(CASE_CARD.CASE_ID);
             JSONObject currentCard = cards.get(thisId);
@@ -272,11 +272,11 @@ public class CaseService extends Service<Case> {
                         .and(DONOR_CASE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))));
+                                .where(USER_ACCESS.USERNAME.eq(username)))))));
         for(Record result: results){
             cases.add(new Case(result));
         }

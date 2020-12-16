@@ -62,11 +62,11 @@ public class Project extends SampuruType {
                         .and(DONOR_CASE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))));
+                                .where(USER_ACCESS.USERNAME.eq(username)))))));
 
         for(Record result: results){
             cases.add(new Case(result));
@@ -85,11 +85,11 @@ public class Project extends SampuruType {
                         .and(PROJECT_INFO_ITEM.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))));
+                                .where(USER_ACCESS.USERNAME.eq(username)))))));
 
         for(Record result: results){
             projectInfoItems.add(new ProjectInfoItem(result));
@@ -108,11 +108,11 @@ public class Project extends SampuruType {
                         .and(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))));
+                                .where(USER_ACCESS.USERNAME.eq(username)))))));
 
         for(Record result: results){
             deliverableList.add(new Deliverable(result));
@@ -131,11 +131,11 @@ public class Project extends SampuruType {
                         .and(PROJECT.ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))));
+                                .where(USER_ACCESS.USERNAME.eq(username)))))));
 
         if(results.isEmpty()){
             throw new Exception("Project does not exist or no permission"); // TODO: more precise exception
