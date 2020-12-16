@@ -45,11 +45,56 @@ public class DeliverableService extends Service<Deliverable> {
 
     private String getPortalJson(String username) {
         DBConnector dbConnector = new DBConnector();
-        Result<Record> deliverable_results = dbConnector.execute(
-                PostgresDSL.select()
-                        .from(DELIVERABLE_FILE)
+        Result<Record> deliverableResults = dbConnector.execute(PostgresDSL
+                .select()
+                .from(DELIVERABLE_FILE)
+                .where(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
+                        .select(USER_ACCESS.PROJECT)
+                        .from(USER_ACCESS)
+                        .where(USER_ACCESS.USERNAME.eq(username)
+                                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username)))))))
         );
-        Result<Record> project_cases = dbConnector.execute()
+        Result<Record> projectCases = dbConnector.execute(PostgresDSL
+                .select()
+                .from(DONOR_CASE)
+                .where(DONOR_CASE.PROJECT_ID.in(PostgresDSL
+                        .select(USER_ACCESS.PROJECT)
+                        .from(USER_ACCESS)
+                        .where(USER_ACCESS.USERNAME.eq(username)
+                                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
+        JSONObject jsonObject = new JSONObject();
+        JSONArray deliverablesArray = new JSONArray();
+        for(Record deliverableResult: deliverableResults){
+            JSONObject deliverableObject = new JSONObject();
+            deliverableObject.put("id", deliverableResult.get(DELIVERABLE_FILE.ID));
+            deliverableObject.put("project_id", deliverableResult.get(DELIVERABLE_FILE.PROJECT_ID));
+            deliverableObject.put("case_ids", deliverableResult.get(DELIVERABLE_FILE.CASE_ID));
+            deliverableObject.put("location", deliverableResult.get(DELIVERABLE_FILE.LOCATION));
+            deliverableObject.put("notes", deliverableResult.get(DELIVERABLE_FILE.NOTES));
+            deliverableObject.put("expiry_date", deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE));
+            deliverablesArray.add(deliverableObject);
+        }
+        jsonObject.put("deliverables", deliverablesArray);
+
+        DBConnector.JSONArrayMap projectCasesArray = new DBConnector.JSONArrayMap();
+        for(Record caseResult: projectCases){
+            JSONObject caseObject = new JSONObject();
+            caseObject.put("id", caseResult.get(DONOR_CASE.ID));
+            caseObject.put("project_id", caseResult.get(DONOR_CASE.PROJECT_ID));
+            caseObject.put("name", caseResult.get(DONOR_CASE.NAME));
+            JSONArray currentProjectArray = projectCasesArray.get(caseObject.get("project_id"));
+            currentProjectArray.add(caseObject);
+            projectCasesArray.put((String)caseObject.get("project_id"), currentProjectArray);
+        }
+        jsonObject.put("project_cases", projectCasesArray.toJSONObject());
+
+        return jsonObject.toJSONString();
     }
 
     @Override
