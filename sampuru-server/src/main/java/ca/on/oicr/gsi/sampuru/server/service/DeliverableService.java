@@ -58,11 +58,11 @@ public class DeliverableService extends Service<Deliverable> {
                         .and(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))
+                                .where(USER_ACCESS.USERNAME.eq(username)))
                         .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))));
+                                .where(USER_ACCESS.USERNAME.eq(username)))))));
         for(Record result: results){
             deliverables.add(new Deliverable(result));
         }
