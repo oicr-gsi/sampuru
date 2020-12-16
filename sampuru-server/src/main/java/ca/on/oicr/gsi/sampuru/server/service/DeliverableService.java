@@ -5,6 +5,7 @@ import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -32,6 +33,23 @@ public class DeliverableService extends Service<Deliverable> {
 
     public static void getAllParams(HttpServerExchange hse) throws Exception {
         getAllParams(new DeliverableService(), hse);
+    }
+
+    public static void endpointDisplayParams(HttpServerExchange hse) {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        DeliverableService ds = new DeliverableService();
+
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        hse.getResponseSender().send(ds.getPortalJson(username));
+    }
+
+    private String getPortalJson(String username) {
+        DBConnector dbConnector = new DBConnector();
+        Result<Record> deliverable_results = dbConnector.execute(
+                PostgresDSL.select()
+                        .from(DELIVERABLE_FILE)
+        );
+        Result<Record> project_cases = dbConnector.execute()
     }
 
     @Override
