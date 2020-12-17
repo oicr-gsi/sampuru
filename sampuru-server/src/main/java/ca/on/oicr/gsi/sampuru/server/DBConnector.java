@@ -1,7 +1,6 @@
 package ca.on.oicr.gsi.sampuru.server;
 
-import ca.on.oicr.gsi.sampuru.server.type.Project;
-import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
+import ca.on.oicr.gsi.sampuru.server.service.DeliverableService;
 import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -58,8 +57,14 @@ public class DBConnector {
     }
 
     //TODO: I wanted this as a catch all to do a filter by username but it doesn't look like al's gonna be so lucky
-    public Result execute(SelectConnectByStep<Record> select){
+    public Result fetch(SelectConnectByStep<Record> select){
         return getContext().fetch(select);
+    }
+
+    public void testInsert(){
+        String[] strarry = new String[1];
+        strarry[0] = "TPS:SAM234227";
+        getContext().insertInto(DELIVERABLE_FILE).values(PostgresDSL.defaultValue(DELIVERABLE_FILE.ID), "TPS", strarry, "testlocation", "testnotes", LocalDateTime.now()).execute();
     }
 
     //TODO: filter by username, probably by removing me
@@ -187,7 +192,7 @@ public class DBConnector {
 
     public List<String> getFailedQCablesForProject(String id, String username) {
         List<String> ids = new LinkedList<>();
-        Result<Record> result = execute(PostgresDSL
+        Result<Record> result = fetch(PostgresDSL
                 .select()
                 .from(QCABLE)
                 .where(QCABLE.PROJECT_ID.eq(id)
@@ -205,7 +210,7 @@ public class DBConnector {
 
     public JSONObject getSankeyTransitions(String projectId, String username) throws SQLException {
         JSONObject jsonObject = new JSONObject();
-        Result<Record> shouldBeSingularResult = execute(PostgresDSL
+        Result<Record> shouldBeSingularResult = fetch(PostgresDSL
                 .select()
                 .from(SANKEY_TRANSITION)
                 .where(SANKEY_TRANSITION.PROJECT_ID.eq(projectId))

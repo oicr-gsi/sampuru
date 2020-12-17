@@ -2,21 +2,17 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
-import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import tables_generated.tables.Changelog;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -38,7 +34,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
     public List<ChangelogEntry> getAll(String username) throws Exception {
         List<ChangelogEntry> changelogs = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select()
                 .from(CHANGELOG));
 
@@ -52,7 +48,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
     public List<ChangelogEntry> search(String term, String username) {
         List<ChangelogEntry> changelogEntries = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(CHANGELOG)
                 .where(CHANGELOG.CONTENT.like("%"+term+"%")

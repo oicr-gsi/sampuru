@@ -26,7 +26,7 @@ public class Server {
     private final static HttpHandler ROUTES = Handlers.path()
             .addPrefixPath("/api", new RoutingHandler()
                     // Special frontend endpoints. I've killed the normal REST endpoints
-                    .get("/active_projects", ProjectService::getActiveProjectsParams)
+                    .get("/active_projects", ProjectService::getActiveProjectsParams) //TODO Broken
                     .get("/completed_projects", ProjectService::getCompletedProjectsParams)
                     .get("/cases_cards/{projectId}", CaseService::getCardsParams)
                     .get("/qcables_table/{filterType}/{filterId}", QCableService::getFilteredQcablesTableParams)
