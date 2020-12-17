@@ -4,6 +4,7 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
+import io.undertow.io.Receiver;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.jooq.DSLContext;
@@ -151,5 +152,12 @@ public class DeliverableService extends Service<Deliverable> {
         }
 
         return jsonArray.toJSONString();
+    }
+
+    public static void postDeliverableParams(HttpServerExchange hse) {
+        hse.getRequestReceiver().receiveFullBytes((httpServerExchange, bytes) -> {
+            System.out.println(new String(bytes));
+        });
+        hse.getResponseSender().send("you did it");
     }
 }

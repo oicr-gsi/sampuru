@@ -36,6 +36,7 @@ public class Server {
                     .get("/deliverables", DeliverableService::endpointDisplayParams)
                     .get("/search/{type}/{term}", Server::doSearch)
                     .get("/home", Server::helloWorld)
+                    .post("/update_deliverable", DeliverableService::postDeliverableParams)
             )
             .addPrefixPath("/", new ResourceHandler(new ClassPathResourceManager(Server.class.getClassLoader(), "static"))
                     .setWelcomeFiles("index.html"));
