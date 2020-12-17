@@ -2,12 +2,9 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
-import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
-import io.undertow.io.Receiver;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -17,7 +14,6 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -46,19 +42,19 @@ public class DeliverableService extends Service<Deliverable> {
 
     private String getPortalJson(String username) {
         DBConnector dbConnector = new DBConnector();
-        Result<Record> deliverableResults = dbConnector.execute(PostgresDSL
+        Result<Record> deliverableResults = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DELIVERABLE_FILE)
                 .where(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
                         .select(USER_ACCESS.PROJECT)
                         .from(USER_ACCESS)
-                        .where(USER_ACCESS.USERNAME.eq(username)
-                                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
-                                        .select(USER_ACCESS.PROJECT)
-                                        .from(USER_ACCESS)
-                                        .where(USER_ACCESS.USERNAME.eq(username)))))))
+                        .where(USER_ACCESS.USERNAME.eq(username))))
+                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                        .select(USER_ACCESS.PROJECT)
+                        .from(USER_ACCESS)
+                        .where(USER_ACCESS.USERNAME.eq(username))))
         );
-        Result<Record> projectCases = dbConnector.execute(PostgresDSL
+        Result<Record> projectCases = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DONOR_CASE)
                 .where(DONOR_CASE.PROJECT_ID.in(PostgresDSL
@@ -102,7 +98,7 @@ public class DeliverableService extends Service<Deliverable> {
     public List<Deliverable> getAll(String username) throws Exception {
         List<Deliverable> deliverables = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(PostgresDSL
+        Result<Record> results = new DBConnector().fetch(PostgresDSL
                 .select()
                 .from(DELIVERABLE_FILE));
 
@@ -116,7 +112,7 @@ public class DeliverableService extends Service<Deliverable> {
     public List<Deliverable> search(String term, String username) {
         List<Deliverable> deliverables = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DELIVERABLE_FILE)
                 .where(DELIVERABLE_FILE.LOCATION.like("%"+term+"%")
@@ -155,9 +151,11 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     public static void postDeliverableParams(HttpServerExchange hse) {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
         hse.getRequestReceiver().receiveFullBytes((httpServerExchange, bytes) -> {
-            System.out.println(new String(bytes));
+            new DBConnector().testInsert();
+            hse.getResponseSender().send(new DeliverableService().getPortalJson(username));
         });
-        hse.getResponseSender().send("you did it");
+        
     }
 }

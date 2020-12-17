@@ -5,8 +5,6 @@ import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
-import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Record;
 import org.jooq.util.postgres.PostgresDSL;
@@ -14,10 +12,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Collection;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -40,7 +36,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getCompletedProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -99,7 +95,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getActiveProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -194,7 +190,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getAll(String username) {
         List<Project> projects = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -223,7 +219,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> search(String term, String username) {
         List<Project> projects = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
