@@ -63,11 +63,11 @@ public class DeliverableService extends Service<Deliverable> {
                 .where(DONOR_CASE.PROJECT_ID.in(PostgresDSL
                         .select(USER_ACCESS.PROJECT)
                         .from(USER_ACCESS)
-                        .where(USER_ACCESS.USERNAME.eq(username)
-                                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
-                                        .select(USER_ACCESS.PROJECT)
-                                        .from(USER_ACCESS)
-                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
+                        .where(USER_ACCESS.USERNAME.eq(username)))
+                    .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                        .select(USER_ACCESS.PROJECT)
+                        .from(USER_ACCESS)
+                        .where(USER_ACCESS.USERNAME.eq(username))))));
         JSONObject jsonObject = new JSONObject();
         JSONArray deliverablesArray = new JSONArray();
         for(Record deliverableResult: deliverableResults){
