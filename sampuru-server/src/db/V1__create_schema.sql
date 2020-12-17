@@ -30,6 +30,7 @@ CREATE TABLE deliverable_file (
  
 CREATE TABLE changelog (
     id SERIAL PRIMARY KEY,
+    project_id text NOT NULL,
     qcable_id text,
     case_id text NOT NULL,
     change_date timestamp NOT NULL,
@@ -55,6 +56,7 @@ ALTER TABLE qcable ADD CONSTRAINT qcable_project_id_match FOREIGN KEY (project_i
 ALTER TABLE qcable ADD CONSTRAINT qcable_case_id_match FOREIGN KEY (case_id) REFERENCES donor_case (id) ON DELETE CASCADE;
 ALTER TABLE deliverable_file ADD CONSTRAINT deliverable_project_id_match FOREIGN KEY (project_id) REFERENCES project (id);
 ALTER TABLE deliverable_file ADD CONSTRAINT deliverable_case_id_match FOREIGN KEY (case_id) REFERENCES donor_case (id);
+ALTER TABLE changelog ADD CONSTRAINT changelog_project_id_match FOREIGN KEY (project_id) REFERENCES project (id);
 ALTER TABLE project_info_item ADD CONSTRAINT project_info_item_project_id_match FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE;
 ALTER TABLE qcable ADD CONSTRAINT qcable_parent_id_match FOREIGN KEY (parent_id) REFERENCES qcable (id);
 
