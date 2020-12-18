@@ -7,6 +7,7 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
+import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
@@ -36,7 +37,7 @@ public class Server {
                     .get("/deliverables", DeliverableService::endpointDisplayParams)
                     .get("/search/{type}/{term}", Server::doSearch)
                     .get("/home", Server::helloWorld)
-                    .post("/update_deliverable", DeliverableService::postDeliverableParams)
+                    .post("/update_deliverable", new BlockingHandler(DeliverableService::postDeliverableParams))
             )
             .addPrefixPath("/", new ResourceHandler(new ClassPathResourceManager(Server.class.getClassLoader(), "static"))
                     .setWelcomeFiles("index.html"));

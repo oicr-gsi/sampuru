@@ -5,12 +5,17 @@ import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.jooq.Context;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -150,12 +155,23 @@ public class DeliverableService extends Service<Deliverable> {
         return jsonArray.toJSONString();
     }
 
+
+
+    // TO TEST: see file 'json curl for writing deliverables'
     public static void postDeliverableParams(HttpServerExchange hse) {
         String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        DeliverableService ds = new DeliverableService();
         hse.getRequestReceiver().receiveFullBytes((httpServerExchange, bytes) -> {
-            new DBConnector().testInsert();
-            hse.getResponseSender().send(new DeliverableService().getPortalJson(username));
+            String fullJson = new String(bytes);
+            JSONArray jsonArray = new JSONArray();
+            try {
+                jsonArray = (JSONArray) new JSONParser().parse(fullJson);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            new DBConnector().writeDeliverables(jsonArray, username);
+            hse.getResponseSender().send(ds.getPortalJson(username));
         });
-        
+
     }
 }
