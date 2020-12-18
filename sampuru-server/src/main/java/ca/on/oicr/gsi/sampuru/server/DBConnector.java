@@ -61,11 +61,6 @@ public class DBConnector {
         return getContext().fetch(select);
     }
 
-    public void testInsert(){
-        String[] strarry = new String[1];
-        strarry[0] = "TPS:SAM234227";
-        getContext().insertInto(DELIVERABLE_FILE).values(PostgresDSL.defaultValue(DELIVERABLE_FILE.ID), "TPS", strarry, "testlocation", "testnotes", LocalDateTime.now()).execute();
-    }
 
     //TODO: filter by username, probably by removing me
     public Record getUniqueRow(TableField field, Object toMatch) throws Exception {
@@ -77,6 +72,32 @@ public class DBConnector {
             throw new Exception("Found >1 record for "+ tableName +" identifier " + toMatch); // TODO: more precise exception
         }
         return rowResult.get(0);
+    }
+
+    public void writeDeliverables(JSONArray deliverableArray, String username){
+        if (deliverableArray.isEmpty()) return;
+        InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
+        JSONObject firstDeliverable = (JSONObject) deliverableArray.remove(0);
+        InsertValuesStepN insertValuesStepN = insertSetStep.values(
+                PostgresDSL.defaultValue(), // ID
+                firstDeliverable.get("project_id"),
+                firstDeliverable.get("case_id"),
+                firstDeliverable.get("location"),
+                firstDeliverable.get("notes"),
+                firstDeliverable.get("expiry_date")
+        );
+        while(!deliverableArray.isEmpty()){
+            JSONObject nextDeliverable = (JSONObject) deliverableArray.remove(0);
+            insertValuesStepN.values(
+                    PostgresDSL.defaultValue(), // ID
+                    nextDeliverable.get("project_id"),
+                    nextDeliverable.get("case_id"),
+                    nextDeliverable.get("location"),
+                    nextDeliverable.get("notes"),
+                    nextDeliverable.get("expiry_date")
+            );
+        }
+        insertValuesStepN.execute();
     }
 
 //    /**
