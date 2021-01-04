@@ -18,7 +18,10 @@ module.exports = {
       '/api': {
         target: 'http://localhost:8088',
         secure: false,
-        changeOrigin: true
+        changeOrigin: true,
+        onProxyReq: function (proxyReq, req, res) {
+          proxyReq.setHeader('X-Remote-User', 'amosquera');
+        }
       }
     },
     headers: {
