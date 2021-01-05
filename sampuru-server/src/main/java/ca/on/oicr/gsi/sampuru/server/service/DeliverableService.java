@@ -2,10 +2,11 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
+import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import org.jooq.Context;
+import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -14,11 +15,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -76,10 +77,10 @@ public class DeliverableService extends Service<Deliverable> {
             JSONObject deliverableObject = new JSONObject();
             deliverableObject.put("id", deliverableResult.get(DELIVERABLE_FILE.ID));
             deliverableObject.put("project_id", deliverableResult.get(DELIVERABLE_FILE.PROJECT_ID));
-            deliverableObject.put("case_ids", deliverableResult.get(DELIVERABLE_FILE.CASE_ID));
+            deliverableObject.put("case_ids", Arrays.stream(deliverableResult.get(DELIVERABLE_FILE.CASE_ID)).collect(Collectors.toSet()).toString());
             deliverableObject.put("location", deliverableResult.get(DELIVERABLE_FILE.LOCATION));
             deliverableObject.put("notes", deliverableResult.get(DELIVERABLE_FILE.NOTES));
-            deliverableObject.put("expiry_date", deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE));
+            deliverableObject.put("expiry_date", JSONObject.escape(deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE).toString()));
             deliverablesArray.add(deliverableObject);
         }
         jsonObject.put("deliverables", deliverablesArray);
@@ -167,9 +168,13 @@ public class DeliverableService extends Service<Deliverable> {
             try {
                 jsonArray = (JSONArray) new JSONParser().parse(fullJson);
             } catch (ParseException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // TODO: send a different response instead probably
             }
-            new DBConnector().writeDeliverables(jsonArray, username);
+            try {
+                new DBConnector().writeDeliverables(jsonArray, username);
+            } catch (Exception e) {
+                e.printStackTrace(); // TODO: send a different response instead probably
+            }
             hse.getResponseSender().send(ds.getPortalJson(username));
         });
 
