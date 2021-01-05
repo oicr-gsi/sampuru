@@ -1,6 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server;
 
-import ca.on.oicr.gsi.sampuru.server.service.DeliverableService;
+import ca.on.oicr.gsi.sampuru.server.type.Project;
+import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -61,7 +62,6 @@ public class DBConnector {
         return getContext().fetch(select);
     }
 
-
     //TODO: filter by username, probably by removing me
     public Record getUniqueRow(TableField field, Object toMatch) throws Exception {
         String tableName = field.getTable().getName();
@@ -74,30 +74,43 @@ public class DBConnector {
         return rowResult.get(0);
     }
 
-    public void writeDeliverables(JSONArray deliverableArray, String username){
+    // TODO: look at https://www.jooq.org/doc/3.14/manual/sql-building/dynamic-sql/
+    public void writeDeliverables(JSONArray deliverableArray, String username) throws Exception {
         if (deliverableArray.isEmpty()) return;
-        InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
-        JSONObject firstDeliverable = (JSONObject) deliverableArray.remove(0);
-        InsertValuesStepN insertValuesStepN = insertSetStep.values(
-                PostgresDSL.defaultValue(), // ID
-                firstDeliverable.get("project_id"),
-                firstDeliverable.get("case_id"),
-                firstDeliverable.get("location"),
-                firstDeliverable.get("notes"),
-                firstDeliverable.get("expiry_date")
-        );
-        while(!deliverableArray.isEmpty()){
-            JSONObject nextDeliverable = (JSONObject) deliverableArray.remove(0);
-            insertValuesStepN.values(
-                    PostgresDSL.defaultValue(), // ID
-                    nextDeliverable.get("project_id"),
-                    nextDeliverable.get("case_id"),
-                    nextDeliverable.get("location"),
-                    nextDeliverable.get("notes"),
-                    nextDeliverable.get("expiry_date")
-            );
+
+        // Front end will provide ID if deliverable is pre-existing. If no ID or ID is null, INSERT instead of UPDATE
+        // Currently, nothing is being done with knownDeliverables. To be implemented (GP-2520)
+        JSONArray knownDeliverables = new JSONArray(),
+                unknownDeliverables = new JSONArray();
+        for(Object obj: deliverableArray){
+            if(!(obj instanceof JSONObject)){
+                // TODO: More precise exception
+                throw new Exception("Got something other than a JSONObject in the JSONArray coming into " +
+                        "writeDeliverables(): " + obj.toString());
+            }
+            JSONObject jsonObject = (JSONObject) obj;
+            if(jsonObject.containsKey("id")){
+                knownDeliverables.add(jsonObject);
+            } else {
+                unknownDeliverables.add(jsonObject);
+            }
         }
-        insertValuesStepN.execute();
+
+        if(!unknownDeliverables.isEmpty()) {
+            InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
+            do { //TODO: convert to for loop
+                JSONObject nextDeliverable = (JSONObject) unknownDeliverables.remove(0);
+                InsertValuesStepN insertValuesStepN = insertSetStep.values(
+                        PostgresDSL.defaultValue(), // ID
+                        nextDeliverable.get("project_id"),
+                        nextDeliverable.get("case_id"),
+                        nextDeliverable.get("location"),
+                        nextDeliverable.get("notes"),
+                        nextDeliverable.get("expiry_date")
+                );
+                insertValuesStepN.execute();
+            } while (!unknownDeliverables.isEmpty());
+        }
     }
 
 //    /**
