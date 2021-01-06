@@ -6,12 +6,14 @@ import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.util.postgres.PostgresDSL;
+import org.jooq.util.postgres.PostgresUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -98,19 +100,22 @@ public class DBConnector {
 
         if(!unknownDeliverables.isEmpty()) {
             InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
+            InsertValuesStepN insertValuesStepN;
             do { //TODO: convert to for loop
                 JSONObject nextDeliverable = (JSONObject) unknownDeliverables.remove(0);
-                InsertValuesStepN insertValuesStepN = insertSetStep.values(
-                        PostgresDSL.defaultValue(), // ID
-                        nextDeliverable.get("project_id"),
-                        nextDeliverable.get("case_id"),
-                        nextDeliverable.get("location"),
-                        nextDeliverable.get("notes"),
-                        nextDeliverable.get("expiry_date")
+                 insertValuesStepN = insertSetStep.values(
+                        PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("project_id")),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.array(((JSONArray)nextDeliverable.get("case_id")).toArray())),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("location")),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("notes")),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
                 );
-                insertValuesStepN.execute();
+
             } while (!unknownDeliverables.isEmpty());
+            insertValuesStepN.execute();
         }
+
     }
 
 //    /**

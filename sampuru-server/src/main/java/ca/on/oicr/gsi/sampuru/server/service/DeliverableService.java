@@ -51,11 +51,7 @@ public class DeliverableService extends Service<Deliverable> {
         Result<Record> deliverableResults = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DELIVERABLE_FILE)
-                .where(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
-                        .select(USER_ACCESS.PROJECT)
-                        .from(USER_ACCESS)
-                        .where(USER_ACCESS.USERNAME.eq(username))))
-                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                .where(DBConnector.ADMIN_ROLE.in(PostgresDSL
                         .select(USER_ACCESS.PROJECT)
                         .from(USER_ACCESS)
                         .where(USER_ACCESS.USERNAME.eq(username))))
@@ -63,14 +59,10 @@ public class DeliverableService extends Service<Deliverable> {
         Result<Record> projectCases = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DONOR_CASE)
-                .where(DONOR_CASE.PROJECT_ID.in(PostgresDSL
+                .where(DBConnector.ADMIN_ROLE.in(PostgresDSL
                         .select(USER_ACCESS.PROJECT)
                         .from(USER_ACCESS)
-                        .where(USER_ACCESS.USERNAME.eq(username)))
-                    .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
-                        .select(USER_ACCESS.PROJECT)
-                        .from(USER_ACCESS)
-                        .where(USER_ACCESS.USERNAME.eq(username))))));
+                        .where(USER_ACCESS.USERNAME.eq(username)))));
         JSONObject jsonObject = new JSONObject();
         JSONArray deliverablesArray = new JSONArray();
         for(Record deliverableResult: deliverableResults){
@@ -85,17 +77,17 @@ public class DeliverableService extends Service<Deliverable> {
         }
         jsonObject.put("deliverables", deliverablesArray);
 
-        DBConnector.JSONArrayMap projectCasesArray = new DBConnector.JSONArrayMap();
-        for(Record caseResult: projectCases){
-            JSONObject caseObject = new JSONObject();
-            caseObject.put("id", caseResult.get(DONOR_CASE.ID));
-            caseObject.put("project_id", caseResult.get(DONOR_CASE.PROJECT_ID));
-            caseObject.put("name", caseResult.get(DONOR_CASE.NAME));
-            JSONArray currentProjectArray = projectCasesArray.get(caseObject.get("project_id"));
-            currentProjectArray.add(caseObject);
-            projectCasesArray.put((String)caseObject.get("project_id"), currentProjectArray);
-        }
-        jsonObject.put("project_cases", projectCasesArray.toJSONObject());
+//        DBConnector.JSONArrayMap projectCasesArray = new DBConnector.JSONArrayMap();
+//        for(Record caseResult: projectCases){
+//            JSONObject caseObject = new JSONObject();
+//            caseObject.put("id", caseResult.get(DONOR_CASE.ID));
+//            caseObject.put("project_id", caseResult.get(DONOR_CASE.PROJECT_ID));
+//            caseObject.put("name", caseResult.get(DONOR_CASE.NAME));
+//            JSONArray currentProjectArray = projectCasesArray.get(caseObject.get("project_id"));
+//            currentProjectArray.add(caseObject);
+//            projectCasesArray.put((String)caseObject.get("project_id"), currentProjectArray);
+//        }
+//        jsonObject.put("project_cases", projectCasesArray.toJSONObject());
 
         return jsonObject.toJSONString();
     }
@@ -156,9 +148,6 @@ public class DeliverableService extends Service<Deliverable> {
         return jsonArray.toJSONString();
     }
 
-
-
-    // TO TEST: see file 'json curl for writing deliverables'
     public static void postDeliverableParams(HttpServerExchange hse) {
         String username = hse.getRequestHeaders().get("X-Remote-User").element();
         DeliverableService ds = new DeliverableService();
