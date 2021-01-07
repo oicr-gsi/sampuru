@@ -364,7 +364,7 @@ public class ProjectService extends Service<Project> {
             deliverableObj.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
             deliverableObj.put("location", deliverable.location);
             deliverableObj.put("notes", deliverable.notes);
-            infoItemsArray.add(deliverableObj);
+            deliverablesArray.add(deliverableObj);
         }
         jsonObject.put("deliverables", deliverablesArray);
 
