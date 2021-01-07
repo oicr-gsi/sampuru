@@ -128,10 +128,11 @@ public class ProjectService extends Service<Project> {
                                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                                 .and(QCABLE.QCABLE_TYPE.eq("final_report"))
                                                 .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
+                                                // Can't use 'in' on text[] https://www.postgresql.org/docs/current/arrays.html
                                                 .andExists(PostgresDSL
                                                         .select(DELIVERABLE_FILE.ID)
                                                         .from(DELIVERABLE_FILE)
-                                                        .where(QCABLE.CASE_ID.in(DELIVERABLE_FILE.CASE_ID))))))
+                                                        .where(QCABLE.CASE_ID.eq(PostgresDSL.any(DELIVERABLE_FILE.CASE_ID)))))))
                                 .as(Project.CASES_COMPLETED),
                         PostgresDSL.field(PostgresDSL
                                 .selectCount()
@@ -252,10 +253,11 @@ public class ProjectService extends Service<Project> {
                                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                                 .and(QCABLE.QCABLE_TYPE.eq("final_report"))
                                                 .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
+                                                // Can't use 'in' on text[] https://www.postgresql.org/docs/current/arrays.html
                                                 .andExists(PostgresDSL
                                                         .select(DELIVERABLE_FILE.ID)
                                                         .from(DELIVERABLE_FILE)
-                                                        .where(QCABLE.CASE_ID.in(DELIVERABLE_FILE.CASE_ID))))))
+                                                        .where(QCABLE.CASE_ID.eq(PostgresDSL.any(DELIVERABLE_FILE.CASE_ID)))))))
                                 .as(Project.CASES_COMPLETED),
                         PostgresDSL.field(PostgresDSL
                                 .selectCount()
