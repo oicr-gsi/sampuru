@@ -113,6 +113,7 @@ public class DeliverableService extends Service<Deliverable> {
         Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DELIVERABLE_FILE)
+                //TODO: Is this the best field to search? Expand probably
                 .where(DELIVERABLE_FILE.LOCATION.like("%"+term+"%")
                         .and(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
