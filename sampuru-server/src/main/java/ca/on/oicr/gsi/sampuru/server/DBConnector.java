@@ -100,9 +100,9 @@ public class DBConnector {
 
         if(!unknownDeliverables.isEmpty()) {
             InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
-            InsertValuesStepN insertValuesStepN;
-            do { //TODO: convert to for loop
-                JSONObject nextDeliverable = (JSONObject) unknownDeliverables.remove(0);
+            InsertValuesStepN insertValuesStepN = null;
+            for(Object obj: unknownDeliverables){
+                JSONObject nextDeliverable = (JSONObject) obj;
                  insertValuesStepN = insertSetStep.values(
                         PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
                         PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("project_id")),
@@ -111,8 +111,7 @@ public class DBConnector {
                         PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("notes")),
                         PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
                 );
-
-            } while (!unknownDeliverables.isEmpty());
+            }
             insertValuesStepN.execute();
         }
 
