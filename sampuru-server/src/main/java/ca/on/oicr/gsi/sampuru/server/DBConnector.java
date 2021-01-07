@@ -1,21 +1,19 @@
 package ca.on.oicr.gsi.sampuru.server;
 
-import ca.on.oicr.gsi.sampuru.server.type.Project;
-import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.util.postgres.PostgresDSL;
-import org.jooq.util.postgres.PostgresUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 import static tables_generated.Tables.*;
 

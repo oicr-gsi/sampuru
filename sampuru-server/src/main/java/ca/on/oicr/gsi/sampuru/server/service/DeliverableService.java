@@ -2,11 +2,9 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
-import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
