@@ -1,5 +1,5 @@
-import {navbar} from "./html";
-import {initialiseActiveProjects} from "./all-projects";
+import {navbar} from "./html.js";
+import {initialiseActiveProjects} from "./all-projects.js";
 
 document.body.appendChild(navbar());
 initialiseActiveProjects();

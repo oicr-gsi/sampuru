@@ -1,4 +1,4 @@
-import {Case, Project} from "./data-transfer-objects";
+import {Case, Project} from "./data-transfer-objects.js";
 
 /**
  * The callback for handling mouse events
