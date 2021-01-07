@@ -98,6 +98,7 @@ public class DBConnector {
             }
         }
 
+        //TODO: Adding Collection of VALUEs to Insert is coming in jOOQ 3.15 apparently. They disapprove of this approach
         if(!unknownDeliverables.isEmpty()) {
             InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
             InsertValuesStepN insertValuesStepN = null;
@@ -116,33 +117,6 @@ public class DBConnector {
         }
 
     }
-
-//    /**
-//     * @param idField Table's own ID field, eg DONOR_CASE.ID
-//     * @param matchField Field on which to match to toMatch, eg DONOR_CASE.PROJECT_ID
-//     * @param toMatch Actual id value to match
-//     * @param toCreate Class<T extends SampuruType> which we would like to create a list of
-//     * @param <T> some SampuruType
-//     * @return LinkedList of SampuruType specified
-//     * @throws Exception
-//     */
-//    //TODO: Is this in use??
-//    public <T extends SampuruType> List<T> getMany(TableField idField, TableField matchField, Object toMatch, Class<T> toCreate)
-//            throws Exception {
-//        List<T> newList = new LinkedList<>();
-//
-//        Result<Record1<Integer>> applicableIds = getContext()
-//                .select(idField)
-//                .from(idField.getTable())
-//                .where(matchField.eq(toMatch))
-//                .fetch();
-//
-//        for(Record1 r: applicableIds){
-//            newList.add(toCreate.getDeclaredConstructor(int.class).newInstance(r.get(idField)));
-//        }
-//
-//        return newList;
-//    }
 
     //TODO: filter by username, probably by rewrite
     public List<Integer> getAllIds(Table getFrom){
@@ -175,58 +149,6 @@ public class DBConnector {
 
         return newList;
     }
-
-//    //TODO: Is this in use?
-//    public List<String> getCompletedProjectIds() throws Exception {
-//        List<String> projectsIdsList = new LinkedList<>();
-//
-//        Result<Record> completedProjects = getContext()
-//                .select()
-//                .from(PROJECT)
-//                .where(PROJECT.COMPLETION_DATE.isNotNull())
-//                .fetch();
-//
-//        for(Record r: completedProjects){
-//            projectsIdsList.add(r.get(PROJECT.ID));
-//        }
-//
-//        return projectsIdsList;
-//    }
-
-//    //TODO: Is this in use?
-//    public List<String> getActiveProjectIds() throws Exception {
-//        List<String> projectsIdsList = new LinkedList<>();
-//
-//        Result<Record> activeProjects = getContext()
-//                .select()
-//                .from(PROJECT)
-//                .where(PROJECT.COMPLETION_DATE.isNull())
-//                .fetch();
-//
-//        for(Record r: activeProjects){
-//            projectsIdsList.add(r.get(PROJECT.ID));
-//        }
-//
-//        return projectsIdsList;
-//    }
-
-//    // TODO is this in use?
-//    public LocalDateTime getLastUpdate(Project project) {
-//        //TODO: this is a placeholder value
-//        return LocalDateTime.now();
-////        DSLContext context = getContext();
-////        Result<Record1<LocalDateTime>> result = context
-////                .selectDistinct(CHANGELOG.CHANGE_DATE)
-////                .from(CHANGELOG)
-////                .where(
-////                        CHANGELOG.CASE_ID.in(
-////                                context.select(DONOR_CASE.ID)
-////                                        .from(DONOR_CASE)
-////                                        .where(DONOR_CASE.PROJECT_ID.eq(project.id))))
-////                .orderBy(CHANGELOG.CHANGE_DATE.desc())
-////                .fetch();
-////        return result.get(0).value1();
-//    }
 
     public List<String> getFailedQCablesForProject(String id, String username) {
         List<String> ids = new LinkedList<>();
