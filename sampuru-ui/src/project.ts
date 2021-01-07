@@ -1,9 +1,10 @@
-import {busyDialog, Card, elementFromTag, staticCard, navbar} from "./html";
-import {fetchAsPromise} from "./io";
-import {ProjectInfo} from "./data-transfer-objects";
-import {sankeyPlot} from "./sankey";
+import {busyDialog, Card, elementFromTag, staticCard, navbar} from "./html.js";
+import {fetchAsPromise} from "./io.js";
+import {ProjectInfo, SankeyTransition} from "./data-transfer-objects.js";
+import {sankeyPlot} from "./sankey.js";
 
 const projectId = sessionStorage.getItem("project-overview-id");
+
 
 if(projectId) {
   document.body.appendChild(navbar());
@@ -27,11 +28,8 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   const contactCard: Card = {contents: contact.element, header: "Contact Information",
     title: projectInfo.name + " Contact Information", tagId: projectInfo.name + "-contact"};
 
-
   const sankeyContainer = document.createElement("div");
-  sankeyContainer.id = "sankey-container";
-  //`.${sankeyContainer.className} `
-  sankeyPlot(projectInfo.sankey_transitions,`#${sankeyContainer.id}`);
+  sankeyContainer.id = "sankey";
   const qcablesCard: Card = {contents: sankeyContainer, header: "QCables",
     title: projectInfo.name + " QCables", tagId: projectInfo.name + "-qcables"};
 
@@ -61,12 +59,17 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   return pageContainer;
 }
 
+
 export function initialiseProjectOverview(project_id: string) {
   const closeBusy = busyDialog();
 
   fetchAsPromise<ProjectInfo>("api/project_overview/" + project_id, {body: null})
     .then((data) => {
       document.body.appendChild(project(data));
+      return data;
+    })
+    .then((data) => {
+      sankeyPlot(data.sankey_transitions);
     })
     .finally(closeBusy);
 }

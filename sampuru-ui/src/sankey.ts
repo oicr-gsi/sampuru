@@ -2,14 +2,14 @@
 /// <reference types="d3-sankey" />
 
 import * as d3 from "d3";
-import * as d3_sankey from "d3-sankey";
-import {SankeyTransition} from "./data-transfer-objects";
-import {node} from "webpack";
+import * as d3Sankey from "d3-sankey";
+import {SankeyTransition} from "./data-transfer-objects.js";
 
 export interface SankeyData {
   source: string | number,
   target: string | number,
-  value: number
+  value: number,
+  color: string
 }
 
 export interface Node {
@@ -27,19 +27,19 @@ export interface Link {
 export function linkSetup(key: keyof SankeyTransition, sankey: SankeyTransition): SankeyData {
   switch(key) {
     case "receipt":
-      return { source: "Receipt", target: "Extraction", value: sankey[key].extraction };
+      return { source: "Receipt", target: "Extraction", value: sankey[key].extraction, color: "#437bbf" };
     case "extraction":
-      return { source: "Extraction", target: "Library Preparation", value: sankey[key].library_preparation };
+      return { source: "Extraction", target: "Library Preparation", value: sankey[key].library_preparation, color: "#437bbf" };
     case "library_preparation":
-      return { source: "Library Preparation", target: "Low-Pass Sequencing", value: sankey[key].low_pass_sequencing };
+      return { source: "Library Preparation", target: "Low-Pass Sequencing", value: sankey[key].low_pass_sequencing, color: "#437bbf" };
     case "low_pass_sequencing":
-      return { source: "Low-Pass Sequencing", target: "Full-Depth Sequencing", value: sankey[key].full_depth_sequencing };
+      return { source: "Low-Pass Sequencing", target: "Full-Depth Sequencing", value: sankey[key].full_depth_sequencing, color: "#437bbf" };
     case "full_depth_sequencing":
-      return { source: "Full-Depth Sequencing", target: "Informatics Interpretation", value: sankey[key].informatics_interpretation };
+      return { source: "Full-Depth Sequencing", target: "Informatics Interpretation", value: sankey[key].informatics_interpretation, color: "#437bbf" };
     case "informatics_interpretation":
-      return { source: "Informatics Interpretation", target: "Final Report", value: sankey[key].final_report };
+      return { source: "Informatics Interpretation", target: "Final Report", value: sankey[key].final_report, color: "#437bbf" };
     case "final_report":
-      return { source: "Final Report", target: "Passed", value: sankey[key].passed };
+      return { source: "Final Report", target: "Passed", value: sankey[key].passed, color: "#437bbf" };
   }
 }
 
@@ -61,7 +61,8 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
           {
             source: link.source,
             target: link.target,
-            value: link.value
+            value: link.value,
+            color: link.color
           });
       }
 
@@ -70,7 +71,8 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
           {
             source: link.source,
             target: "Pending",
-            value: sankey[key].pending
+            value: sankey[key].pending,
+            color: "#fcc874"
           });
       }
 
@@ -79,20 +81,31 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
           {
             source: link.source,
             target: "Failed",
-            value: sankey[key].failed
+            value: sankey[key].failed,
+            color: "#c42d2d"
           });
       }
     });
 
-  data.forEach((d) => console.log("preprocess: " + d.source));
   return data;
 }
 
-/**
- * Create svg object from SankeyTransition data
- * Use targetId to know which element to append the svg element to
- * */
-export function sankeyPlot(sankey: SankeyTransition, targetId: string) {
+export function distinctBy<T>(key: keyof T, array: T[]) {
+  const keys = array.map(value => value[key]);
+  return array.filter((value, index) => keys.indexOf(value[key]) === index);
+}
+
+export function colorNodes(nodeName: string): string {
+  if(nodeName == "Pending") {
+    return "#fcc874"
+  } else if(nodeName == "Failed") {
+    return "#c42d2d"
+  } else {
+    return "#437bbf"
+  }
+}
+
+export function sankeyPlot(sankey: SankeyTransition) {
   const data = preprocess(sankey);
 
   // set the dimensions and margins of the graph
@@ -102,92 +115,86 @@ export function sankeyPlot(sankey: SankeyTransition, targetId: string) {
 
   // format variables
   const formatNumber = d3.format(",.0f"),    // zero decimal places
-    format = function (d: number | { valueOf(): number; }) {
-      return formatNumber(d);
-    },
-    color = d3.scaleOrdinal(d3.schemeCategory10);
-
-  // append the svg object to the body of the page
-  const svg = d3.select("body").select("div").select(".container .card .card-body")
-    .select(targetId).append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform",
-      "translate(" + margin.left + "," + margin.top + ")");
-
-  // set the sankey diagram properties
-  const sankeyPlot = d3_sankey.sankey<Node, Link>()
-    .nodeWidth(36)
-    .nodePadding(40)
-    .size([width, height]);
-
-  const path = sankeyPlot.links();
+    format = function (d: number | undefined) {
+      return (typeof d === "number" ? formatNumber(d): null);
+    };
 
   // set up nodes for graph
   const nodes: Node[] = []
   data.forEach((row, index, rowData) => {
-    // only push if distinct
-    if (!(row.source in nodes)) {
-      nodes.push(<Node>{ name: row.source, index: index });
-    }
-    if (!(row.target in nodes)) {
-      nodes.push(<Node>{ name: row.target, index: index });
-    }
+    nodes.push(<Node>{ name: row.source, index: index });
+    nodes.push(<Node>{ name: row.target, index: index });
   });
 
   const graph = { nodes: nodes, links: data };
 
-  console.log(data);
+  // only want distinct nodes
+  graph.nodes = distinctBy('name', graph.nodes);
 
   // replace node name with index
   graph.links.forEach((link, index, linksList) => {
     graph.links[index].source = graph.nodes.findIndex((value) => value.name == graph.links[index].source);
     graph.links[index].target = graph.nodes.findIndex((value) => value.name == graph.links[index].target);
-  })
+  });
 
-  console.log(graph.links);
+  // set the sankey diagram properties
+  const sankeyPlot = d3Sankey.sankey<Node, SankeyData>()
+    .nodeWidth(20)
+    .nodePadding(25)
+    .size([width, height]);
 
+  // instantiate view box and append to sankey div
+  const svg = d3.select("div#sankey")
+    .append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`);
+
+  // pass nodes and links to sankey diagram that was created above
   const plot = sankeyPlot(graph);
 
-  // add sankey elements to the svg canvas
-  const link = svg.append("g").selectAll(".link")
-    .data(plot.links)
-    .enter().append("path")
-    .attr("class", "link")
-    .attr("d", d3_sankey.sankeyLinkHorizontal())
-    .attr("stroke-width", d => (typeof d.width === "number") ? d.width : null);
-
-  // add the link titles
-  link.append("title")
-    .text(function(d) {
-      return d.source + " → " +
-        d.target + "\n" + format(d.value); });
-
-  const node = svg.append("g").selectAll(".node")
+  // draw node rectangles
+  svg.append("g")
+    .attr("stroke", "#000")
+    .selectAll("rect")
     .data(plot.nodes)
-    .enter().append("g")
-    .attr("class", "node");
-
-
-  // add the rectangles for the nodes
-  node.append("rect")
+    .join("rect")
     .attr("x", d => (typeof d.x0 === "number") ? d.x0 : null)
     .attr("y", d => (typeof d.y0 === "number") ? d.y0 : null)
     .attr("height", d => (typeof d.y0 === "number" && typeof d.y1 === "number") ? d.y1 - d.y0 : null)
-    .attr("width", sankeyPlot.nodeWidth())
-    .style("fill", d => color(d.name.replace(/ .*/, ""))) //omitted stroke
+    .attr("width", d => (typeof d.x0 === "number" && typeof d.x1 === "number") ? d.x1 - d.x0 : null)
+    .attr("fill", d => colorNodes(d.name))
     .append("title")
-    .text(d => d.name); //omitted node value
+    .text(d => `${d.name}\n${format(d.value)}`);
 
-  // add title for the nodes
-  node.append("text")
-    .attr("x", d => (typeof d.x0 === "number") ? d.x0 - 6: null)
+  // draw links
+  const link = svg.append("g")
+    .attr("fill", "none")
+    .attr("stroke-opacity", 0.3)
+    .selectAll("g")
+    .data(plot.links)
+    .join("g")
+    .style("mix-blend-mode", "multiply");
+
+  // format position and color of links
+  link.append("path")
+    .attr("d", d3Sankey.sankeyLinkHorizontal())
+    .attr("stroke", d => d.color)
+    .attr("stroke-width", d => (typeof d.width === "number") ? Math.max(1, d.width) : Math.max(1, 50));
+
+  // add titles to link
+  link.append("title")
+    .text(d => (typeof d.target === "object" && typeof d.source === "object") ?
+      `${d.source.name} → ${d.target.name}\n${format(d.value)}` : "")
+
+  // add title for nodes
+  svg.append("g")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", 8)
+    .selectAll("text")
+    .data(plot.nodes)
+    .join("text")
+    .attr("x", d => (typeof d.x0 === "number" && typeof d.x1 === "number") ? d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6: null)
     .attr("y", d => (typeof d.y0 === "number" && typeof d.y1 === "number") ? (d.y1 + d.y0)/2 : null)
     .attr("dy", "0.35em")
-    .attr("text-anchor", "end")
-    .text(d => d.name)
-    .filter(d => (typeof d.x0 === "number") ? d.x0 < width / 2: true)
-    .attr("x", d => (typeof d.x1 === "number") ? d.x1 + 6: null)
-    .attr("text-anchor", "start");
+    .attr("text-anchor", d => (typeof d.x0 === "number") ? (d.x0 < width / 2 ? "start" : "end") : null)
+    .text(d => d.name);
 }
