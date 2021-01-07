@@ -156,12 +156,14 @@ public class DeliverableService extends Service<Deliverable> {
             try {
                 jsonArray = (JSONArray) new JSONParser().parse(fullJson);
             } catch (ParseException e) {
-                e.printStackTrace(); // TODO: send a different response instead probably
+                hse.setStatusCode(400);
+                hse.getResponseSender().send("Sampuru Server received a JSONArray it couldn't parse: " + jsonArray + "\n" + e.getMessage());
             }
             try {
                 new DBConnector().writeDeliverables(jsonArray, username);
             } catch (Exception e) {
-                e.printStackTrace(); // TODO: send a different response instead probably
+                hse.setStatusCode(503);
+                hse.getResponseSender().send("Sampuru Server was unable to write deliverables to database: " + e.getMessage());
             }
             hse.getResponseSender().send(ds.getPortalJson(username));
         });
