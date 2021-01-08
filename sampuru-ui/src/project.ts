@@ -1,7 +1,13 @@
-import {busyDialog, Card, elementFromTag, staticCard, navbar} from "./html.js";
-import {fetchAsPromise} from "./io.js";
-import {ProjectInfo, SankeyTransition} from "./data-transfer-objects.js";
-import {sankeyPlot} from "./sankey.js";
+import {
+  busyDialog,
+  Card,
+  elementFromTag,
+  staticCard,
+  navbar
+} from "./html.js";
+import { fetchAsPromise } from "./io.js";
+import { ProjectInfo } from "./data-transfer-objects.js";
+import { drawSankey } from "./sankey.js";
 
 const projectId = sessionStorage.getItem("project-overview-id");
 
@@ -69,7 +75,7 @@ export function initialiseProjectOverview(project_id: string) {
       return data;
     })
     .then((data) => {
-      sankeyPlot(data.sankey_transitions);
+      drawSankey(data.sankey_transitions);
     })
     .finally(closeBusy);
 }

@@ -1,9 +1,10 @@
 /// <reference types="d3" />
 /// <reference types="d3-sankey" />
 
-import * as d3 from "d3";
-import * as d3Sankey from "d3-sankey";
-import {SankeyTransition} from "./data-transfer-objects.js";
+import * as d3 from 'd3';
+import * as d3Sankey from 'd3-sankey';
+
+import { SankeyTransition } from "./data-transfer-objects.js";
 
 export interface SankeyData {
   source: string | number,
@@ -15,10 +16,6 @@ export interface SankeyData {
 export interface Node {
   name: string,
   index: number
-}
-
-export interface Link {
-  value: number
 }
 
 /**
@@ -105,7 +102,7 @@ export function colorNodes(nodeName: string): string {
   }
 }
 
-export function sankeyPlot(sankey: SankeyTransition) {
+export function drawSankey(sankey: SankeyTransition) {
   const data = preprocess(sankey);
 
   // set the dimensions and margins of the graph

@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "css-loader": "^5.0.0",
     "html-webpack-plugin": "^4.5.0",
     "import-glob-loader": "^1.1.0",
@@ -27,6 +28,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.5.1",
     "popper.js": "^1.16.1",
+    "rollup": "^2.36.1",
     "ts-loader": "^8.0.7",
     "typescript": "^4.0.5",
     "webpack": "^5.4.0",
