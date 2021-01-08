@@ -4,7 +4,6 @@
   "main": "dist/index.js",
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^11.0.1",
     "css-loader": "^5.0.0",
     "html-webpack-plugin": "^4.5.0",
     "import-glob-loader": "^1.1.0",
@@ -15,6 +14,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "@types/bootstrap": "^5.0.0",
     "@types/d3": "^6.0.0",
     "@types/d3-sankey": "^0.11.1",
