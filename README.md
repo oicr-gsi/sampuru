@@ -2,7 +2,7 @@
 
 `npm install` to download dependencies in `package.json`
 
-`tsc -p sampuru-ui && rollup -c`
+`tsc -p sampuru-ui && PATH=$(npm bin):$PATH rollup -c`
 
 `mvn clean install`
 
