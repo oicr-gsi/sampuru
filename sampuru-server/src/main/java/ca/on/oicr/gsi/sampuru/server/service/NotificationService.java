@@ -2,11 +2,9 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.Notification;
-import ca.on.oicr.gsi.sampuru.server.type.Project;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -16,7 +14,6 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -42,7 +39,7 @@ public class NotificationService extends Service<Notification> {
     public List<Notification> getAll(String username) throws Exception {
         List<Notification> notifications = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(PostgresDSL.select().from(NOTIFICATION).where(NOTIFICATION.USER_ID.eq(username)));
+        Result<Record> results = new DBConnector().fetch(PostgresDSL.select().from(NOTIFICATION).where(NOTIFICATION.USER_ID.eq(username)));
 
         for(Record result: results){
             notifications.add(new Notification(result));
@@ -55,7 +52,7 @@ public class NotificationService extends Service<Notification> {
     public List<Notification> search(String term, String username) {
         List<Notification> notifications = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(NOTIFICATION
                 .where(NOTIFICATION.CONTENT.like("%"+term+"%")
@@ -92,7 +89,7 @@ public class NotificationService extends Service<Notification> {
     }
 
     private List<Notification> getActiveNotifications(String username) {
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select()
                 .from(NOTIFICATION)
                 .where(NOTIFICATION.RESOLVED_DATE.isNull().and(NOTIFICATION.USER_ID.eq(username))));

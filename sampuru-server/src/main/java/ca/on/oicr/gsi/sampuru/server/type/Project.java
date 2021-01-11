@@ -1,7 +1,6 @@
 package ca.on.oicr.gsi.sampuru.server.type;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
-import ca.on.oicr.gsi.sampuru.server.service.CaseService;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.TableField;
@@ -55,7 +54,7 @@ public class Project extends SampuruType {
     public List<Case> getCases(String username) {
         List<Case> cases = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DONOR_CASE)
                 .where(DONOR_CASE.PROJECT_ID.in(donorCases)
@@ -78,7 +77,7 @@ public class Project extends SampuruType {
     public List<ProjectInfoItem> getInfoItems(String username) {
         List<ProjectInfoItem> projectInfoItems = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(PROJECT_INFO_ITEM)
                 .where(PROJECT_INFO_ITEM.ID.in(infoItems)
@@ -101,7 +100,7 @@ public class Project extends SampuruType {
     public List<Deliverable> getDeliverables(String username) {
         List<Deliverable> deliverableList = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(DELIVERABLE_FILE)
                 .where(DELIVERABLE_FILE.PROJECT_ID.eq(this.id)
@@ -124,7 +123,7 @@ public class Project extends SampuruType {
     private void getProjectFromDb(TableField field, Object toMatch, String username) throws Exception {
         DBConnector dbConnector = new DBConnector();
 
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(PROJECT)
                 .where(PROJECT.ID.eq((String)toMatch)

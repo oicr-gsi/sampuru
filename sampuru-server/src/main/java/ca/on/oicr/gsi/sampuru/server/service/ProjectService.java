@@ -5,8 +5,6 @@ import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
-import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Result;
 import org.jooq.Record;
 import org.jooq.util.postgres.PostgresDSL;
@@ -14,10 +12,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Collection;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -40,7 +36,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getCompletedProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -99,7 +95,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getActiveProjects(String username) throws Exception {
         List<Project> newList = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -132,16 +128,11 @@ public class ProjectService extends Service<Project> {
                                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                                 .and(QCABLE.QCABLE_TYPE.eq("final_report"))
                                                 .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
+                                                // Can't use 'in' on text[] https://www.postgresql.org/docs/current/arrays.html
                                                 .andExists(PostgresDSL
                                                         .select(DELIVERABLE_FILE.ID)
                                                         .from(DELIVERABLE_FILE)
-                                                        .where(DELIVERABLE_FILE.CASE_ID.in(PostgresDSL
-                                                                .select(QCABLE.CASE_ID)
-                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(PostgresDSL
-                                                                        .select(DONOR_CASE.ID)
-                                                                        .from(DONOR_CASE)
-                                                                        .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
-                                                                        .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
+                                                        .where(QCABLE.CASE_ID.eq(PostgresDSL.any(DELIVERABLE_FILE.CASE_ID)))))))
                                 .as(Project.CASES_COMPLETED),
                         PostgresDSL.field(PostgresDSL
                                 .selectCount()
@@ -200,7 +191,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> getAll(String username) {
         List<Project> projects = new LinkedList<>();
 
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -229,7 +220,7 @@ public class ProjectService extends Service<Project> {
     public List<Project> search(String term, String username) {
         List<Project> projects = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -262,16 +253,11 @@ public class ProjectService extends Service<Project> {
                                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                                 .and(QCABLE.QCABLE_TYPE.eq("final_report"))
                                                 .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))
+                                                // Can't use 'in' on text[] https://www.postgresql.org/docs/current/arrays.html
                                                 .andExists(PostgresDSL
                                                         .select(DELIVERABLE_FILE.ID)
                                                         .from(DELIVERABLE_FILE)
-                                                        .where(DELIVERABLE_FILE.CASE_ID.in(PostgresDSL
-                                                                .select(QCABLE.CASE_ID)
-                                                                .from(QCABLE).where(QCABLE.CASE_ID.in(PostgresDSL
-                                                                        .select(DONOR_CASE.ID)
-                                                                        .from(DONOR_CASE)
-                                                                        .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
-                                                                        .and(QCABLE.QCABLE_TYPE.eq("final_report")))))))))
+                                                        .where(QCABLE.CASE_ID.eq(PostgresDSL.any(DELIVERABLE_FILE.CASE_ID)))))))
                                 .as(Project.CASES_COMPLETED),
                         PostgresDSL.field(PostgresDSL
                                 .selectCount()
@@ -376,8 +362,9 @@ public class ProjectService extends Service<Project> {
             JSONObject deliverableObj = new JSONObject();
             deliverableObj.put("id", deliverable.id);
             deliverableObj.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
-            deliverableObj.put("content", deliverable.content);
-            infoItemsArray.add(deliverableObj);
+            deliverableObj.put("location", deliverable.location);
+            deliverableObj.put("notes", deliverable.notes);
+            deliverablesArray.add(deliverableObj);
         }
         jsonObject.put("deliverables", deliverablesArray);
 

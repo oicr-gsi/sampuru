@@ -5,7 +5,6 @@ import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
-import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -15,7 +14,6 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -43,7 +41,7 @@ public class QCableService extends Service<QCable> {
         List<QCable> qcables = new LinkedList<>();
 
         // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(QCABLE.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -63,7 +61,7 @@ public class QCableService extends Service<QCable> {
     public List<QCable> search(String term, String username) {
         List<QCable> qcables = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select(QCABLE.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -149,7 +147,7 @@ public class QCableService extends Service<QCable> {
     }
 
     private JSONArray getQcableTableFromCase(String caseId, String username){
-        return buildQcableTable(new DBConnector().execute(PostgresDSL
+        return buildQcableTable(new DBConnector().fetch(PostgresDSL
                 .select()
                 .from(QCABLE_TABLE)
                 .where(QCABLE_TABLE.CASE_ID.eq(caseId)
@@ -164,7 +162,7 @@ public class QCableService extends Service<QCable> {
     }
 
     private JSONArray getQcableTableFromProject(String projectId, String username){
-        return buildQcableTable(new DBConnector().execute(PostgresDSL
+        return buildQcableTable(new DBConnector().fetch(PostgresDSL
                 .select()
                 .from(QCABLE_TABLE)
                 .where(QCABLE_TABLE.PROJECT_ID.eq(projectId)

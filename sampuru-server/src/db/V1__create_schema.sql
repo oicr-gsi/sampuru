@@ -20,12 +20,16 @@ CREATE TABLE qcable (
     failure_reason text,
     library_design text,
     parent_id text);
- 
+
+-- If the writes can be condensed into one transaction, consider changing case_id to its own table (case_id, deliverable_id)
+-- see https://www.postgresql.org/docs/current/arrays.html "searching for specific array elements can be a sign of
+-- database misdesign"
 CREATE TABLE deliverable_file (
     id SERIAL PRIMARY KEY,
     project_id text NOT NULL,
-    case_id text NOT NULL,
-    content text NOT NULL,
+    case_id text[] NOT NULL,
+    location text NOT NULL,
+    notes text,
     expiry_date timestamp);
  
 CREATE TABLE changelog (
@@ -55,7 +59,6 @@ ALTER TABLE donor_case ADD CONSTRAINT case_project_id_match FOREIGN KEY (project
 ALTER TABLE qcable ADD CONSTRAINT qcable_project_id_match FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE;
 ALTER TABLE qcable ADD CONSTRAINT qcable_case_id_match FOREIGN KEY (case_id) REFERENCES donor_case (id) ON DELETE CASCADE;
 ALTER TABLE deliverable_file ADD CONSTRAINT deliverable_project_id_match FOREIGN KEY (project_id) REFERENCES project (id);
-ALTER TABLE deliverable_file ADD CONSTRAINT deliverable_case_id_match FOREIGN KEY (case_id) REFERENCES donor_case (id);
 ALTER TABLE changelog ADD CONSTRAINT changelog_project_id_match FOREIGN KEY (project_id) REFERENCES project (id);
 ALTER TABLE project_info_item ADD CONSTRAINT project_info_item_project_id_match FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE;
 ALTER TABLE qcable ADD CONSTRAINT qcable_parent_id_match FOREIGN KEY (parent_id) REFERENCES qcable (id);

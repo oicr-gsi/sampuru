@@ -1,7 +1,5 @@
 package ca.on.oicr.gsi.sampuru.server;
 
-import ca.on.oicr.gsi.sampuru.server.type.Project;
-import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -12,8 +10,10 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 
 import static tables_generated.Tables.*;
 
@@ -58,7 +58,7 @@ public class DBConnector {
     }
 
     //TODO: I wanted this as a catch all to do a filter by username but it doesn't look like al's gonna be so lucky
-    public Result execute(SelectConnectByStep<Record> select){
+    public Result fetch(SelectConnectByStep<Record> select){
         return getContext().fetch(select);
     }
 
@@ -74,32 +74,47 @@ public class DBConnector {
         return rowResult.get(0);
     }
 
-//    /**
-//     * @param idField Table's own ID field, eg DONOR_CASE.ID
-//     * @param matchField Field on which to match to toMatch, eg DONOR_CASE.PROJECT_ID
-//     * @param toMatch Actual id value to match
-//     * @param toCreate Class<T extends SampuruType> which we would like to create a list of
-//     * @param <T> some SampuruType
-//     * @return LinkedList of SampuruType specified
-//     * @throws Exception
-//     */
-//    //TODO: Is this in use??
-//    public <T extends SampuruType> List<T> getMany(TableField idField, TableField matchField, Object toMatch, Class<T> toCreate)
-//            throws Exception {
-//        List<T> newList = new LinkedList<>();
-//
-//        Result<Record1<Integer>> applicableIds = getContext()
-//                .select(idField)
-//                .from(idField.getTable())
-//                .where(matchField.eq(toMatch))
-//                .fetch();
-//
-//        for(Record1 r: applicableIds){
-//            newList.add(toCreate.getDeclaredConstructor(int.class).newInstance(r.get(idField)));
-//        }
-//
-//        return newList;
-//    }
+    // TODO: look at https://www.jooq.org/doc/3.14/manual/sql-building/dynamic-sql/
+    public void writeDeliverables(JSONArray deliverableArray, String username) throws Exception {
+        if (deliverableArray.isEmpty()) return;
+
+        // Front end will provide ID if deliverable is pre-existing. If no ID or ID is null, INSERT instead of UPDATE
+        // Currently, nothing is being done with knownDeliverables. To be implemented (GP-2520)
+        JSONArray knownDeliverables = new JSONArray(),
+                unknownDeliverables = new JSONArray();
+        for(Object obj: deliverableArray){
+            if(!(obj instanceof JSONObject)){
+                // TODO: More precise exception
+                throw new Exception("Got something other than a JSONObject in the JSONArray coming into " +
+                        "writeDeliverables(): " + obj.toString());
+            }
+            JSONObject jsonObject = (JSONObject) obj;
+            if(jsonObject.containsKey("id")){
+                knownDeliverables.add(jsonObject);
+            } else {
+                unknownDeliverables.add(jsonObject);
+            }
+        }
+
+        //TODO: Adding Collection of VALUEs to Insert is coming in jOOQ 3.15 apparently. They disapprove of this approach
+        if(!unknownDeliverables.isEmpty()) {
+            InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
+            InsertValuesStepN insertValuesStepN = null;
+            for(Object obj: unknownDeliverables){
+                JSONObject nextDeliverable = (JSONObject) obj;
+                 insertValuesStepN = insertSetStep.values(
+                        PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("project_id")),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.array(((JSONArray)nextDeliverable.get("case_id")).toArray())),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("location")),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("notes")),
+                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
+                );
+            }
+            insertValuesStepN.execute();
+        }
+
+    }
 
     //TODO: filter by username, probably by rewrite
     public List<Integer> getAllIds(Table getFrom){
@@ -133,61 +148,9 @@ public class DBConnector {
         return newList;
     }
 
-//    //TODO: Is this in use?
-//    public List<String> getCompletedProjectIds() throws Exception {
-//        List<String> projectsIdsList = new LinkedList<>();
-//
-//        Result<Record> completedProjects = getContext()
-//                .select()
-//                .from(PROJECT)
-//                .where(PROJECT.COMPLETION_DATE.isNotNull())
-//                .fetch();
-//
-//        for(Record r: completedProjects){
-//            projectsIdsList.add(r.get(PROJECT.ID));
-//        }
-//
-//        return projectsIdsList;
-//    }
-
-//    //TODO: Is this in use?
-//    public List<String> getActiveProjectIds() throws Exception {
-//        List<String> projectsIdsList = new LinkedList<>();
-//
-//        Result<Record> activeProjects = getContext()
-//                .select()
-//                .from(PROJECT)
-//                .where(PROJECT.COMPLETION_DATE.isNull())
-//                .fetch();
-//
-//        for(Record r: activeProjects){
-//            projectsIdsList.add(r.get(PROJECT.ID));
-//        }
-//
-//        return projectsIdsList;
-//    }
-
-//    // TODO is this in use?
-//    public LocalDateTime getLastUpdate(Project project) {
-//        //TODO: this is a placeholder value
-//        return LocalDateTime.now();
-////        DSLContext context = getContext();
-////        Result<Record1<LocalDateTime>> result = context
-////                .selectDistinct(CHANGELOG.CHANGE_DATE)
-////                .from(CHANGELOG)
-////                .where(
-////                        CHANGELOG.CASE_ID.in(
-////                                context.select(DONOR_CASE.ID)
-////                                        .from(DONOR_CASE)
-////                                        .where(DONOR_CASE.PROJECT_ID.eq(project.id))))
-////                .orderBy(CHANGELOG.CHANGE_DATE.desc())
-////                .fetch();
-////        return result.get(0).value1();
-//    }
-
     public List<String> getFailedQCablesForProject(String id, String username) {
         List<String> ids = new LinkedList<>();
-        Result<Record> result = execute(PostgresDSL
+        Result<Record> result = fetch(PostgresDSL
                 .select()
                 .from(QCABLE)
                 .where(QCABLE.PROJECT_ID.eq(id)
@@ -205,7 +168,7 @@ public class DBConnector {
 
     public JSONObject getSankeyTransitions(String projectId, String username) throws SQLException {
         JSONObject jsonObject = new JSONObject();
-        Result<Record> shouldBeSingularResult = execute(PostgresDSL
+        Result<Record> shouldBeSingularResult = fetch(PostgresDSL
                 .select()
                 .from(SANKEY_TRANSITION)
                 .where(SANKEY_TRANSITION.PROJECT_ID.eq(projectId))
@@ -282,6 +245,14 @@ public class DBConnector {
                 this.put((String)key, new JSONArray());
             }
             return super.get(key);
+        }
+
+        public JSONObject toJSONObject(){
+            JSONObject jsonObject = new JSONObject();
+            for(String key: this.keySet()){
+                jsonObject.put(key, this.get(key));
+            }
+            return jsonObject;
         }
     }
 
