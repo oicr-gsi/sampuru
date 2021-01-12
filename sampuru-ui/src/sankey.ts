@@ -32,9 +32,9 @@ export function linkSetup(key: keyof SankeyTransition, sankey: SankeyTransition)
     case "low_pass_sequencing":
       return { source: "Low-Pass Sequencing", target: "Full-Depth Sequencing", value: sankey[key].full_depth_sequencing, color: "#437bbf" };
     case "full_depth_sequencing":
-      return { source: "Full-Depth Sequencing", target: "Informatics Interpretation", value: sankey[key].informatics_interpretation, color: "#437bbf" };
+      return { source: "Full-Depth Sequencing", target: "Informatics & Interpretation", value: sankey[key].informatics_interpretation, color: "#437bbf" };
     case "informatics_interpretation":
-      return { source: "Informatics Interpretation", target: "Final Report", value: sankey[key].final_report, color: "#437bbf" };
+      return { source: "Informatics & Interpretation", target: "Final Report", value: sankey[key].final_report, color: "#437bbf" };
     case "final_report":
       return { source: "Final Report", target: "Passed", value: sankey[key].passed, color: "#437bbf" };
   }
