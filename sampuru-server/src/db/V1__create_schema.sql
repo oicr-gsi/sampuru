@@ -20,12 +20,16 @@ CREATE TABLE qcable (
     failure_reason text,
     library_design text,
     parent_id text);
- 
+
+-- If the writes can be condensed into one transaction, consider changing case_id to its own table (case_id, deliverable_id)
+-- see https://www.postgresql.org/docs/current/arrays.html "searching for specific array elements can be a sign of
+-- database misdesign"
 CREATE TABLE deliverable_file (
     id SERIAL PRIMARY KEY,
     project_id text NOT NULL,
-    case_id text NOT NULL,
-    content text NOT NULL,
+    case_id text[] NOT NULL,
+    location text NOT NULL,
+    notes text,
     expiry_date timestamp);
  
 CREATE TABLE changelog (

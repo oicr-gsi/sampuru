@@ -14,7 +14,6 @@ import org.json.simple.JSONObject;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -52,7 +51,7 @@ public class CaseService extends Service<Case> {
     public String getCardJsonForProject(String projectId, String username) throws Exception {
         DBConnector dbConnector = new DBConnector();
         DBConnector.JSONObjectMap cards = new DBConnector.JSONObjectMap();
-        Result<Record> cardResults = dbConnector.execute(PostgresDSL
+        Result<Record> cardResults = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(CASE_CARD)
                 .where(CASE_CARD.CASE_ID.in(PostgresDSL
@@ -137,7 +136,7 @@ public class CaseService extends Service<Case> {
         }
 
         // TODO: don't like that we're making a second request! fix somehow eventually maybe
-        Result<Record> changelogResults = dbConnector.execute(PostgresDSL
+        Result<Record> changelogResults = dbConnector.fetch(PostgresDSL
                 .select()
                 .from(CHANGELOG)
                 .where(CHANGELOG.CASE_ID.in(PostgresDSL
@@ -184,7 +183,7 @@ public class CaseService extends Service<Case> {
         List<Case> cases = new LinkedList<>();
 
         // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(DONOR_CASE.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(QCABLE.ID)
@@ -194,7 +193,7 @@ public class CaseService extends Service<Case> {
                         PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
-                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -219,7 +218,7 @@ public class CaseService extends Service<Case> {
         List<Case> cases = new LinkedList<>();
 
         // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
-        Result<Record> results = new DBConnector().execute(
+        Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select(DONOR_CASE.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(QCABLE.ID)
@@ -229,7 +228,7 @@ public class CaseService extends Service<Case> {
                         PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
-                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -250,7 +249,7 @@ public class CaseService extends Service<Case> {
     public List<Case> search(String term, String username) {
         List<Case> cases = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.execute(PostgresDSL
+        Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select(DONOR_CASE.asterisk(),
                         PostgresDSL.array(PostgresDSL
                                 .select(QCABLE.ID)
@@ -260,7 +259,7 @@ public class CaseService extends Service<Case> {
                         PostgresDSL.array(PostgresDSL
                                 .select(DELIVERABLE_FILE.ID)
                                 .from(DELIVERABLE_FILE)
-                                .where(DELIVERABLE_FILE.CASE_ID.eq(DONOR_CASE.ID)))
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
