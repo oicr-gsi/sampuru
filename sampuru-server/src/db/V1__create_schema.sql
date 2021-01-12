@@ -32,7 +32,6 @@ CREATE TABLE qcable (
 CREATE TABLE deliverable_file (
     id SERIAL PRIMARY KEY,
     project_id text NOT NULL,
-    case_id text[] NOT NULL,
     location text NOT NULL,
     notes text,
     expiry_date timestamp);
