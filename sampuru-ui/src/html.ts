@@ -288,28 +288,7 @@ export function bootstrapTable(
   return table;
 }
 
-export function caseCard(
-  caseContent: Case
-): HTMLElement {
-
-  const caseProgess: DOMElement[] = [];
-  caseContent.bars.forEach((bar) => {
-    const steps: DOMElement[] = [];
-    bar.steps.forEach((step) => {
-      steps.push(elementFromTag("div", "col", step.type + ": ", step.completed.toString() + "/" + step.total.toString()));
-    });
-    caseProgess.push(elementFromTag("div", "row",
-      elementFromTag("div", "col", bar.library_design), steps));
-  });
-
-  const container = elementFromTag("div", "container", caseProgess);
-  return container.element;
-}
-
-
-
-
-export function caseCard2(caseContent: Case): HTMLElement {
+export function caseCard(caseContent: Case): HTMLElement {
   const caseProgess: DOMElement[] = [];
   // sort list so blank library designs are displayed first
   caseContent.bars.sort((a, b) => libDesignSort(a.library_design, b.library_design));

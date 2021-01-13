@@ -1,4 +1,4 @@
-import {busyDialog, Card, caseCard, caseCard2, collapsibleCard, navbar} from "./html.js";
+import {busyDialog, Card, caseCard, collapsibleCard, navbar} from "./html.js";
 import {fetchAsPromise} from "./io.js";
 import {Case} from "./data-transfer-objects.js";
 
@@ -20,7 +20,7 @@ export function casesPage(cases: Case[]): HTMLElement {
   const cards: HTMLElement[] = [];
   cases
     .forEach((caseItem) => {
-      const cardContent = caseCard2(caseItem);
+      const cardContent = caseCard(caseItem);
       const card: Card = {contents: cardContent, header: caseItem.name, title: caseItem.name, tagId: caseItem.name};
       cards.push(collapsibleCard(null, card));
     });
