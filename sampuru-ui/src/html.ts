@@ -1,4 +1,5 @@
-import {Case, Project} from "./data-transfer-objects.js";
+import { Case, Project } from "./data-transfer-objects.js";
+import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common.js";
 
 /**
  * The callback for handling mouse events
@@ -303,7 +304,42 @@ export function caseCard(
 
   const container = elementFromTag("div", "container", caseProgess);
   return container.element;
+}
 
+
+
+
+export function caseCard2(caseContent: Case): HTMLElement {
+  const caseProgess: DOMElement[] = [];
+  // sort list so blank library designs are displayed first
+  caseContent.bars.sort((a, b) => libDesignSort(a.library_design, b.library_design));
+  // each bar represents case data split by library design
+  caseContent.bars.forEach((bar) => {
+    const progressBarContainer = document.createElement("div");
+    progressBarContainer.className = "col-10 cases container"; // col-10 => so progress bars span most of the card-body
+    // a step is equivalent to quality gate
+    bar.steps.forEach((step) => {
+      const qualityGate = document.createElement("div");
+      qualityGate.className = "cases quality-gate " + step.status;
+      qualityGate.innerText = step.completed.toString() + "/" + step.total.toString();
+
+      const qualityGateName = document.createElement("p");
+      qualityGateName.className = "quality-gate-name";
+      qualityGateName.innerText = formatQualityGateNames(step.type);
+
+      qualityGate.appendChild(qualityGateName);
+      progressBarContainer.appendChild(qualityGate);
+    });
+
+    // push each row of case data with the library design to the left and progress bars to the right
+    caseProgess.push(elementFromTag("div", "row",
+      elementFromTag("div", "col-2 library-design",
+        formatLibraryDesigns(typeof bar.library_design === "string" ? bar.library_design : "")),
+      { type: "complex", element: progressBarContainer }));
+  });
+
+  const container = elementFromTag("div", "container", caseProgess);
+  return container.element;
 }
 
 /**
