@@ -1,0 +1,42 @@
+.cases .container {
+    width: 100%;
+}
+
+.cases .quality-gate {
+    width: 10%;
+    background-color: lightgray;
+    border: 1px solid grey;
+    border-radius: 3px;
+    margin-right: 2px;
+    float: left;
+    display: block;
+    height: 20px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.row {
+    padding-bottom: 45px;
+}
+
+.library-design {
+    font-size: 12px;
+}
+
+.quality-gate-name {
+    font-size: 10px;
+    position: relative;
+    text-align: center;
+}
+
+.pending {
+    background-color: #fcc874 !important;
+}
+
+.passed {
+    background-color: #7BA2D2 !important;
+}
+
+.failed {
+    background-color: #c42d2d !important;
+}
