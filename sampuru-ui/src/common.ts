@@ -40,7 +40,8 @@ export function formatLibraryDesigns(libraryDesign: string) {
 
 /**
  * Float null values to the top and sort everything else alphabetically
- * Used to ensure in Cases page, blank library designs float to the top
+ * Used to ensure that progress bars with blank library designs in the Case page
+ * are displayed first.
  */
 
 export function libDesignSort(a: string | null, b: string | null) {
