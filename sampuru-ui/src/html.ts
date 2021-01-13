@@ -420,10 +420,12 @@ export function createLinkElement(
 
 //todo: refactor DOM element creation so less verbose
 export function collapsibleCard(
+  referer: string,
   click: ClickHandler | null,
   content: Card
 ): HTMLElement {
 
+  // todo: this is for Boostrap card collapsing
   /*
   let attributes = new Map();
   attributes.set('data-toggle', 'collapse');
@@ -431,12 +433,28 @@ export function collapsibleCard(
 
   const cardLink = createLinkElement("card-link", content.header, attributes, null);*/
 
-  const cardLink = document.createElement("a");
-  cardLink.innerText = content.header;
-  cardLink.addEventListener("click", () => {
-    sessionStorage.setItem("project-overview-id", content.tagId);
-  });
-  cardLink.href = "project.html";
+  let cardLink;
+  if (referer == "active_projects") {
+    cardLink = document.createElement("a");
+    cardLink.innerText = content.header;
+    cardLink.addEventListener("click", () => {
+      sessionStorage.setItem("project-overview-id", content.tagId);
+    });
+    cardLink.href = "project.html";
+  } else if (referer == "cases") {
+    cardLink = document.createElement("a");
+    cardLink.innerText = content.header;
+    cardLink.addEventListener("click", () => {
+      sessionStorage.setItem("qcables-filter-type", "case");
+      sessionStorage.setItem("qcables-filter-id", content.tagId);
+      sessionStorage.setItem("qcables-filter-name", content.header);
+    });
+    cardLink.href = "qcables.html";
+  }
+  else {
+    cardLink = document.createElement("p");
+    cardLink.innerText = content.header;
+  }
 
   const cardHeader = document.createElement("div");
   cardHeader.className = "card-header";
