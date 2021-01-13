@@ -28,7 +28,7 @@ if (filterType && filterId && filterName) {
 function statusToClassName(status: string | null) {
   switch(status) {
     case "passed":
-      return "table-success";
+      return "table-primary";
     case "failed":
       return "table-danger";
     case "pending":
