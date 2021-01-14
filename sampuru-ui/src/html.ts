@@ -1,4 +1,5 @@
-import {Case, Project} from "./data-transfer-objects.js";
+import { Case, Project } from "./data-transfer-objects.js";
+import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common.js";
 
 /**
  * The callback for handling mouse events
@@ -287,23 +288,37 @@ export function bootstrapTable(
   return table;
 }
 
-export function caseCard(
-  caseContent: Case
-): HTMLElement {
-
+export function caseCard(caseContent: Case): HTMLElement {
   const caseProgess: DOMElement[] = [];
+  // sort list so blank library designs are displayed first
+  caseContent.bars.sort((a, b) => libDesignSort(a.library_design, b.library_design));
+  // each bar represents case data split by library design
   caseContent.bars.forEach((bar) => {
-    const steps: DOMElement[] = [];
+    const progressBarContainer = document.createElement("div");
+    progressBarContainer.className = "col-10 cases container"; // col-10 => so progress bars span most of the card-body
+    // a step is equivalent to quality gate
     bar.steps.forEach((step) => {
-      steps.push(elementFromTag("div", "col", step.type + ": ", step.completed.toString() + "/" + step.total.toString()));
+      const qualityGate = document.createElement("div");
+      qualityGate.className = "cases quality-gate " + step.status;
+      qualityGate.innerText = step.completed.toString() + "/" + step.total.toString();
+
+      const qualityGateName = document.createElement("p");
+      qualityGateName.className = "quality-gate-name";
+      qualityGateName.innerText = formatQualityGateNames(step.type);
+
+      qualityGate.appendChild(qualityGateName);
+      progressBarContainer.appendChild(qualityGate);
     });
+
+    // push each row of case data with the library design to the left and progress bars to the right
     caseProgess.push(elementFromTag("div", "row",
-      elementFromTag("div", "col", bar.library_design), steps));
+      elementFromTag("div", "col-2 library-design",
+        formatLibraryDesigns(typeof bar.library_design === "string" ? bar.library_design : "")),
+      { type: "complex", element: progressBarContainer }));
   });
 
   const container = elementFromTag("div", "container", caseProgess);
   return container.element;
-
 }
 
 /**
@@ -405,10 +420,12 @@ export function createLinkElement(
 
 //todo: refactor DOM element creation so less verbose
 export function collapsibleCard(
+  referer: string,
   click: ClickHandler | null,
   content: Card
 ): HTMLElement {
 
+  // todo: this is for Boostrap card collapsing
   /*
   let attributes = new Map();
   attributes.set('data-toggle', 'collapse');
@@ -416,12 +433,28 @@ export function collapsibleCard(
 
   const cardLink = createLinkElement("card-link", content.header, attributes, null);*/
 
-  const cardLink = document.createElement("a");
-  cardLink.innerText = content.header;
-  cardLink.addEventListener("click", () => {
-    sessionStorage.setItem("project-overview-id", content.tagId);
-  });
-  cardLink.href = "project.html";
+  let cardLink;
+  if (referer == "active_projects") {
+    cardLink = document.createElement("a");
+    cardLink.innerText = content.header;
+    cardLink.addEventListener("click", () => {
+      sessionStorage.setItem("project-overview-id", content.tagId);
+    });
+    cardLink.href = "project.html";
+  } else if (referer == "cases") {
+    cardLink = document.createElement("a");
+    cardLink.innerText = content.header;
+    cardLink.addEventListener("click", () => {
+      sessionStorage.setItem("qcables-filter-type", "case");
+      sessionStorage.setItem("qcables-filter-id", content.tagId);
+      sessionStorage.setItem("qcables-filter-name", content.header);
+    });
+    cardLink.href = "qcables.html";
+  }
+  else {
+    cardLink = document.createElement("p");
+    cardLink.innerText = content.header;
+  }
 
   const cardHeader = document.createElement("div");
   cardHeader.className = "card-header";

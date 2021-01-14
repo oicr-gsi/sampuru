@@ -86,6 +86,6 @@ export interface Bar {
 
 export interface Case {
   name: string,
-  id: number,
+  id: string,
   bars: Bar[]
 }
