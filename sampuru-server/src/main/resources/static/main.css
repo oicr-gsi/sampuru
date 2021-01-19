@@ -41,6 +41,7 @@
     background-color: #c42d2d !important;
 }
 
-#navBarSearchForm input[type=text] {
-    width:60% !important;
+.navbar input[type=search] {
+    width:400px !important;
 }
+
