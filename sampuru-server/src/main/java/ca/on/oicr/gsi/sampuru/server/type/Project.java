@@ -22,9 +22,9 @@ public class Project extends SampuruType {
             QCABLES_TOTAL = "qcables_total",
             QCABLES_COMPLETED = "qcables_completed";
 
-    public String id, name, contactName, contactEmail;
-    public LocalDateTime completionDate, lastUpdate;
-    public List<Integer> infoItems = new LinkedList<>(), deliverables = new LinkedList<>();
+    public String id, name, contactName, contactEmail, description, pipeline, referenceGenome;
+    public LocalDateTime createdDate, completionDate, lastUpdate;
+    public List<Integer> infoItems = new LinkedList<>(), deliverables = new LinkedList<>(), kits = new LinkedList<>();
     public List<String> donorCases = new LinkedList<>();
     public int casesTotal, casesCompleted, qcablesTotal, qcablesCompleted;
 
@@ -35,9 +35,14 @@ public class Project extends SampuruType {
     public Project(Record row) {
         id = row.get(PROJECT.ID);
         name = row.get(PROJECT.NAME);
+        description = row.get(PROJECT.DESCRIPTION);
+        pipeline = row.get(PROJECT.PIPELINE);
+        referenceGenome = row.get(PROJECT.REFERENCE_GENOME);
         contactName = row.get(PROJECT.CONTACT_NAME);
         contactEmail = row.get(PROJECT.CONTACT_EMAIL);
+        createdDate = row.get(PROJECT.CREATED_DATE);
         completionDate = row.get(PROJECT.COMPLETION_DATE);
+        kits = row.get(PROJECT.KITS, List.class);
         infoItems = row.get(INFO_ITEM_IDS, List.class);
         donorCases = row.get(CASE_IDS, List.class);
         deliverables = row.get(DELIVERABLE_IDS, List.class);
@@ -149,7 +154,12 @@ public class Project extends SampuruType {
         contactName = dbRecord.get(PROJECT.CONTACT_NAME);
         contactEmail = dbRecord.get(PROJECT.CONTACT_EMAIL);
         completionDate = dbRecord.get(PROJECT.COMPLETION_DATE);
+        description = dbRecord.get(PROJECT.DESCRIPTION);
+        pipeline = dbRecord.get(PROJECT.PIPELINE);
+        referenceGenome = dbRecord.get(PROJECT.REFERENCE_GENOME);
 
+        //todo: kits will require a function in dbConnector
+        //kits = dbConnector.getChildIdList(PROJECT, PROJECT.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
         infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
         donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;
         deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
@@ -172,6 +182,11 @@ public class Project extends SampuruType {
                 + "\n name: " + name
                 + "\n contactName: " + contactName
                 + "\n contactEmail: " + contactEmail
+                + "\n description: " + description
+                + "\n pipeline: " + pipeline
+                + "\n kits: " + kits
+                + "\n referenceGenome: " + referenceGenome
+                + "\n createdDate: " + createdDate
                 + "\n completionDate: " + completionDate
                 + "\n infoItems: " + infoItems
                 + "\n donorCases: " + donorCases

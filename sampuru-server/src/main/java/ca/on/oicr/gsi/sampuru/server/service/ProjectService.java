@@ -306,6 +306,11 @@ public class ProjectService extends Service<Project> {
             jsonObject.put("name", project.name);
             jsonObject.put("contact_name", project.contactName == null? "null": project.contactName);
             jsonObject.put("contact_email", project.contactEmail == null? "null": project.contactEmail);
+            jsonObject.put("decription", project.description == null? "null": project.description);
+            jsonObject.put("pipeline", project.pipeline == null? "null": project.pipeline);
+            jsonObject.put("reference_genome", project.referenceGenome == null? "null": project.referenceGenome);
+            //todo: kits!!
+            jsonObject.put("created_date", project.createdDate == null? "null": JSONObject.escape(project.createdDate.toString()));
             jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
 
             if(expand){
@@ -341,11 +346,17 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("name", subject.name);
         jsonObject.put("contact_name", subject.contactName == null? "null": subject.contactName);
         jsonObject.put("contact_email", subject.contactEmail == null? "null": subject.contactEmail);
+        jsonObject.put("decription", subject.description == null? "null": subject.description);
+        jsonObject.put("pipeline", subject.pipeline == null? "null": subject.pipeline);
+        jsonObject.put("reference_genome", subject.referenceGenome == null? "null": subject.referenceGenome);
+        //todo: kits!!
+        jsonObject.put("created_date", subject.createdDate == null? "null": JSONObject.escape(subject.createdDate.toString()));
         jsonObject.put("completion_date", subject.completionDate  == null? "null": JSONObject.escape(subject.completionDate.toString()));
         jsonObject.put("cases_total", subject.casesTotal);
         jsonObject.put("cases_completed", subject.casesCompleted);
         jsonObject.put("qcables_total", subject.qcablesTotal);
         jsonObject.put("qcables_completed", subject.qcablesCompleted);
+
 
         JSONArray infoItemsArray = new JSONArray();
         for (ProjectInfoItem infoItem: subject.getInfoItems(username)){

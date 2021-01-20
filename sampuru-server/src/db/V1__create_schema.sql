@@ -3,6 +3,11 @@ CREATE TABLE project (
     name varchar(10) UNIQUE NOT NULL,
     contact_name text,
     contact_email text,
+    description text,
+    pipeline text,
+    kits text[],
+    reference_genome text,
+    created_date timestamp,
     completion_date timestamp);
  
 CREATE TABLE donor_case (
