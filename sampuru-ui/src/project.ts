@@ -20,7 +20,7 @@ if(projectId) {
 export function project(projectInfo: ProjectInfo): HTMLElement {
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h2");
-  pageHeader.innerText = "Project Overview"
+  pageHeader.innerText = projectInfo.name;
 
   const cardContainter = document.createElement("div");
   cardContainter.className = "container";
