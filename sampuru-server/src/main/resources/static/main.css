@@ -40,3 +40,8 @@
 .failed {
     background-color: #c42d2d !important;
 }
+
+.navbar input[type=search] {
+    width:400px !important;
+}
+

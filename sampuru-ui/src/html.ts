@@ -385,7 +385,7 @@ export function navbar(): HTMLElement {
   const inputBox = document.createElement("input");
   inputBox.className = "form-control mr-sm-2";
   inputBox.type = "search";
-  inputBox.placeholder = "Search";
+  inputBox.placeholder = "Search Sampuru";
 
   const submitButton = document.createElement("button");
   submitButton.className = "btn btn-outline-secondary my-2 my-sm-0";

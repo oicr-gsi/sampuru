@@ -101,7 +101,11 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
   document.body.appendChild(pageContainer);
 
   $(function () {
-    $('#table').bootstrapTable({});
+    $('#table').bootstrapTable({
+      formatSearch: function() {
+        return 'Search QCables';
+      }
+    });
   });
 }
 

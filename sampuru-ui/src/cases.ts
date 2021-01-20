@@ -21,7 +21,7 @@ export function casesPage(cases: Case[]): HTMLElement {
   cases
     .forEach((caseItem) => {
       const cardContent = caseCard(caseItem);
-      const card: Card = {contents: cardContent, header: caseItem.name, title: caseItem.name, tagId: caseItem.id};
+      const card: Card = {contents: cardContent, header: caseItem.name, title: caseItem.name, tagId: caseItem.id.toString()};
       cards.push(collapsibleCard("cases", null, card));
     });
 
