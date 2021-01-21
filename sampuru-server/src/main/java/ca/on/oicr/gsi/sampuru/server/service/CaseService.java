@@ -160,7 +160,7 @@ public class CaseService extends Service<Case> {
             JSONObject changelogEntry = new JSONObject();
 
             changelogEntry.put("id", result.get(CHANGELOG.ID));
-            changelogEntry.put("change_date", result.get(CHANGELOG.CHANGE_DATE));
+            changelogEntry.put("change_date", result.get(CHANGELOG.CHANGE_DATE).toString());
             changelogEntry.put("content", result.get(CHANGELOG.CONTENT));
 
             currentChangelog.add(changelogEntry);
