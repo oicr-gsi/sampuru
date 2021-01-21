@@ -9,9 +9,9 @@ import {
   navbar,
   tableBodyFromRows,
   tableRow
-} from "./html";
-import {fetchAsPromise} from "./io";
-import {QCable} from "./data-transfer-objects";
+} from "./html.js";
+import {fetchAsPromise} from "./io.js";
+import {QCable} from "./data-transfer-objects.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const filterType = urlParams.get("qcables-filter-type");

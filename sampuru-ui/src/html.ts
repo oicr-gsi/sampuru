@@ -1,7 +1,6 @@
-import { Case, Project } from "./data-transfer-objects";
-import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common";
-import {updateURLQueryString} from "./io";
-import '../../sampuru-server/src/main/resources/static/main.css'
+import { Case, Project } from "./data-transfer-objects.js";
+import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common.js";
+import {updateURLQueryString} from "./io.js";
 
 /**
  * The callback for handling mouse events

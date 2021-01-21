@@ -1,6 +1,6 @@
-import {busyDialog, Card, caseCard, collapsibleCard, navbar} from "./html";
-import {fetchAsPromise} from "./io";
-import {Case} from "./data-transfer-objects";
+import {busyDialog, Card, caseCard, collapsibleCard, navbar} from "./html.js";
+import {fetchAsPromise} from "./io.js";
+import {Case} from "./data-transfer-objects.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("cases-project-id");

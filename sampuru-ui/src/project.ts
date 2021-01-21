@@ -4,10 +4,10 @@ import {
   elementFromTag,
   staticCard,
   navbar
-} from "./html";
-import { fetchAsPromise } from "./io";
-import { ProjectInfo } from "./data-transfer-objects";
-import { drawSankey } from "./sankey";
+} from "./html.js";
+import { fetchAsPromise } from "./io.js";
+import { ProjectInfo } from "./data-transfer-objects.js";
+import { drawSankey } from "./sankey.js";
 
 
 const urlParams = new URLSearchParams(window.location.search);

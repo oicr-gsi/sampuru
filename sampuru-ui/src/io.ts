@@ -1,4 +1,4 @@
-import {Project, ProjectJSON} from "./data-transfer-objects";
+import {Project, ProjectJSON} from "./data-transfer-objects.js";
 
 /**
  * Perform JSON fetch operation with a callback
@@ -78,18 +78,9 @@ export function decodeProject(json: ProjectJSON): Project {
   });
 }
 
-/*
-export function updateURLQueryString(referer: string, params: string[], values: string[], title: string){
-  const queryParams = new URLSearchParams(window.location.search);
-  params.forEach((param, index, paramArr) => {
-    queryParams.set(param, values[index]);
-  });
-
-  history.pushState(null, title, referer + "?" + queryParams.toString());
-}*/
 
 export function updateURLQueryString(destination: string, params: string[], values: string[], title: string) {
-  const newUrl = new URL(window.location.href + destination);
+  const newUrl = new URL(window.location.origin + "/"+ destination);
   const queryParams = new URLSearchParams(newUrl.search);
   params.forEach((param, index, paramArr) => {
     queryParams.set(param, values[index]);
