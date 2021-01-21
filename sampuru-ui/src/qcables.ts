@@ -9,13 +9,14 @@ import {
   navbar,
   tableBodyFromRows,
   tableRow
-} from "./html.js";
-import {fetchAsPromise} from "./io.js";
-import {QCable} from "./data-transfer-objects.js";
+} from "./html";
+import {fetchAsPromise} from "./io";
+import {QCable} from "./data-transfer-objects";
 
-const filterType = sessionStorage.getItem("qcables-filter-type");
-const filterId = sessionStorage.getItem("qcables-filter-id");
-const filterName = sessionStorage.getItem("qcables-filter-name");
+const urlParams = new URLSearchParams(window.location.search);
+const filterType = urlParams.get("qcables-filter-type");
+const filterId = urlParams.get("qcables-filter-id");
+const filterName = urlParams.get("qcables-filter-name");
 
 if (filterType && filterId && filterName) {
   document.body.appendChild(navbar());
