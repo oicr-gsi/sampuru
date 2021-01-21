@@ -11,9 +11,11 @@ import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -309,7 +311,7 @@ public class ProjectService extends Service<Project> {
             jsonObject.put("decription", project.description == null? "null": project.description);
             jsonObject.put("pipeline", project.pipeline == null? "null": project.pipeline);
             jsonObject.put("reference_genome", project.referenceGenome == null? "null": project.referenceGenome);
-            //todo: kits!!
+            jsonObject.put("kits", Arrays.stream(project.kits.toArray()).collect(Collectors.toSet()).toString());
             jsonObject.put("created_date", project.createdDate == null? "null": JSONObject.escape(project.createdDate.toString()));
             jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
 
@@ -349,7 +351,7 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("decription", subject.description == null? "null": subject.description);
         jsonObject.put("pipeline", subject.pipeline == null? "null": subject.pipeline);
         jsonObject.put("reference_genome", subject.referenceGenome == null? "null": subject.referenceGenome);
-        //todo: kits!!
+        jsonObject.put("kits", Arrays.stream(subject.kits.toArray()).collect(Collectors.toSet()).toString());
         jsonObject.put("created_date", subject.createdDate == null? "null": JSONObject.escape(subject.createdDate.toString()));
         jsonObject.put("completion_date", subject.completionDate  == null? "null": JSONObject.escape(subject.completionDate.toString()));
         jsonObject.put("cases_total", subject.casesTotal);

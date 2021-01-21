@@ -7,6 +7,7 @@ import org.jooq.TableField;
 import org.jooq.util.postgres.PostgresDSL;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +25,8 @@ public class Project extends SampuruType {
 
     public String id, name, contactName, contactEmail, description, pipeline, referenceGenome;
     public LocalDateTime createdDate, completionDate, lastUpdate;
-    public List<Integer> infoItems = new LinkedList<>(), deliverables = new LinkedList<>(), kits = new LinkedList<>();
-    public List<String> donorCases = new LinkedList<>();
+    public List<Integer> infoItems = new LinkedList<>(), deliverables = new LinkedList<>();
+    public List<String> donorCases = new LinkedList<>(), kits = new LinkedList<>();
     public int casesTotal, casesCompleted, qcablesTotal, qcablesCompleted;
 
     public Project(String newId, String username) throws Exception {
@@ -157,9 +158,8 @@ public class Project extends SampuruType {
         description = dbRecord.get(PROJECT.DESCRIPTION);
         pipeline = dbRecord.get(PROJECT.PIPELINE);
         referenceGenome = dbRecord.get(PROJECT.REFERENCE_GENOME);
+        kits = Arrays.stream(dbRecord.get(PROJECT.KITS)).collect(Collectors.toList());
 
-        //todo: kits will require a function in dbConnector
-        //kits = dbConnector.getChildIdList(PROJECT, PROJECT.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
         infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
         donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;
         deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
