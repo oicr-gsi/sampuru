@@ -64,11 +64,20 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
     }
   });
 
-  const info = elementFromTag("div", "container", infoItems);
+  const info = elementFromTag("div", "container project-overview", infoItems);
   const infoCard: Card = {contents: info.element, header: "Project Information",
     title: projectInfo.name + " Overview", tagId: projectInfo.name + "-overview"};
 
-  const contact = elementFromTag("div", null, "Name: " + projectInfo.contact_name, "\n", "Email: " + projectInfo.contact_email);
+
+  const contact = elementFromTag("div", "contact row",
+    elementFromTag("div", "col-6",
+      elementFromTag("b", null, "Name: "),
+      elementFromTag("p", null, (projectInfo.contact_name == "null") ? "None" : projectInfo.contact_name)),
+    elementFromTag("div", "col-6",
+      elementFromTag("b", null, "Email: "),
+      elementFromTag("p", null, (projectInfo.contact_email == "null") ? "None" : projectInfo.contact_email)));
+
+
   const contactCard: Card = {contents: contact.element, header: "Contact Information",
     title: projectInfo.name + " Contact Information", tagId: projectInfo.name + "-contact"};
 
