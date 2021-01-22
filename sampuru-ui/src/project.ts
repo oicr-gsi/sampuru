@@ -3,14 +3,16 @@ import {
   Card,
   elementFromTag,
   staticCard,
-  navbar, DOMElement
+  navbar,
+  DOMElement
 } from "./html.js";
 import { fetchAsPromise } from "./io.js";
 import { ProjectInfo } from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
-const projectId = sessionStorage.getItem("project-overview-id");
 
+const urlParams = new URLSearchParams(window.location.search);
+const projectId = urlParams.get("project-overview-id");
 
 if(projectId) {
   document.body.appendChild(navbar());

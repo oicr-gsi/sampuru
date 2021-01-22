@@ -13,13 +13,13 @@ import {
 import {fetchAsPromise} from "./io.js";
 import {QCable} from "./data-transfer-objects.js";
 
-const filterType = sessionStorage.getItem("qcables-filter-type");
-const filterId = sessionStorage.getItem("qcables-filter-id");
-const filterName = sessionStorage.getItem("qcables-filter-name");
+const urlParams = new URLSearchParams(window.location.search);
+const filterType = urlParams.get("qcables-filter-type");
+const filterId = urlParams.get("qcables-filter-id");
 
-if (filterType && filterId && filterName) {
+if (filterType && filterId) {
   document.body.appendChild(navbar());
-  initialiseQCables(filterType, filterId, filterName);
+  initialiseQCables(filterType, filterId);
 }
 
 /**
@@ -109,12 +109,12 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
   });
 }
 
-export function initialiseQCables(filterType: string, filterId: string, filterName: string) {
+export function initialiseQCables(filterType: string, filterId: string) {
   const closeBusy = busyDialog();
 
   fetchAsPromise<QCable[]>("api/qcables_table/" + filterType + "/" + filterId, {body: null})
     .then((data) => {
-      qcablesTable(data, filterName);
+      qcablesTable(data, filterId);
     })
     .finally(closeBusy);
 }

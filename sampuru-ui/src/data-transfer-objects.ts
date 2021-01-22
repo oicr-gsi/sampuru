@@ -85,6 +85,12 @@ export interface QCable {
   final_report_qcable_status: string | null
 }
 
+export interface Changelog {
+  id: number,
+  change_date: string,
+  content: string
+}
+
 export interface Step {
   total: number,
   completed: number,
@@ -100,5 +106,6 @@ export interface Bar {
 export interface Case {
   name: string,
   id: string,
-  bars: Bar[]
+  bars: Bar[],
+  changelog: Changelog[]
 }

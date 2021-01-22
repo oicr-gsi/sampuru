@@ -74,7 +74,7 @@ module.exports = {
       filename: "cases.html"
     }),
     new MiniCssExtractPlugin({
-      filename: 'index.css',
+      filename: 'main.css',
       chunkFilename: "[id].css"
     })
   ]

@@ -77,3 +77,17 @@ export function decodeProject(json: ProjectJSON): Project {
     last_update: new Date(json.last_update)
   });
 }
+
+
+export function updateURLQueryString(destination: string, params: string[], values: string[], title: string) {
+  const newUrl = new URL(window.location.origin + "/"+ destination);
+  const queryParams = new URLSearchParams(newUrl.search);
+  params.forEach((param, index, paramArr) => {
+    queryParams.set(param, values[index]);
+  });
+
+  newUrl.search = queryParams.toString();
+
+  history.pushState(null, title, newUrl.toString());
+  window.location.href = newUrl.toString();
+}
