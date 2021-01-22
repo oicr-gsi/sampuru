@@ -3,7 +3,8 @@ import {
   Card,
   elementFromTag,
   staticCard,
-  navbar
+  navbar,
+  DOMElement
 } from "./html.js";
 import { fetchAsPromise } from "./io.js";
 import { ProjectInfo } from "./data-transfer-objects.js";
