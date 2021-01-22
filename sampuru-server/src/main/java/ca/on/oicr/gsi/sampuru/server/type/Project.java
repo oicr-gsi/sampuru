@@ -159,7 +159,8 @@ public class Project extends SampuruType {
         description = dbRecord.get(PROJECT.DESCRIPTION);
         pipeline = dbRecord.get(PROJECT.PIPELINE);
         referenceGenome = dbRecord.get(PROJECT.REFERENCE_GENOME);
-        kits = Arrays.stream(dbRecord.get(PROJECT.KITS)).collect(Collectors.toList());
+        kits = dbRecord.get(PROJECT.KITS) != null ?
+                Arrays.stream(dbRecord.get(PROJECT.KITS)).collect(Collectors.toList()) : new LinkedList<>();
 
         infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
         donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;

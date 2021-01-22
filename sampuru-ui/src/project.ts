@@ -50,7 +50,7 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
       elementFromTag("p", null,  projectInfo.pipeline)));
   }
 
-  if(projectInfo.kits != "null") {
+  if(projectInfo.kits != "[]") {
     infoItems.push(elementFromTag("div", "row",
       elementFromTag("b", null, "Kits: "),
       elementFromTag("p", null,  projectInfo.kits.replace(/[\[\]']+/g, ''))));
