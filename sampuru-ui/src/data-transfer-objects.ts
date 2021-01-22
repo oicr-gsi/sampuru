@@ -37,12 +37,25 @@ export interface SankeyTransition {
   final_report: {total: number, pending: number, passed: number, failed: number},
 }
 
+export interface InfoItem {
+  id: number,
+  entry_type: string,
+  content: string,
+  expected: number | string,
+  received: number | string
+}
+
 export interface ProjectInfo {
   id: string,
   name: string,
   contact_name: string,
   contact_email: string,
-  info_items: string[],
+  description: string,
+  pipeline: string,
+  created_date: string,
+  reference_genome: string,
+  kits: string,
+  info_items: InfoItem[],
   failures: string[],
   sankey_transitions: SankeyTransition,
   deliverables: string[],
