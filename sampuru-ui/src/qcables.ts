@@ -16,11 +16,10 @@ import {QCable} from "./data-transfer-objects.js";
 const urlParams = new URLSearchParams(window.location.search);
 const filterType = urlParams.get("qcables-filter-type");
 const filterId = urlParams.get("qcables-filter-id");
-const filterName = urlParams.get("qcables-filter-name");
 
-if (filterType && filterId && filterName) {
+if (filterType && filterId) {
   document.body.appendChild(navbar());
-  initialiseQCables(filterType, filterId, filterName);
+  initialiseQCables(filterType, filterId);
 }
 
 /**
@@ -110,12 +109,12 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
   });
 }
 
-export function initialiseQCables(filterType: string, filterId: string, filterName: string) {
+export function initialiseQCables(filterType: string, filterId: string) {
   const closeBusy = busyDialog();
 
   fetchAsPromise<QCable[]>("api/qcables_table/" + filterType + "/" + filterId, {body: null})
     .then((data) => {
-      qcablesTable(data, filterName);
+      qcablesTable(data, filterId);
     })
     .finally(closeBusy);
 }

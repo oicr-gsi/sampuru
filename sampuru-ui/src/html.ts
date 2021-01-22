@@ -451,8 +451,8 @@ export function collapsibleCard(
     cardLink.href = "#";
     cardLink.addEventListener("click", () => {
       updateURLQueryString(
-        "qcables.html", ["qcables-filter-type", "qcables-filter-id", "qcables-filter-name"],
-        ["case", content.tagId, content.header], "QCables for case " + content.header);
+        "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
+        ["case", content.tagId], "QCables for case " + content.header);
     });
   }
   else {
@@ -553,8 +553,8 @@ export function projectCard(
   qcablesTitle.href = "#";
   qcablesTitle.addEventListener("click", () => {
     updateURLQueryString(
-      "qcables.html", ["qcables-filter-type", "qcables-filter-id", "qcables-filter-name"],
-      ["project", project.id, project.name], "QCAbles");
+      "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
+      ["project", project.id], "QCAbles (" + project.name + ")");
   });
 
   qcables.appendChild(qcablesTitle);
