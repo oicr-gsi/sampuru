@@ -308,7 +308,7 @@ public class ProjectService extends Service<Project> {
             jsonObject.put("name", project.name);
             jsonObject.put("contact_name", project.contactName == null? "null": project.contactName);
             jsonObject.put("contact_email", project.contactEmail == null? "null": project.contactEmail);
-            jsonObject.put("decription", project.description == null? "null": project.description);
+            jsonObject.put("description", project.description == null? "null": project.description);
             jsonObject.put("pipeline", project.pipeline == null? "null": project.pipeline);
             jsonObject.put("reference_genome", project.referenceGenome == null? "null": project.referenceGenome);
             jsonObject.put("kits", Arrays.stream(project.kits.toArray()).collect(Collectors.toSet()).toString());
@@ -348,7 +348,7 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("name", subject.name);
         jsonObject.put("contact_name", subject.contactName == null? "null": subject.contactName);
         jsonObject.put("contact_email", subject.contactEmail == null? "null": subject.contactEmail);
-        jsonObject.put("decription", subject.description == null? "null": subject.description);
+        jsonObject.put("description", subject.description == null? "null": subject.description);
         jsonObject.put("pipeline", subject.pipeline == null? "null": subject.pipeline);
         jsonObject.put("reference_genome", subject.referenceGenome == null? "null": subject.referenceGenome);
         jsonObject.put("kits", Arrays.stream(subject.kits.toArray()).collect(Collectors.toSet()).toString());

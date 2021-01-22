@@ -154,6 +154,7 @@ public class Project extends SampuruType {
         name = dbRecord.get(PROJECT.NAME);
         contactName = dbRecord.get(PROJECT.CONTACT_NAME);
         contactEmail = dbRecord.get(PROJECT.CONTACT_EMAIL);
+        createdDate = dbRecord.get(PROJECT.CREATED_DATE);
         completionDate = dbRecord.get(PROJECT.COMPLETION_DATE);
         description = dbRecord.get(PROJECT.DESCRIPTION);
         pipeline = dbRecord.get(PROJECT.PIPELINE);
