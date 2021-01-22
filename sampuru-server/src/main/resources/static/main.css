@@ -45,3 +45,24 @@
     width:400px !important;
 }
 
+.container .project-overview {
+    font-size: 13px !important;
+}
+
+.project-overview .row {
+    padding-bottom: 0 !important;
+}
+
+.contact.row {
+    padding-bottom: 0 !important;
+    font-size: 13px !important;
+}
+
+.project-overview b, strong {
+    padding-right: 5px;
+}
+
+h2 {
+    padding: 20px;
+}
+

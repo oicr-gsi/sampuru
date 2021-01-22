@@ -3,7 +3,7 @@ import {
   Card,
   elementFromTag,
   staticCard,
-  navbar
+  navbar, DOMElement
 } from "./html.js";
 import { fetchAsPromise } from "./io.js";
 import { ProjectInfo } from "./data-transfer-objects.js";
@@ -26,11 +26,58 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   cardContainter.className = "container";
 
   const cards: HTMLElement[] = [];
-  const info = elementFromTag("p", null, projectInfo.info_items.join("\n")); //todo: should info_items be a map once there is data?
+  const infoItems: DOMElement[] = [];
+
+  infoItems.push(elementFromTag("div", "row",
+    elementFromTag("b", null, "Name: "),
+    elementFromTag("p", null,  projectInfo.name)));
+
+  if(projectInfo.created_date != "null") {
+    infoItems.push(elementFromTag("div", "row",
+      elementFromTag("b", null, "Creation Date: "),
+      elementFromTag("p", null,  projectInfo.created_date)));
+  }
+
+  if(projectInfo.description != "null") {
+    infoItems.push(elementFromTag("div", "row",
+      elementFromTag("b", null, "Description: "),
+      elementFromTag("p", null,  projectInfo.description)));
+  }
+
+  if(projectInfo.pipeline != "null") {
+    infoItems.push(elementFromTag("div", "row",
+      elementFromTag("b", null, "Pipeline: "),
+      elementFromTag("p", null,  projectInfo.pipeline)));
+  }
+
+  if(projectInfo.kits != "[]") {
+    infoItems.push(elementFromTag("div", "row",
+      elementFromTag("b", null, "Kits: "),
+      elementFromTag("p", null,  projectInfo.kits.replace(/[\[\]']+/g, ''))));
+  }
+
+  projectInfo.info_items.forEach((item) => {
+    if (item.content != "null") {
+      infoItems.push(elementFromTag("div", "row",
+        elementFromTag("b", null, item.entry_type + ": "),
+        elementFromTag("p", null,  item.content)));
+    }
+  });
+
+  const info = elementFromTag("div", "container project-overview", infoItems);
   const infoCard: Card = {contents: info.element, header: "Project Information",
     title: projectInfo.name + " Overview", tagId: projectInfo.name + "-overview"};
 
-  const contact = elementFromTag("div", null, "Name: " + projectInfo.contact_name, "\n", "Email: " + projectInfo.contact_email);
+
+  const contact = elementFromTag("div", "contact row",
+    elementFromTag("div", "col-6",
+      elementFromTag("b", null, "Name: "),
+      elementFromTag("p", null, (projectInfo.contact_name == "null") ? "None" : projectInfo.contact_name)),
+    elementFromTag("div", "col-6",
+      elementFromTag("b", null, "Email: "),
+      elementFromTag("p", null, (projectInfo.contact_email == "null") ? "None" : projectInfo.contact_email)));
+
+
   const contactCard: Card = {contents: contact.element, header: "Contact Information",
     title: projectInfo.name + " Contact Information", tagId: projectInfo.name + "-contact"};
 

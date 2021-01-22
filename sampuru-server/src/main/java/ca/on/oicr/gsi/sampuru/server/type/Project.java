@@ -7,6 +7,7 @@ import org.jooq.TableField;
 import org.jooq.util.postgres.PostgresDSL;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,10 +23,10 @@ public class Project extends SampuruType {
             QCABLES_TOTAL = "qcables_total",
             QCABLES_COMPLETED = "qcables_completed";
 
-    public String id, name, contactName, contactEmail;
-    public LocalDateTime completionDate, lastUpdate;
+    public String id, name, contactName, contactEmail, description, pipeline, referenceGenome;
+    public LocalDateTime createdDate, completionDate, lastUpdate;
     public List<Integer> infoItems = new LinkedList<>(), deliverables = new LinkedList<>();
-    public List<String> donorCases = new LinkedList<>();
+    public List<String> donorCases = new LinkedList<>(), kits = new LinkedList<>();
     public int casesTotal, casesCompleted, qcablesTotal, qcablesCompleted;
 
     public Project(String newId, String username) throws Exception {
@@ -35,9 +36,14 @@ public class Project extends SampuruType {
     public Project(Record row) {
         id = row.get(PROJECT.ID);
         name = row.get(PROJECT.NAME);
+        description = row.get(PROJECT.DESCRIPTION);
+        pipeline = row.get(PROJECT.PIPELINE);
+        referenceGenome = row.get(PROJECT.REFERENCE_GENOME);
         contactName = row.get(PROJECT.CONTACT_NAME);
         contactEmail = row.get(PROJECT.CONTACT_EMAIL);
+        createdDate = row.get(PROJECT.CREATED_DATE);
         completionDate = row.get(PROJECT.COMPLETION_DATE);
+        kits = row.get(PROJECT.KITS, List.class);
         infoItems = row.get(INFO_ITEM_IDS, List.class);
         donorCases = row.get(CASE_IDS, List.class);
         deliverables = row.get(DELIVERABLE_IDS, List.class);
@@ -148,7 +154,13 @@ public class Project extends SampuruType {
         name = dbRecord.get(PROJECT.NAME);
         contactName = dbRecord.get(PROJECT.CONTACT_NAME);
         contactEmail = dbRecord.get(PROJECT.CONTACT_EMAIL);
+        createdDate = dbRecord.get(PROJECT.CREATED_DATE);
         completionDate = dbRecord.get(PROJECT.COMPLETION_DATE);
+        description = dbRecord.get(PROJECT.DESCRIPTION);
+        pipeline = dbRecord.get(PROJECT.PIPELINE);
+        referenceGenome = dbRecord.get(PROJECT.REFERENCE_GENOME);
+        kits = dbRecord.get(PROJECT.KITS) != null ?
+                Arrays.stream(dbRecord.get(PROJECT.KITS)).collect(Collectors.toList()) : new LinkedList<>();
 
         infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
         donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;
@@ -172,6 +184,11 @@ public class Project extends SampuruType {
                 + "\n name: " + name
                 + "\n contactName: " + contactName
                 + "\n contactEmail: " + contactEmail
+                + "\n description: " + description
+                + "\n pipeline: " + pipeline
+                + "\n kits: " + kits
+                + "\n referenceGenome: " + referenceGenome
+                + "\n createdDate: " + createdDate
                 + "\n completionDate: " + completionDate
                 + "\n infoItems: " + infoItems
                 + "\n donorCases: " + donorCases
