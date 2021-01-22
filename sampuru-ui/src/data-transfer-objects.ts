@@ -87,7 +87,7 @@ export interface QCable {
 
 export interface Changelog {
   id: number,
-  change_date: string, //todo: how did i force other dates to be strings??
+  change_date: string,
   content: string
 }
 
