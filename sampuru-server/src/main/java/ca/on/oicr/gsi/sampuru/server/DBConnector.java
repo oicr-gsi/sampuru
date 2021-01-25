@@ -149,18 +149,19 @@ public class DBConnector {
     }
 
     public int getTotalCount(Table getFrom, TableField matchField, Object toMatch) {
-        Result<Record1<Integer>> countFromDb = getContext()
+        Record1<Integer> countFromDb = getContext()
                 .selectCount()
                 .from(getFrom)
                 .where(matchField.eq(toMatch))
-                .fetch();
+                .fetchOne();
 
-        return ((Number) countFromDb.get(1)).intValue();
+        assert countFromDb != null;
+        return (Integer) countFromDb.getValue(0);
     }
 
     // TODO not checking deliverables for GP-2583. Re-instate when ready
     public int getCompletedCases(String id) {
-        Result<Record1<Integer>> countFromDb = getContext()
+        Record1<Integer> countFromDb = getContext()
                 .selectCount()
                 .from(PostgresDSL
                         .selectDistinct(QCABLE.CASE_ID)
@@ -171,20 +172,22 @@ public class DBConnector {
                                 .where(DONOR_CASE.PROJECT_ID.eq(id)))
                                 .and(QCABLE.QCABLE_TYPE.eq("final_report"))
                                 .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))))
-                .fetch();
+                .fetchOne();
 
-        return ((Number) countFromDb.get(1)).intValue();
+        assert countFromDb != null;
+        return (Integer) countFromDb.getValue(0);
     }
 
     public int getCompletedQcables(String id) {
-        Result<Record1<Integer>> countFromDb = getContext()
+        Record1<Integer> countFromDb = getContext()
                 .selectCount()
                 .from(QCABLE)
                 .where(QCABLE.PROJECT_ID.eq(id)
                         .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED)))
-                .fetch();
+                .fetchOne();
 
-        return ((Number) countFromDb.get(1)).intValue();
+        assert countFromDb != null;
+        return (Integer) countFromDb.getValue(0);
     }
 
     public List<String> getFailedQCablesForProject(String id, String username) {
