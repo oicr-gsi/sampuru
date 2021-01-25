@@ -162,6 +162,10 @@ public class Project extends SampuruType {
         kits = dbRecord.get(PROJECT.KITS) != null ?
                 Arrays.stream(dbRecord.get(PROJECT.KITS)).collect(Collectors.toList()) : new LinkedList<>();
 
+        casesTotal = dbConnector.getTotalCount(DONOR_CASE, DONOR_CASE.PROJECT_ID, id);
+        casesCompleted = dbConnector.getCompletedCases(id);
+        qcablesTotal = dbConnector.getTotalCount(QCABLE, QCABLE.PROJECT_ID, id);
+        qcablesCompleted = dbConnector.getCompletedQcables(id);
         infoItems = dbConnector.getChildIdList(PROJECT_INFO_ITEM, PROJECT_INFO_ITEM.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;
         donorCases = dbConnector.getChildIdList(DONOR_CASE, DONOR_CASE.PROJECT_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;
         deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());;

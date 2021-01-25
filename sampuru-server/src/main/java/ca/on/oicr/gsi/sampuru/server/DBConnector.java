@@ -148,6 +148,48 @@ public class DBConnector {
         return newList;
     }
 
+    public int getTotalCount(Table getFrom, TableField matchField, Object toMatch) {
+        Record1<Integer> countFromDb = getContext()
+                .selectCount()
+                .from(getFrom)
+                .where(matchField.eq(toMatch))
+                .fetchOne();
+
+        assert countFromDb != null;
+        return (Integer) countFromDb.getValue(0);
+    }
+
+    // TODO not checking deliverables for GP-2583. Re-instate when ready
+    public int getCompletedCases(String id) {
+        Record1<Integer> countFromDb = getContext()
+                .selectCount()
+                .from(PostgresDSL
+                        .selectDistinct(QCABLE.CASE_ID)
+                        .from(QCABLE)
+                        .where(QCABLE.CASE_ID.in(PostgresDSL
+                                .select(DONOR_CASE.ID)
+                                .from(DONOR_CASE)
+                                .where(DONOR_CASE.PROJECT_ID.eq(id)))
+                                .and(QCABLE.QCABLE_TYPE.eq("final_report"))
+                                .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))))
+                .fetchOne();
+
+        assert countFromDb != null;
+        return (Integer) countFromDb.getValue(0);
+    }
+
+    public int getCompletedQcables(String id) {
+        Record1<Integer> countFromDb = getContext()
+                .selectCount()
+                .from(QCABLE)
+                .where(QCABLE.PROJECT_ID.eq(id)
+                        .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED)))
+                .fetchOne();
+
+        assert countFromDb != null;
+        return (Integer) countFromDb.getValue(0);
+    }
+
     public List<String> getFailedQCablesForProject(String id, String username) {
         List<String> ids = new LinkedList<>();
         Result<Record> result = fetch(PostgresDSL

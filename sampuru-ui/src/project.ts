@@ -4,9 +4,9 @@ import {
   elementFromTag,
   staticCard,
   navbar,
-  DOMElement
+  DOMElement, progressBar
 } from "./html.js";
-import { fetchAsPromise } from "./io.js";
+import {fetchAsPromise, updateURLQueryString} from "./io.js";
 import { ProjectInfo } from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
@@ -83,6 +83,39 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   const contactCard: Card = {contents: contact.element, header: "Contact Information",
     title: projectInfo.name + " Contact Information", tagId: projectInfo.name + "-contact"};
 
+  const qcablesLink = document.createElement("a");
+  qcablesLink.innerText = "QCables";
+  qcablesLink.href = "#";
+  qcablesLink.addEventListener("click", () => {
+    updateURLQueryString(
+      "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
+      ["project", projectInfo.name], "QCables for project " + projectInfo.name);
+  });
+
+  const qcables = elementFromTag("div", null,
+    {type: "complex", element: qcablesLink},
+    {type: "complex", element: progressBar(projectInfo.qcables_total, projectInfo.qcables_completed)});
+
+  const casesLink = document.createElement("a");
+  casesLink.innerText = "Cases";
+  casesLink.href = "#";
+  casesLink.addEventListener("click", () => {
+    updateURLQueryString(
+      "cases.html", ["cases-project-id"],
+      [projectInfo.name], "Cases for project " + projectInfo.name);
+  });
+
+  const cases = elementFromTag("div", null,
+    {type: "complex", element: casesLink},
+    {type: "complex", element: progressBar(projectInfo.cases_total, projectInfo.cases_completed)});
+
+  const projectSummary = elementFromTag("div", "row",
+    elementFromTag("div", "col col-md-8", {type: "complex", element: staticCard(infoCard)}),
+    elementFromTag("div", "col col-md-4",
+      {type: "complex", element: staticCard(contactCard)},
+      {type: "complex", element: qcables.element},
+      {type: "complex", element: cases.element}));
+
   const sankeyContainer = document.createElement("div");
   sankeyContainer.id = "sankey";
   const qcablesCard: Card = {contents: sankeyContainer, header: "QCables",
@@ -96,8 +129,7 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   const deliverablesCard: Card = {contents: deliverables.element, header: "Files",
     title: projectInfo.name + " Files", tagId: projectInfo.name + "-files"};
 
-  cards.push(staticCard(infoCard));
-  cards.push(staticCard(contactCard));
+  cards.push(projectSummary.element);
   cards.push(staticCard(qcablesCard));
   cards.push(staticCard(failuresCard));
   cards.push(staticCard(deliverablesCard));

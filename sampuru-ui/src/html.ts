@@ -59,7 +59,7 @@ export interface LinkElement {
   type: "a";
 
   /** URL to link to*/
-  url: string;
+  href: string;
 
   /** Display text to use*/
   innerText: string;
@@ -124,7 +124,7 @@ function addElements(
           case "a": {
             const element = document.createElement("a");
             element.innerText = result.innerText;
-            element.href = result.url;
+            element.href = result.href;
             element.title = result.title;
             element.className = result.className;
             target.appendChild(element);
@@ -143,8 +143,9 @@ function addElements(
             break;
           case "card": {
             //todo: not currently working
-            const linkElement = link(result.header, "#", "card-link"); //todo: data-toggle: collapse attribute
-            const cardHeader = elementFromTag("div", "card-header", linkElement);
+            //todo: data-toggle: collapse attribute
+            const cardHeader = elementFromTag("div", "card-header",
+              {type: "a", innerText: result.header, href: "#", className: "card-link", title: "collapse-card"});
 
             const cardBodyInner = elementFromTag("div", "card-body", result.contents);
 
@@ -320,22 +321,6 @@ export function caseCard(caseContent: Case): HTMLElement {
 
   const container = elementFromTag("div", "container", caseProgess);
   return container.element;
-}
-
-/**
- *
- * @param innerText - label for the link
- * @param url - target of the hyperlink
- * @param title - optional tooltip
- * @param className - class for hyperlink element
- */
-export function link(
-  innerText: string | number,
-  url: string,
-  className: string,
-  title?: string
-): LinkElement {
-  return { type: "a", url: url, innerText: innerText.toString(), title: title || "", className: className}
 }
 
 /**
