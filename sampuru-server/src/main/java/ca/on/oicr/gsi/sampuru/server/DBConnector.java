@@ -118,15 +118,13 @@ public class DBConnector {
                 for(Object obj: casesForId){
                     String strObject = (String) obj;
                     deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
-                            thisId,
-                            strObject
+                            PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), thisId),
+                            PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), strObject)
                     );
                 }
             }
             deliverableCaseInsertValuesStepN.execute();
-
         }
-
     }
 
     //TODO: filter by username, probably by rewrite
