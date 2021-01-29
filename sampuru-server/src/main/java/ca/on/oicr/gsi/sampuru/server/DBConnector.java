@@ -110,8 +110,10 @@ public class DBConnector {
                 );
 
             }
+            // Write the new deliverables to the database and get back the new SERIAL ids
             Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
 
+            // Associate the new ids with the appropriate case ids and write to deliverables_case table
             for(int i = 0; i < ids.size(); i++){
                 Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
                 JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
