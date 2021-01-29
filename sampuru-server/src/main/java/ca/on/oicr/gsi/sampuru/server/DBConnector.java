@@ -111,19 +111,16 @@ public class DBConnector {
 
             }
             Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
-            Map<Integer, JSONArray> idToCaseArray = new HashMap<>();
-            int i = 0;
-            for(Record idRecord: ids){
-                idToCaseArray.put(Integer.valueOf(idRecord.get("id").toString()), ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id")));
-                i++;
-            }
 
-            for(Map.Entry<Integer, JSONArray> mapEntry: idToCaseArray.entrySet()){
-                for(Object obj: mapEntry.getValue()){
+            for(int i = 0; i < ids.size(); i++){
+                Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
+                JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
+                for(Object obj: casesForId){
                     String strObject = (String) obj;
                     deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
-                            mapEntry.getKey(),
-                            strObject);
+                            thisId,
+                            strObject
+                    );
                 }
             }
             deliverableCaseInsertValuesStepN.execute();
