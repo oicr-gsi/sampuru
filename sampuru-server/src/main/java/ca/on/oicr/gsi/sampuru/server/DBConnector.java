@@ -10,10 +10,7 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static tables_generated.Tables.*;
 
@@ -113,7 +110,24 @@ public class DBConnector {
                 );
 
             }
-            deliverableInsertValuesStepN.execute();
+            Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
+            Map<Integer, JSONArray> idToCaseArray = new HashMap<>();
+            int i = 0;
+            for(Record idRecord: ids){
+                idToCaseArray.put(Integer.valueOf(idRecord.get("id").toString()), ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id")));
+                i++;
+            }
+
+            for(Map.Entry<Integer, JSONArray> mapEntry: idToCaseArray.entrySet()){
+                for(Object obj: mapEntry.getValue()){
+                    String strObject = (String) obj;
+                    deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
+                            mapEntry.getKey(),
+                            strObject);
+                }
+            }
+            deliverableCaseInsertValuesStepN.execute();
+
         }
 
     }
