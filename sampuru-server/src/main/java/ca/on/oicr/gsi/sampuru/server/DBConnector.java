@@ -103,10 +103,10 @@ public class DBConnector {
                 JSONObject nextDeliverable = (JSONObject) obj;
                 deliverableInsertValuesStepN = deliverableInsertSetStep.values(
                         PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("project_id")),
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("location")),
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("notes")),
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
+                        checkWritePermission(nextDeliverable.get("project_id"), username),
+                        checkWritePermission(nextDeliverable.get("location"), username),
+                        checkWritePermission(nextDeliverable.get("notes"), username),
+                        checkWritePermission(PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()), username)
                 );
 
             }
@@ -118,13 +118,17 @@ public class DBConnector {
                 for(Object obj: casesForId){
                     String strObject = (String) obj;
                     deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
-                            PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), thisId),
-                            PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), strObject)
+                            checkWritePermission(thisId, username),
+                            checkWritePermission(strObject, username)
                     );
                 }
             }
             deliverableCaseInsertValuesStepN.execute();
         }
+    }
+
+    private Object checkWritePermission(Object value, String username){
+        return PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), value);
     }
 
     //TODO: filter by username, probably by rewrite
