@@ -64,10 +64,11 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
       }
 
       if (sankey[key].pending > 0) {
+        // Target has "link.target" to ensure the nodes are considered distinct
         data.push(
           {
             source: link.source,
-            target: "Pending",
+            target: "Pending " + link.target,
             value: sankey[key].pending,
             color: "#fcc874"
           });
@@ -77,7 +78,7 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
         data.push(
           {
             source: link.source,
-            target: "Failed",
+            target: "Failed " + link.target,
             value: sankey[key].failed,
             color: "#c42d2d"
           });
@@ -93,9 +94,9 @@ export function distinctBy<T>(key: keyof T, array: T[]) {
 }
 
 export function colorNodes(nodeName: string): string {
-  if(nodeName == "Pending") {
+  if(nodeName.includes("Pending")) {
     return "#fcc874"
-  } else if(nodeName == "Failed") {
+  } else if(nodeName.includes("Failed")) {
     return "#c42d2d"
   } else {
     return "#437bbf"
@@ -115,6 +116,11 @@ export function drawSankey(sankey: SankeyTransition) {
     format = function (d: number | undefined) {
       return (typeof d === "number" ? formatNumber(d): null);
     };
+
+  // Only want to display the short-hand i.e. "Pending" instead of "Pending Informatics & Interpretation"
+  const formatNodeLabel = function (d: string) {
+    return (d.includes("Pending") ? "Pending": (d.includes("Failed") ? "Failed" : d));
+  }
 
   // set up nodes for graph
   const nodes: Node[] = []
@@ -138,7 +144,8 @@ export function drawSankey(sankey: SankeyTransition) {
   const sankeyPlot = d3Sankey.sankey<Node, SankeyData>()
     .nodeWidth(20)
     .nodePadding(25)
-    .size([width, height]);
+    .size([width, height])
+    .nodeAlign(d3Sankey.sankeyLeft);
 
   // instantiate view box and append to sankey div
   const svg = d3.select("div#sankey")
@@ -161,6 +168,7 @@ export function drawSankey(sankey: SankeyTransition) {
     .attr("fill", d => colorNodes(d.name))
     .append("title")
     .text(d => `${d.name}\n${format(d.value)}`);
+
 
   // draw links
   const link = svg.append("g")
@@ -193,5 +201,6 @@ export function drawSankey(sankey: SankeyTransition) {
     .attr("y", d => (typeof d.y0 === "number" && typeof d.y1 === "number") ? (d.y1 + d.y0)/2 : null)
     .attr("dy", "0.35em")
     .attr("text-anchor", d => (typeof d.x0 === "number") ? (d.x0 < width / 2 ? "start" : "end") : null)
-    .text(d => d.name);
+    .text(d => `${formatNodeLabel(d.name)}`);
+
 }
