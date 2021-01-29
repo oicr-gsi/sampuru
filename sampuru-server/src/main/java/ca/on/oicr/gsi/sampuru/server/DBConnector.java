@@ -149,8 +149,11 @@ public class DBConnector {
 
     //TODO: filter by username?? maybe?? probably by rewrite
     public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
+        return getChildIdList(getFrom, matchField, toMatch, getFrom.field("id"));
+    }
+
+    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch, Field idField){
         List<Object> newList = new LinkedList<>();
-        Field<Object> idField = getFrom.field("id");
 
         Result<Record1<Object>> idsFromDb = getContext()
                 .select(idField)

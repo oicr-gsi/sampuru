@@ -69,7 +69,7 @@ public class Case extends SampuruType {
 
         changelog = dbConnector.getChildIdList(CHANGELOG, CHANGELOG.CASE_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());
         qcables = dbConnector.getChildIdList(QCABLE, QCABLE.CASE_ID, id).stream().map(o -> (String)o).collect(Collectors.toList());;
-        deliverables = dbConnector.getChildIdList(DELIVERABLE_FILE, DELIVERABLE_FILE.CASE_ID, id).stream().map(o -> (Integer)o).collect(Collectors.toList());
+        deliverables = dbConnector.getChildIdList(DELIVERABLE_CASE, DELIVERABLE_CASE.CASE_ID, id, DELIVERABLE_CASE.DELIVERABLE_ID).stream().map(o -> (Integer)o).collect(Collectors.toList());
     }
 
     @Override

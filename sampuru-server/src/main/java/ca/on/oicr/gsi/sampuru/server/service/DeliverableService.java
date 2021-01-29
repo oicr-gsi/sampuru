@@ -45,9 +45,17 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     private String getPortalJson(String username) {
+        final String CASE_IDS = "case_ids";
         DBConnector dbConnector = new DBConnector();
         Result<Record> deliverableResults = dbConnector.fetch(PostgresDSL
-                .select()
+                .select(
+                        DELIVERABLE_FILE.asterisk(),
+                        PostgresDSL.array(PostgresDSL
+                                .select(DELIVERABLE_CASE.CASE_ID)
+                                .from(DELIVERABLE_CASE)
+                                .where(DELIVERABLE_FILE.ID.eq(DELIVERABLE_CASE.DELIVERABLE_ID)))
+                                .as(CASE_IDS)
+                )
                 .from(DELIVERABLE_FILE)
                 .where(DBConnector.ADMIN_ROLE.in(PostgresDSL
                         .select(USER_ACCESS.PROJECT)
@@ -67,7 +75,7 @@ public class DeliverableService extends Service<Deliverable> {
             JSONObject deliverableObject = new JSONObject();
             deliverableObject.put("id", deliverableResult.get(DELIVERABLE_FILE.ID));
             deliverableObject.put("project_id", deliverableResult.get(DELIVERABLE_FILE.PROJECT_ID));
-            deliverableObject.put("case_ids", Arrays.stream(deliverableResult.get(DELIVERABLE_FILE.CASE_ID)).collect(Collectors.toSet()).toString());
+            deliverableObject.put("case_ids", Arrays.stream((String[])deliverableResult.get(CASE_IDS)).collect(Collectors.toSet()).toString());
             deliverableObject.put("location", deliverableResult.get(DELIVERABLE_FILE.LOCATION));
             deliverableObject.put("notes", deliverableResult.get(DELIVERABLE_FILE.NOTES));
             deliverableObject.put("expiry_date", JSONObject.escape(deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE).toString()));
