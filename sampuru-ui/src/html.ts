@@ -424,15 +424,12 @@ export function collapsibleCard(
     cardLink = document.createElement("a");
     cardLink.innerText = content.header;
     cardLink.href = constructURL(
-      "project.html", ["project-overview-id"],
-      [content.tagId], "Project (" + content.tagId + ")"
-    );
+      "project.html", ["project-overview-id"], [content.tagId]);
   } else if (referer == "cases") {
     cardLink = document.createElement("a");
     cardLink.innerText = content.header;
     cardLink.href = constructURL(
-      "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
-      ["case", content.tagId], "QCables for case " + content.header);
+      "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["case", content.tagId]);
   }
   else {
     cardLink = document.createElement("p");
@@ -514,7 +511,7 @@ export function projectCard(
 
   const casesTitle = document.createElement("a");
   casesTitle.innerText = "Cases";
-  casesTitle.href = constructURL("cases.html", ["cases-project-id"], [project.id], "Cases (" + project.id + ")");
+  casesTitle.href = constructURL("cases.html", ["cases-project-id"], [project.id]);
 
   cases.appendChild(casesTitle);
   cases.appendChild(casesProgress);
@@ -525,8 +522,7 @@ export function projectCard(
   const qcablesTitle = document.createElement("a");
   qcablesTitle.innerText = "QCables";
   qcablesTitle.href = constructURL(
-    "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
-    ["project", project.id], "QCAbles (" + project.name + ")");
+    "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", project.id]);
 
   qcables.appendChild(qcablesTitle);
   qcables.appendChild(qcablesProgress);
