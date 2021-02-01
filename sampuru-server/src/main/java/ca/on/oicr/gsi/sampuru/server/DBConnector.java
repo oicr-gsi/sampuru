@@ -95,37 +95,42 @@ public class DBConnector {
 
         //TODO: Adding Collection of VALUEs to Insert is coming in jOOQ 3.15 apparently. They disapprove of this approach
         if(!unknownDeliverables.isEmpty()) {
-            InsertSetStep deliverableInsertSetStep = getContext().insertInto(DELIVERABLE_FILE),
-                    deliverableCaseInsertSetStep = getContext().insertInto(DELIVERABLE_CASE);
-            InsertValuesStepN deliverableInsertValuesStepN = null,
-                    deliverableCaseInsertValuesStepN = null;
-            for(Object obj: unknownDeliverables){
-                JSONObject nextDeliverable = (JSONObject) obj;
-                deliverableInsertValuesStepN = deliverableInsertSetStep.values(
-                        PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
-                        checkWritePermission(nextDeliverable.get("project_id"), username),
-                        checkWritePermission(nextDeliverable.get("location"), username),
-                        checkWritePermission(nextDeliverable.get("notes"), username),
-                        checkWritePermission(PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()), username)
-                );
 
-            }
             // Write the new deliverables to the database and get back the new SERIAL ids
-            Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
-
-            // Associate the new ids with the appropriate case ids and write to deliverables_case table
-            for(int i = 0; i < ids.size(); i++){
-                Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
-                JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
-                for(Object obj: casesForId){
-                    String strObject = (String) obj;
-                    deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
-                            checkWritePermission(thisId, username),
-                            checkWritePermission(strObject, username)
+            // Wrapped in transaction to ensure rollback on bad case_id
+            getContext().transaction(configuration -> {
+                InsertSetStep deliverableInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_FILE),
+                    deliverableCaseInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_CASE);
+                InsertValuesStepN deliverableInsertValuesStepN = null,
+                        deliverableCaseInsertValuesStepN = null;
+                for(Object obj: unknownDeliverables){
+                    JSONObject nextDeliverable = (JSONObject) obj;
+                    deliverableInsertValuesStepN = deliverableInsertSetStep.values(
+                            PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
+                            checkWritePermission(nextDeliverable.get("project_id"), username),
+                            checkWritePermission(nextDeliverable.get("location"), username),
+                            checkWritePermission(nextDeliverable.get("notes"), username),
+                            checkWritePermission(PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()), username)
                     );
+
                 }
-            }
-            deliverableCaseInsertValuesStepN.execute();
+                Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
+
+                // Associate the new ids with the appropriate case ids and write to deliverables_case table
+                for(int i = 0; i < ids.size(); i++){
+                    Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
+                    JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
+                    for(Object obj: casesForId){
+                        String strObject = (String) obj;
+                        deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
+                                checkWritePermission(thisId, username),
+                                checkWritePermission(strObject, username)
+                        );
+                    }
+                }
+                deliverableCaseInsertValuesStepN.execute();
+            });
+
         }
     }
 
