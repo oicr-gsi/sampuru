@@ -191,9 +191,9 @@ public class CaseService extends Service<Case> {
                                 .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
                                 .as(Case.QCABLE_IDS),
                         PostgresDSL.array(PostgresDSL
-                                .select(DELIVERABLE_FILE.ID)
-                                .from(DELIVERABLE_FILE)
-                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
+                                .select(DELIVERABLE_CASE.DELIVERABLE_ID)
+                                .from(DELIVERABLE_CASE)
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_CASE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -226,9 +226,9 @@ public class CaseService extends Service<Case> {
                                 .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
                                 .as(Case.QCABLE_IDS),
                         PostgresDSL.array(PostgresDSL
-                                .select(DELIVERABLE_FILE.ID)
-                                .from(DELIVERABLE_FILE)
-                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
+                                .select(DELIVERABLE_CASE.DELIVERABLE_ID)
+                                .from(DELIVERABLE_CASE)
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_CASE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)
@@ -257,9 +257,9 @@ public class CaseService extends Service<Case> {
                                 .where(QCABLE.CASE_ID.eq(DONOR_CASE.ID)))
                                 .as(Case.QCABLE_IDS),
                         PostgresDSL.array(PostgresDSL
-                                .select(DELIVERABLE_FILE.ID)
-                                .from(DELIVERABLE_FILE)
-                                .where(DONOR_CASE.ID.in(DELIVERABLE_FILE.CASE_ID)))
+                                .select(DELIVERABLE_CASE.DELIVERABLE_ID)
+                                .from(DELIVERABLE_CASE)
+                                .where(DONOR_CASE.ID.in(DELIVERABLE_CASE.CASE_ID)))
                                 .as(Case.DELIVERABLE_IDS),
                         PostgresDSL.array(PostgresDSL
                                 .select(CHANGELOG.ID)

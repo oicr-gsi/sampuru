@@ -10,10 +10,7 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static tables_generated.Tables.*;
 
@@ -98,22 +95,47 @@ public class DBConnector {
 
         //TODO: Adding Collection of VALUEs to Insert is coming in jOOQ 3.15 apparently. They disapprove of this approach
         if(!unknownDeliverables.isEmpty()) {
-            InsertSetStep insertSetStep = getContext().insertInto(DELIVERABLE_FILE);
-            InsertValuesStepN insertValuesStepN = null;
-            for(Object obj: unknownDeliverables){
-                JSONObject nextDeliverable = (JSONObject) obj;
-                 insertValuesStepN = insertSetStep.values(
-                        PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("project_id")),
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.array(((JSONArray)nextDeliverable.get("case_id")).toArray())),
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("location")),
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), nextDeliverable.get("notes")),
-                        PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
-                );
-            }
-            insertValuesStepN.execute();
-        }
 
+            // Write the new deliverables to the database and get back the new SERIAL ids
+            // Wrapped in transaction to ensure rollback on bad case_id
+            getContext().transaction(configuration -> {
+                InsertSetStep deliverableInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_FILE),
+                    deliverableCaseInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_CASE);
+                InsertValuesStepN deliverableInsertValuesStepN = null,
+                        deliverableCaseInsertValuesStepN = null;
+                for(Object obj: unknownDeliverables){
+                    JSONObject nextDeliverable = (JSONObject) obj;
+                    deliverableInsertValuesStepN = deliverableInsertSetStep.values(
+                            PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
+                            checkWritePermission(nextDeliverable.get("project_id"), username),
+                            checkWritePermission(nextDeliverable.get("location"), username),
+                            checkWritePermission(nextDeliverable.get("notes"), username),
+                            checkWritePermission(PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()), username)
+                    );
+
+                }
+                Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
+
+                // Associate the new ids with the appropriate case ids and write to deliverables_case table
+                for(int i = 0; i < ids.size(); i++){
+                    Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
+                    JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
+                    for(Object obj: casesForId){
+                        String strObject = (String) obj;
+                        deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
+                                checkWritePermission(thisId, username),
+                                checkWritePermission(strObject, username)
+                        );
+                    }
+                }
+                deliverableCaseInsertValuesStepN.execute();
+            });
+
+        }
+    }
+
+    private Object checkWritePermission(Object value, String username){
+        return PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), value);
     }
 
     //TODO: filter by username, probably by rewrite
@@ -132,8 +154,11 @@ public class DBConnector {
 
     //TODO: filter by username?? maybe?? probably by rewrite
     public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
+        return getChildIdList(getFrom, matchField, toMatch, getFrom.field("id"));
+    }
+
+    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch, Field idField){
         List<Object> newList = new LinkedList<>();
-        Field<Object> idField = getFrom.field("id");
 
         Result<Record1<Object>> idsFromDb = getContext()
                 .select(idField)
