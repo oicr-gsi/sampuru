@@ -6,7 +6,7 @@ import {
   navbar,
   DOMElement, progressBar
 } from "./html.js";
-import {fetchAsPromise, updateURLQueryString} from "./io.js";
+import {fetchAsPromise, updateURL} from "./io.js";
 import { ProjectInfo } from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
@@ -85,12 +85,9 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
   const qcablesLink = document.createElement("a");
   qcablesLink.innerText = "QCables";
-  qcablesLink.href = "#";
-  qcablesLink.addEventListener("click", () => {
-    updateURLQueryString(
-      "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
-      ["project", projectInfo.name], "QCables for project " + projectInfo.name);
-  });
+  qcablesLink.href = updateURL(
+    "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
+    ["project", projectInfo.name], "QCables for project " + projectInfo.name);
 
   const qcables = elementFromTag("div", null,
     {type: "complex", element: qcablesLink},
@@ -98,12 +95,9 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
   const casesLink = document.createElement("a");
   casesLink.innerText = "Cases";
-  casesLink.href = "#";
-  casesLink.addEventListener("click", () => {
-    updateURLQueryString(
-      "cases.html", ["cases-project-id"],
-      [projectInfo.name], "Cases for project " + projectInfo.name);
-  });
+  casesLink.href = updateURL(
+    "cases.html", ["cases-project-id"],
+    [projectInfo.name], "Cases for project " + projectInfo.name);
 
   const cases = elementFromTag("div", null,
     {type: "complex", element: casesLink},

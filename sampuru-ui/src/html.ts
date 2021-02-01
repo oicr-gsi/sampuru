@@ -1,6 +1,6 @@
 import { Case, Project } from "./data-transfer-objects.js";
 import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common.js";
-import {updateURLQueryString} from "./io.js";
+import {updateURL} from "./io.js";
 
 /**
  * The callback for handling mouse events
@@ -423,22 +423,16 @@ export function collapsibleCard(
   if (referer == "active_projects") {
     cardLink = document.createElement("a");
     cardLink.innerText = content.header;
-    cardLink.href = "#";
-    cardLink.addEventListener("click", () => {
-      updateURLQueryString(
-        "project.html", ["project-overview-id"],
-        [content.tagId], "Project (" + content.tagId + ")"
-      );
-    });
+    cardLink.href = updateURL(
+      "project.html", ["project-overview-id"],
+      [content.tagId], "Project (" + content.tagId + ")"
+    );
   } else if (referer == "cases") {
     cardLink = document.createElement("a");
     cardLink.innerText = content.header;
-    cardLink.href = "#";
-    cardLink.addEventListener("click", () => {
-      updateURLQueryString(
-        "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
-        ["case", content.tagId], "QCables for case " + content.header);
-    });
+    cardLink.href = updateURL(
+      "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
+      ["case", content.tagId], "QCables for case " + content.header);
   }
   else {
     cardLink = document.createElement("p");
@@ -520,12 +514,7 @@ export function projectCard(
 
   const casesTitle = document.createElement("a");
   casesTitle.innerText = "Cases";
-  casesTitle.href = "#";
-  casesTitle.addEventListener("click", () => {
-    updateURLQueryString(
-      "cases.html", ["cases-project-id"], [project.id], "Cases (" + project.id + ")"
-    );
-  });
+  casesTitle.href = updateURL("cases.html", ["cases-project-id"], [project.id], "Cases (" + project.id + ")");
 
   cases.appendChild(casesTitle);
   cases.appendChild(casesProgress);
@@ -535,12 +524,9 @@ export function projectCard(
 
   const qcablesTitle = document.createElement("a");
   qcablesTitle.innerText = "QCables";
-  qcablesTitle.href = "#";
-  qcablesTitle.addEventListener("click", () => {
-    updateURLQueryString(
-      "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
-      ["project", project.id], "QCAbles (" + project.name + ")");
-  });
+  qcablesTitle.href = updateURL(
+    "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
+    ["project", project.id], "QCAbles (" + project.name + ")");
 
   qcables.appendChild(qcablesTitle);
   qcables.appendChild(qcablesProgress);
