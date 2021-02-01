@@ -1,6 +1,6 @@
 import { Case, Project } from "./data-transfer-objects.js";
 import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common.js";
-import {updateURL} from "./io.js";
+import {constructURL} from "./io.js";
 
 /**
  * The callback for handling mouse events
@@ -423,14 +423,14 @@ export function collapsibleCard(
   if (referer == "active_projects") {
     cardLink = document.createElement("a");
     cardLink.innerText = content.header;
-    cardLink.href = updateURL(
+    cardLink.href = constructURL(
       "project.html", ["project-overview-id"],
       [content.tagId], "Project (" + content.tagId + ")"
     );
   } else if (referer == "cases") {
     cardLink = document.createElement("a");
     cardLink.innerText = content.header;
-    cardLink.href = updateURL(
+    cardLink.href = constructURL(
       "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
       ["case", content.tagId], "QCables for case " + content.header);
   }
@@ -514,7 +514,7 @@ export function projectCard(
 
   const casesTitle = document.createElement("a");
   casesTitle.innerText = "Cases";
-  casesTitle.href = updateURL("cases.html", ["cases-project-id"], [project.id], "Cases (" + project.id + ")");
+  casesTitle.href = constructURL("cases.html", ["cases-project-id"], [project.id], "Cases (" + project.id + ")");
 
   cases.appendChild(casesTitle);
   cases.appendChild(casesProgress);
@@ -524,7 +524,7 @@ export function projectCard(
 
   const qcablesTitle = document.createElement("a");
   qcablesTitle.innerText = "QCables";
-  qcablesTitle.href = updateURL(
+  qcablesTitle.href = constructURL(
     "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
     ["project", project.id], "QCAbles (" + project.name + ")");
 

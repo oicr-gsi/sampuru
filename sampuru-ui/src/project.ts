@@ -6,7 +6,7 @@ import {
   navbar,
   DOMElement, progressBar
 } from "./html.js";
-import {fetchAsPromise, updateURL} from "./io.js";
+import {fetchAsPromise, constructURL} from "./io.js";
 import { ProjectInfo } from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
@@ -85,7 +85,7 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
   const qcablesLink = document.createElement("a");
   qcablesLink.innerText = "QCables";
-  qcablesLink.href = updateURL(
+  qcablesLink.href = constructURL(
     "qcables.html", ["qcables-filter-type", "qcables-filter-id"],
     ["project", projectInfo.name], "QCables for project " + projectInfo.name);
 
@@ -95,7 +95,7 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
   const casesLink = document.createElement("a");
   casesLink.innerText = "Cases";
-  casesLink.href = updateURL(
+  casesLink.href = constructURL(
     "cases.html", ["cases-project-id"],
     [projectInfo.name], "Cases for project " + projectInfo.name);
 

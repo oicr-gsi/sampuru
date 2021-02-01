@@ -79,7 +79,7 @@ export function decodeProject(json: ProjectJSON): Project {
 }
 
 
-export function updateURL(destination: string, params: string[], values: string[], title: string) {
+export function constructURL(destination: string, params: string[], values: string[], title: string) {
   const newUrl = new URL(window.location.origin + "/"+ destination);
   const queryParams = new URLSearchParams(newUrl.search);
   params.forEach((param, index, paramArr) => {
