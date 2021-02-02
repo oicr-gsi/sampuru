@@ -1,6 +1,7 @@
-import { Case, Project } from "./data-transfer-objects.js";
-import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common.js";
+import {Case, Project} from "./data-transfer-objects.js";
+import {defaultSearch, formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
 import {urlConstructor} from "./io.js";
+
 
 /**
  * The callback for handling mouse events
@@ -373,6 +374,7 @@ export function navbar(): HTMLElement {
   searchForm.className = "form-inline mx-lg-auto";
 
   const inputBox = document.createElement("input");
+  inputBox.id = "search-box"
   inputBox.className = "form-control mr-sm-2";
   inputBox.type = "search";
   inputBox.placeholder = "Search Sampuru";
@@ -381,6 +383,9 @@ export function navbar(): HTMLElement {
   submitButton.className = "btn btn-outline-secondary my-2 my-sm-0";
   submitButton.type = "submit";
   submitButton.innerText = "Search";
+  submitButton.addEventListener("click", () => {
+    defaultSearch(inputBox.value);
+  });
 
   searchForm.appendChild(inputBox);
   searchForm.appendChild(submitButton);

@@ -1,3 +1,6 @@
+import {busyDialog} from "./html";
+import {fetchAsPromise} from "./io";
+
 export function formatQualityGateNames(name: string) {
   switch(name){
     case "receipt":
@@ -59,5 +62,26 @@ export function libDesignSort(a: string | null, b: string | null) {
   // otherwise, sort alphabetically
   else  {
     return a < b ? -1 : 1;
+  }
+}
+
+export function defaultSearch(searchString: string | null) {
+  const closeBusy = busyDialog();
+
+  //todo: test with all 6 calls
+  if(typeof searchString === "string") {
+    Promise.all([
+      fetch("api/search/project/" + searchString),
+      fetch("api/search/qcable/" + searchString),
+      fetch("api/search/case/" + searchString)
+    ]).then((responses) => {
+      return Promise.all(responses.map((response) => {
+        return response.json();
+      }));
+    }).then((data) => {
+      console.log(data);
+    }).catch((error) => {
+      console.log(error); // todo: log this somewhere permanent
+    }).finally(closeBusy);
   }
 }
