@@ -135,6 +135,11 @@ public class DBConnector {
 
             }
         }
+
+        // Update the existing deliverables
+        if(!knownDeliverables.isEmpty()){
+
+        }
     }
 
     private Object checkWritePermission(Object value, String username){
