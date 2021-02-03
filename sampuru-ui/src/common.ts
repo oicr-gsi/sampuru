@@ -1,5 +1,5 @@
-import {busyDialog} from "./html";
-import {fetchAsPromise} from "./io";
+import {busyDialog} from "./html.js";
+import {fetchAsPromise} from "./io.js";
 
 export function formatQualityGateNames(name: string) {
   switch(name){
@@ -65,23 +65,23 @@ export function libDesignSort(a: string | null, b: string | null) {
   }
 }
 
-export function defaultSearch(searchString: string | null) {
+export function defaultSearch(searchString: string) {
   const closeBusy = busyDialog();
 
-  //todo: test with all 6 calls
-  if(typeof searchString === "string") {
-    Promise.all([
-      fetch("api/search/project/" + searchString),
-      fetch("api/search/qcable/" + searchString),
-      fetch("api/search/case/" + searchString)
-    ]).then((responses) => {
-      return Promise.all(responses.map((response) => {
-        return response.json();
-      }));
-    }).then((data) => {
+  Promise.all([
+    fetch("api/search/project/" + searchString),
+    fetch("api/search/qcable/" + searchString),
+    fetch("api/search/case/" + searchString),
+    fetch("api/search/changelog/" + searchString),
+    fetch("api/search/notification/" + searchString),
+    fetch("api/search/deliverable/" + searchString)
+  ])
+    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then((data) => {
       console.log(data);
-    }).catch((error) => {
+    })
+    .catch((error) => {
       console.log(error); // todo: log this somewhere permanent
-    }).finally(closeBusy);
-  }
+    })
+    .finally(closeBusy);
 }

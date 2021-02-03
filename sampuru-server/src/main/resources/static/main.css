@@ -41,8 +41,9 @@
     background-color: #c42d2d !important;
 }
 
-.navbar input[type=search] {
-    width:400px !important;
+.navbar .input-group {
+    width:500px !important;
+    margin: auto;
 }
 
 .container .project-overview {

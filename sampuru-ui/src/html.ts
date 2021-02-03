@@ -370,28 +370,26 @@ export function navbar(): HTMLElement {
     null,
     "/");
 
-  const searchForm = document.createElement("form");
-  searchForm.className = "form-inline mx-lg-auto";
-
-  const inputBox = document.createElement("input");
-  inputBox.id = "search-box"
-  inputBox.className = "form-control mr-sm-2";
-  inputBox.type = "search";
-  inputBox.placeholder = "Search Sampuru";
+  const textBox = document.createElement("input");
+  textBox.type = "text";
+  textBox.className = "form-control";
+  textBox.placeholder = "Search Sampuru";
 
   const submitButton = document.createElement("button");
-  submitButton.className = "btn btn-outline-secondary my-2 my-sm-0";
-  submitButton.type = "submit";
+  submitButton.type = "button";
+  submitButton.className = "btn btn-secondary";
   submitButton.innerText = "Search";
   submitButton.addEventListener("click", () => {
-    defaultSearch(inputBox.value);
+    defaultSearch(textBox.value);
   });
 
-  searchForm.appendChild(inputBox);
-  searchForm.appendChild(submitButton);
+  const search = elementFromTag("div", "input-group",
+    {type: "complex", element: textBox},
+    elementFromTag("div", "input-group-append",
+      {type: "complex", element: submitButton}))
 
   nav.appendChild(sampuru);
-  nav.appendChild(searchForm);
+  nav.appendChild(search.element);
 
   return nav;
 }
