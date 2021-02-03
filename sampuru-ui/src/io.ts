@@ -79,7 +79,7 @@ export function decodeProject(json: ProjectJSON): Project {
 }
 
 
-export function updateURLQueryString(destination: string, params: string[], values: string[], title: string) {
+export function urlConstructor(destination: string, params: string[], values: string[]) {
   const newUrl = new URL(window.location.origin + "/"+ destination);
   const queryParams = new URLSearchParams(newUrl.search);
   params.forEach((param, index, paramArr) => {
@@ -87,7 +87,5 @@ export function updateURLQueryString(destination: string, params: string[], valu
   });
 
   newUrl.search = queryParams.toString();
-
-  history.pushState(null, title, newUrl.toString());
-  window.location.href = newUrl.toString();
+  return newUrl.toString();
 }
