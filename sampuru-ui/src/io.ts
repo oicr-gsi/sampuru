@@ -1,4 +1,4 @@
-import {Project, ProjectJSON} from "./data-transfer-objects.js";
+import {ActiveProject, ActiveProjectJSON} from "./data-transfer-objects.js";
 
 /**
  * Perform JSON fetch operation with a callback
@@ -72,7 +72,7 @@ export function fetchOperation<T>(
 /**
  * Convert ProjectJson object to Project
 * */
-export function decodeProject(json: ProjectJSON): Project {
+export function decodeProject(json: ActiveProjectJSON): ActiveProject {
   return Object.assign({}, json, {
     last_update: new Date(json.last_update)
   });

@@ -1,5 +1,6 @@
 import {busyDialog} from "./html.js";
 import {fetchAsPromise} from "./io.js";
+import {Changelog, DeliverableFile, SearchedCase, SearchedProject, SearchedQCable} from "./data-transfer-objects";
 
 export function formatQualityGateNames(name: string) {
   switch(name){
@@ -65,6 +66,23 @@ export function libDesignSort(a: string | null, b: string | null) {
   }
 }
 
+export function defaultSearchResults(
+  projects: SearchedProject[],
+  qcables: SearchedQCable[],
+  donor_cases: SearchedCase[],
+  changelogs: Changelog[],
+  notifications: Notification[],
+  deliverables: DeliverableFile[]
+): HTMLElement {
+  const container = document.createElement("div");
+
+  return container;
+}
+
+
+
+
+
 export function defaultSearch(searchString: string) {
   const closeBusy = busyDialog();
 
@@ -77,11 +95,19 @@ export function defaultSearch(searchString: string) {
     fetch("api/search/deliverable/" + searchString)
   ])
     .then(responses => Promise.all(responses.map(response => response.json())))
-    .then((data) => {
-      console.log(data);
+    .then((responses) => {
+      const projects = responses[0] as SearchedProject[];
+      const qcables = responses[1] as SearchedQCable[];
+      const donor_cases = responses[2] as SearchedCase[];
+      const changelogs = responses[3] as Changelog[];
+      const notifications = responses[4] as Notification[];
+      const deliverables = responses[5] as DeliverableFile[];
+
+      document.body.appendChild(defaultSearchResults(projects, qcables, donor_cases, changelogs, notifications, deliverables));
     })
     .catch((error) => {
       console.log(error); // todo: log this somewhere permanent
     })
     .finally(closeBusy);
+
 }

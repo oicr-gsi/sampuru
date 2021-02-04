@@ -1,4 +1,4 @@
-import {Case, Project} from "./data-transfer-objects.js";
+import {Case, ActiveProject} from "./data-transfer-objects.js";
 import {defaultSearch, formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
 import {urlConstructor} from "./io.js";
 
@@ -517,7 +517,7 @@ export function progressBar(
 }
 
 export function projectCard(
-  project: Project
+  project: ActiveProject
 ): HTMLElement {
 
   //todo: refactor so it's extensible to other pages

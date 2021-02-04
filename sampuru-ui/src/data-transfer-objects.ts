@@ -1,7 +1,7 @@
 /**
- * Data returned from api/active_projects
+ * Object returned from api/active_projects
  * */
-export interface Project {
+export interface ActiveProject {
   id: string,
   name: string,
   cases_total: number,
@@ -11,7 +11,7 @@ export interface Project {
   last_update: Date,
 }
 
-export interface ProjectJSON {
+export interface ActiveProjectJSON {
   id: string,
   name: string,
   cases_total: number,
@@ -20,12 +20,6 @@ export interface ProjectJSON {
   qcables_completed: number,
   last_update: string,
 }
-
-
-/**
- * Data returned from api/project_overview
- *
- */
 
 export interface SankeyTransition {
   receipt: {total: number, pending: number, extraction: number, failed: number},
@@ -37,6 +31,7 @@ export interface SankeyTransition {
   final_report: {total: number, pending: number, passed: number, failed: number},
 }
 
+//todo: change search endpoint to return entire infoitem
 export interface InfoItem {
   id: number,
   entry_type: string,
@@ -45,6 +40,11 @@ export interface InfoItem {
   received: number | string
 }
 
+/**
+ * Object returned from api/project_overview
+ * */
+//todo: need everything south of infoitem to be undefined??
+//todo: need infoitem to optionall be a string
 export interface ProjectInfo {
   id: string,
   name: string,
@@ -56,16 +56,27 @@ export interface ProjectInfo {
   reference_genome: string,
   kits: string,
   info_items: InfoItem[],
+  deliverables: string[],
+  completion_date: string,
   failures: string[],
   sankey_transitions: SankeyTransition,
-  deliverables: string[],
   qcables_total: number,
   qcables_completed: number,
   cases_total: number,
-  cases_completed: number,
-  completion_date: string
+  cases_completed: number
 }
 
+/**
+ * Object returned from api/search/project
+ * */
+//todo: rename
+export interface SearchedProject extends ProjectInfo {
+  donor_cases: string[]
+}
+
+/**
+ * Object returned from api/qcables_table/
+ * */
 export interface QCable {
   project_id: string,
   case_id: string,
@@ -93,10 +104,35 @@ export interface QCable {
   final_report_qcable_status: string | null
 }
 
+/**
+ * Object returned from api/search/qcable
+ * */
+//todo: rename??
+export interface SearchedQCable {
+  id: string,
+  type: string,
+  status: string,
+  library_design: string,
+  parent_id: string,
+  alias: string,
+  changelog: string[],
+  failure_reason: string
+}
+
 export interface Changelog {
   id: number,
   change_date: string,
   content: string
+}
+
+/**
+ * Object returned from api/search/changelog
+ * */
+//todo: rename
+export interface SearchedChangelog extends Changelog {
+  project_id: string,
+  qcable_id: string,
+  case_id: string
 }
 
 export interface Step {
@@ -111,9 +147,39 @@ export interface Bar {
   steps: Step[]
 }
 
+/**
+ * Object returned from api/case_cards/
+ * */
 export interface Case {
   name: string,
   id: string,
-  bars: Bar[],
-  changelog: Changelog[]
+  changelog: Changelog[] //todo: check if this breaks shit
+  bars: Bar[] //todo: how to have this not break shit
 }
+
+
+/**
+ * Object returned from api/search/case/
+ * */
+//todo: rename
+export interface SearchedCase extends Case {
+  qcables: string[],
+  deliverables: string[]
+}
+
+export interface Notification {
+  id: number,
+  user_id: string,
+  issue_date: string, //todo: make sure this is a string not date
+  resolved_date: string, //todo: make sure this is a string not date
+  content: string
+}
+
+export interface DeliverableFile {
+  id: number,
+  project_id: string,
+  location: string,
+  notes: string,
+  expiry_date: string //todo: check that it's string and add todo for better handling of dates
+}
+
