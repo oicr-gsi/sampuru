@@ -227,7 +227,7 @@ public class ProjectService extends Service<Project> {
         Result<Record> results = dbConnector.fetch(PostgresDSL
                 .select(PROJECT.asterisk(),
                         PostgresDSL.array(PostgresDSL
-                                .select(DONOR_CASE.ID)
+                                .select(DONOR_CASE.NAME)
                                 .from(DONOR_CASE)
                                 .where(DONOR_CASE.PROJECT_ID.eq(PROJECT.ID)))
                                 .as(Project.CASE_IDS),

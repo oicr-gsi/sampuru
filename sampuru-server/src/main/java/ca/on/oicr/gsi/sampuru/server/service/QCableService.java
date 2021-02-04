@@ -71,6 +71,9 @@ public class QCableService extends Service<QCable> {
                                 .as(QCable.CHANGELOG_IDS))
                 .from(QCABLE)
                 .where(QCABLE.PROJECT_ID.like("%"+term+"%")
+                        .or(QCABLE.ID.like("%"+term+"%"))
+                        .or(QCABLE.CASE_ID.like("%"+term+"%"))
+                        .or(QCABLE.OICR_ALIAS.like("%"+term+"%"))
                         .and(QCABLE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
