@@ -451,7 +451,12 @@ export function collapsibleCard(
   cardHeader.type = "button";
   cardHeader.className = "card-header";
   cardHeader.setAttribute("data-toggle", "collapse");
-  cardHeader.setAttribute("data-target", `#${content.tagId}`);
+  cardHeader.setAttribute("data-target", `#${content.tagId.replace(/[:]+/g, '')}`);
+
+  const headerIcon = document.createElement("i");
+  headerIcon.className = "fa fa-chevron-down pull-right";
+
+  cardHeader.appendChild(headerIcon);
   cardHeader.appendChild(cardLink);
 
   const cardBodyInner = document.createElement("div");
@@ -459,7 +464,7 @@ export function collapsibleCard(
   cardBodyInner.appendChild(content.contents);
 
   const cardBody = document.createElement("div");
-  cardBody.id = `${content.tagId}`;
+  cardBody.id = `${content.tagId.replace(/[:]+/g, '')}`;
   cardBody.className = show ? "collapse show" : "collapse";
   cardBody.appendChild(cardBodyInner);
 

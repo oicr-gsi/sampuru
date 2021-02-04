@@ -3,6 +3,13 @@
     text-align: left;
 }
 
+.card-header .fa {
+    transition: .3s transform ease-in-out;
+}
+.card-header.collapsed .fa {
+    transform: rotate(90deg);
+}
+
 .cases .container {
     width: 100%;
 }
