@@ -18,7 +18,7 @@ export function activeProjects(projects: ActiveProject[]): HTMLElement {
     .forEach((project) => {
       const cardContent = projectCard(project);
       const card: Card = {contents: cardContent, header: project.name, title: project.name, tagId: project.id};
-      cards.push(collapsibleCard("active_projects", null, card));
+      cards.push(collapsibleCard("active_projects", null, card, true));
     })
 
   // todo: move this out to a function

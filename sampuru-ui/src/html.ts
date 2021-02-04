@@ -418,16 +418,9 @@ export function createLinkElement(
 export function collapsibleCard(
   referer: string,
   click: ClickHandler | null,
-  content: Card
+  content: Card,
+  show: boolean
 ): HTMLElement {
-
-  // todo: this is for Boostrap card collapsing
-  /*
-  let attributes = new Map();
-  attributes.set('data-toggle', 'collapse');
-  attributes.set('href', `#${content.tagId}`);
-
-  const cardLink = createLinkElement("card-link", content.header, attributes, null);*/
 
   let cardLink;
   if (referer == "active_projects") {
@@ -454,8 +447,11 @@ export function collapsibleCard(
     cardLink.innerText = content.header;
   }
 
-  const cardHeader = document.createElement("div");
+  const cardHeader = document.createElement("button");
+  cardHeader.type = "button";
   cardHeader.className = "card-header";
+  cardHeader.setAttribute("data-toggle", "collapse");
+  cardHeader.setAttribute("data-target", `#${content.tagId}`);
   cardHeader.appendChild(cardLink);
 
   const cardBodyInner = document.createElement("div");
@@ -463,7 +459,8 @@ export function collapsibleCard(
   cardBodyInner.appendChild(content.contents);
 
   const cardBody = document.createElement("div");
-  cardBody.className = "collapse show";
+  cardBody.id = `${content.tagId}`;
+  cardBody.className = show ? "collapse show" : "collapse";
   cardBody.appendChild(cardBodyInner);
 
   const card = document.createElement("div");

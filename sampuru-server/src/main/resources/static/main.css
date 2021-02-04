@@ -1,3 +1,8 @@
+.card-header {
+    border: 1px solid rgba(0,0,0,.125) !important;
+    text-align: left;
+}
+
 .cases .container {
     width: 100%;
 }
