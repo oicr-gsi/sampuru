@@ -107,7 +107,8 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
   const cases = elementFromTag("div", null,
     {type: "complex", element: casesLink},
-    {type: "complex", element: progressBar(projectInfo.cases_total, projectInfo.cases_completed)});
+    {type: "complex", element: progressBar(typeof projectInfo.cases_total !== "undefined" ? projectInfo.cases_total : 0,
+        typeof projectInfo.cases_completed !== "undefined" ? projectInfo.cases_completed : 0)});
 
   const projectSummary = elementFromTag("div", "row",
     elementFromTag("div", "col col-md-8", {type: "complex", element: staticCard(infoCard)}),

@@ -122,7 +122,10 @@ public class DeliverableService extends Service<Deliverable> {
                 .from(DELIVERABLE_FILE)
                 .where(DELIVERABLE_FILE.LOCATION.like("%"+term+"%")
                         .or(DELIVERABLE_FILE.PROJECT_ID.like("%"+term+"%"))
-                        .or(DELIVERABLE_CASE.CASE_ID.like("%"+term+"%"))
+                        .or(DELIVERABLE_FILE.ID.in(PostgresDSL
+                                .select(DELIVERABLE_CASE.DELIVERABLE_ID)
+                                .from(DELIVERABLE_CASE)
+                                .where(DELIVERABLE_CASE.CASE_ID.like("%"+term+"%"))))
                         .and(DELIVERABLE_FILE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)

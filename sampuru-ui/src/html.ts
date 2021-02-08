@@ -1,6 +1,7 @@
-import {Case, ActiveProject} from "./data-transfer-objects.js";
-import {defaultSearch, formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
+import {CaseCard, ActiveProject} from "./data-transfer-objects.js";
+import {formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
 import {urlConstructor} from "./io.js";
+import {defaultSearch} from "./index.js";
 
 
 /**
@@ -258,15 +259,17 @@ export function tableRow(
  * @param headers -> map of data-field to header innerText
  * @param pagination -> boolean for paginating table
  * @param search -> boolean for adding a search to table
+ * @param tableId -> id to associate with table for jQuery to do its thing
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
   pagination: boolean,
-  search: boolean
+  search: boolean,
+  tableId: string
 ): HTMLElement {
   
   const table = document.createElement("table");
-  table.id = "table";
+  table.id = tableId;
   table.setAttribute("data-toggle", "table");
 
   if (pagination) {
@@ -293,7 +296,7 @@ export function bootstrapTable(
   return table;
 }
 
-export function caseCard(caseContent: Case): HTMLElement {
+export function caseCard(caseContent: CaseCard): HTMLElement {
   const caseProgess: DOMElement[] = [];
   // sort list so blank library designs are displayed first
   caseContent.bars.sort((a, b) => libDesignSort(a.library_design, b.library_design));
@@ -380,7 +383,8 @@ export function navbar(): HTMLElement {
   submitButton.className = "btn btn-secondary";
   submitButton.innerText = "Search";
   submitButton.addEventListener("click", () => {
-    defaultSearch(textBox.value);
+    window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
+    //defaultSearch(textBox.value);
   });
 
   const search = elementFromTag("div", "input-group",
@@ -423,7 +427,7 @@ export function collapsibleCard(
 ): HTMLElement {
 
   let cardLink;
-  if (referer == "active_projects") {
+  if (referer == "projects") {
     cardLink = createLinkElement(
         "card-link",
         content.header,

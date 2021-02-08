@@ -11,6 +11,7 @@ export interface ActiveProject {
   last_update: Date,
 }
 
+//todo: probably not the best way to handle timestamp's from the server
 export interface ActiveProjectJSON {
   id: string,
   name: string,
@@ -31,7 +32,6 @@ export interface SankeyTransition {
   final_report: {total: number, pending: number, passed: number, failed: number},
 }
 
-//todo: change search endpoint to return entire infoitem
 export interface InfoItem {
   id: number,
   entry_type: string,
@@ -40,12 +40,7 @@ export interface InfoItem {
   received: number | string
 }
 
-/**
- * Object returned from api/project_overview
- * */
-//todo: need everything south of infoitem to be undefined??
-//todo: need infoitem to optionall be a string
-export interface ProjectInfo {
+export interface BaseProject<I> {
   id: string,
   name: string,
   contact_name: string,
@@ -55,9 +50,15 @@ export interface ProjectInfo {
   created_date: string,
   reference_genome: string,
   kits: string,
-  info_items: InfoItem[],
+  info_items: I[],
   deliverables: string[],
   completion_date: string,
+}
+
+/**
+ * Object returned from api/project_overview
+ * */
+export interface ProjectInfo extends BaseProject<InfoItem> {
   failures: string[],
   sankey_transitions: SankeyTransition,
   qcables_total: number,
@@ -69,8 +70,7 @@ export interface ProjectInfo {
 /**
  * Object returned from api/search/project
  * */
-//todo: rename
-export interface SearchedProject extends ProjectInfo {
+export interface SearchedProject extends BaseProject<string> {
   donor_cases: string[]
 }
 
@@ -107,7 +107,6 @@ export interface QCable {
 /**
  * Object returned from api/search/qcable
  * */
-//todo: rename??
 export interface SearchedQCable {
   id: string,
   type: string,
@@ -128,7 +127,6 @@ export interface Changelog {
 /**
  * Object returned from api/search/changelog
  * */
-//todo: rename
 export interface SearchedChangelog extends Changelog {
   project_id: string,
   qcable_id: string,
@@ -147,22 +145,23 @@ export interface Bar {
   steps: Step[]
 }
 
+export interface BaseCase<C> {
+  name: string,
+  id: string,
+  changelog: C[]
+}
+
 /**
  * Object returned from api/case_cards/
  * */
-export interface Case {
-  name: string,
-  id: string,
-  changelog: Changelog[] //todo: check if this breaks shit
-  bars: Bar[] //todo: how to have this not break shit
+export interface CaseCard extends BaseCase<Changelog> {
+  bars: Bar[]
 }
-
 
 /**
  * Object returned from api/search/case/
  * */
-//todo: rename
-export interface SearchedCase extends Case {
+export interface SearchedCase extends BaseCase<string> {
   qcables: string[],
   deliverables: string[]
 }
