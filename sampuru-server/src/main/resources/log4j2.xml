@@ -4,21 +4,27 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{ABSOLUTE} %5p [%-50c{4}] - %m%n"/>
         </Console>
+        <File name="File" fileName="logs/sampuru.log">
+            <PatternLayout pattern="%d{ABSOLUTE} %5p [%-50c{4}] - %m%n"/>
+        </File>
     </Appenders>
 
     <Loggers>
         <!-- SQL execution logging is logged to the LoggerListener logger at DEBUG level -->
         <Logger name="org.jooq.tools.LoggerListener" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
 
         <!-- Other jOOQ related debug log output -->
+        <!-- This has the giant jOOQ logo in it so i'm not putting it in the file -->
         <Logger name="org.jooq" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
 
         <Root level="info">
             <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Root>
     </Loggers>
 </Configuration>
