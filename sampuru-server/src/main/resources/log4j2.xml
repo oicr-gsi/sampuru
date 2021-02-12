@@ -4,7 +4,7 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{ABSOLUTE} %5p [%-50c{4}] - %m%n"/>
         </Console>
-        <File name="File" fileName="logs/sampuru.log">
+        <File name="File" fileName="${logPath}">
             <PatternLayout pattern="%d{ABSOLUTE} %5p [%-50c{4}] - %m%n"/>
         </File>
     </Appenders>
