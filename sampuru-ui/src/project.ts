@@ -59,7 +59,7 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   }
 
   projectInfo.info_items.forEach((item) => {
-    if (item.content != "null") {
+    if (item.content != null) {
       infoItems.push(elementFromTag("div", "row",
         elementFromTag("b", null, item.entry_type + ": "),
         elementFromTag("p", null,  item.content)));
