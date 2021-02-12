@@ -3,3 +3,4 @@ dbUser:
 dbPassword:
 hostAddress:
 hostPort:
+logDirectory:
