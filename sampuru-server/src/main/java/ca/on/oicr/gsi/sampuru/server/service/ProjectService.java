@@ -312,7 +312,7 @@ public class ProjectService extends Service<Project> {
             jsonObject.put("description", project.description == null? "null": project.description);
             jsonObject.put("pipeline", project.pipeline == null? "null": project.pipeline);
             jsonObject.put("reference_genome", project.referenceGenome == null? "null": project.referenceGenome);
-            jsonObject.put("kits", Arrays.stream(project.kits.toArray()).collect(Collectors.toSet()).toString());
+            jsonObject.put("kits", project.kits == null? "[]": Arrays.stream(project.kits.toArray()).collect(Collectors.toSet()).toString());
             jsonObject.put("created_date", project.createdDate == null? "null": JSONObject.escape(project.createdDate.toString()));
             jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
 
