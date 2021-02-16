@@ -117,19 +117,27 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     const cellValue = elementFromTag("div", "card",
       elementFromTag("div", "card-body", value));
 
-    const childNodes = $element.children();
-    if (childNodes.length) {
-      childNodes.remove();
-    } else {
-      if(value != "" && field != "case_id") {
-        $element.attr('id', value).append(cellValue.element);
-      } else if (field != "case_id") {
-        // Let user know QCable hasn't been created yet
-        const emptyNotifier = elementFromTag("div", "card",
-          elementFromTag("div", "card-body", "Hasn't yet started"));
-        $element.attr('id', field).append(emptyNotifier.element);
+    const selection = window.getSelection();
+    const isEmpty = (selection != null) ? selection.toString() : "";
+    // Don't register click events when user is selecting text
+    if(isEmpty.length <= 0) {
+      const childNodes = $element.children();
+
+      if (childNodes.length) {
+        childNodes.remove();
+      } else {
+        if(value != "" && field != "case_id") {
+          $element.attr('id', value).append(cellValue.element);
+        } else if (field != "case_id") {
+          // Let user know QCable hasn't been created yet
+          const emptyNotifier = elementFromTag("div", "card",
+            elementFromTag("div", "card-body", "Hasn't yet started"));
+          $element.attr('id', field).append(emptyNotifier.element);
+        }
       }
     }
+
+
   });
 }
 
