@@ -51,6 +51,10 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     .forEach((qcable) => {
       tableRows.push(tableRow(null,
         {
+          contents: qcable.case_id,
+          className: "qcable-table-donor-case"
+        },
+        {
           contents: qcable.tissue_qcable_alias ? qcable.tissue_qcable_alias: "",
           className: statusToClassName(qcable.tissue_qcable_status)
         },
@@ -83,6 +87,7 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     });
 
   const tableHeaders = new Map([
+    ["case_id", "Case"],
     ["tissue_qcable_alias", "Receipt/Inspection"],
     ["extraction_qcable_alias", "Extraction"],
     ["library_preparation_qcable_alias", "Library Preparation"],
@@ -116,9 +121,9 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     if (childNodes.length) {
       childNodes.remove();
     } else {
-      if(value != "") {
+      if(value != "" && field != "case_id") {
         $element.attr('id', value).append(cellValue.element);
-      } else {
+      } else if (field != "case_id") {
         // Let user know QCable hasn't been created yet
         const emptyNotifier = elementFromTag("div", "card",
           elementFromTag("div", "card-body", "Hasn't yet started"));
