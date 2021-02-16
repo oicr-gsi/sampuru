@@ -122,11 +122,13 @@ function addElements(
       } else {
         switch (result.type) {
           case "a": {
-            const element = document.createElement("a");
-            element.innerText = result.innerText;
-            element.href = result.href;
-            element.title = result.title;
-            element.className = result.className;
+            const element = createLinkElement(
+                result.className,
+                result.innerText,
+                result.title,
+                null,
+                result.href
+            );
             target.appendChild(element);
           }
             break;
@@ -360,10 +362,12 @@ export function navbar(): HTMLElement {
   const nav = document.createElement("nav");
   nav.className = "navbar navbar-expand-sm bg-light navbar-light";
 
-  const sampuru = document.createElement("a");
-  sampuru.className = "navbar-brand";
-  sampuru.innerText = "Sampuru";
-  sampuru.href = "/";
+  const sampuru = createLinkElement(
+    "navbar-brand",
+    "Sampuru",
+    "Home",
+    null,
+    "/");
 
   const searchForm = document.createElement("form");
   searchForm.className = "form-inline mx-lg-auto";
@@ -388,15 +392,17 @@ export function navbar(): HTMLElement {
 }
 
 export function createLinkElement(
-  className: string,
+  className: string | null,
   innerText: string,
+  title: string | null,
   attributes: Map<string, string> | null,
   url: string | null
 ): HTMLElement {
   const link = document.createElement("a");
-  link.className = className;
+  className? link.className = className : null;
   link.innerText = innerText;
-  link.target = "_blank";
+  title? link.title = innerText : title;
+  link.target = "_self";
   link.rel = "noopener noreferrer";
   url ? link.href = url : null;
   if (attributes) {
@@ -422,15 +428,23 @@ export function collapsibleCard(
 
   let cardLink;
   if (referer == "active_projects") {
-    cardLink = document.createElement("a");
-    cardLink.innerText = content.header;
-    cardLink.href = urlConstructor(
-      "project.html", ["project-overview-id"], [content.tagId]);
+    cardLink = createLinkElement(
+        "card-link",
+        content.header,
+        null,
+        null,
+        urlConstructor(
+              "project.html", ["project-overview-id"], [content.tagId])
+    );
   } else if (referer == "cases") {
-    cardLink = document.createElement("a");
-    cardLink.innerText = content.header;
-    cardLink.href = urlConstructor(
-      "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["case", content.tagId]);
+    cardLink = createLinkElement(
+        "card-link",
+        content.header,
+        null,
+        null,
+        urlConstructor(
+              "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["case", content.tagId])
+    );
   }
   else {
     cardLink = document.createElement("p");
@@ -510,9 +524,13 @@ export function projectCard(
   const cases = document.createElement("div");
   cases.className = "cases";
 
-  const casesTitle = document.createElement("a");
-  casesTitle.innerText = "Cases";
-  casesTitle.href = urlConstructor("cases.html", ["cases-project-id"], [project.id]);
+  const casesTitle = createLinkElement(
+    cases.className,
+    "Cases",
+    null,
+    null,
+    urlConstructor("cases.html", ["cases-project-id"], [project.id])
+  );
 
   cases.appendChild(casesTitle);
   cases.appendChild(casesProgress);
@@ -520,10 +538,14 @@ export function projectCard(
   const qcables = document.createElement("div");
   qcables.className = "qcables";
 
-  const qcablesTitle = document.createElement("a");
-  qcablesTitle.innerText = "QCables";
-  qcablesTitle.href = urlConstructor(
-    "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", project.id]);
+  const qcablesTitle = createLinkElement(
+    qcables.className,
+    "QCables",
+    null,
+    null,
+    urlConstructor("qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", project.id])
+
+  );
 
   qcables.appendChild(qcablesTitle);
   qcables.appendChild(qcablesProgress);

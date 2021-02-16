@@ -4,7 +4,8 @@ import {
   elementFromTag,
   staticCard,
   navbar,
-  DOMElement, progressBar
+  DOMElement, progressBar,
+  createLinkElement
 } from "./html.js";
 import {fetchAsPromise, urlConstructor} from "./io.js";
 import { ProjectInfo } from "./data-transfer-objects.js";
@@ -83,18 +84,26 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   const contactCard: Card = {contents: contact.element, header: "Contact Information",
     title: projectInfo.name + " Contact Information", tagId: projectInfo.name + "-contact"};
 
-  const qcablesLink = document.createElement("a");
-  qcablesLink.innerText = "QCables";
-  qcablesLink.href = urlConstructor(
-    "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", projectInfo.name]);
+  const qcablesLink = createLinkElement(
+    null,
+    "QCables",
+    null,
+    null,
+    urlConstructor("qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", projectInfo.name])
+
+  );
 
   const qcables = elementFromTag("div", null,
     {type: "complex", element: qcablesLink},
     {type: "complex", element: progressBar(projectInfo.qcables_total, projectInfo.qcables_completed)});
 
-  const casesLink = document.createElement("a");
-  casesLink.innerText = "Cases";
-  casesLink.href = urlConstructor("cases.html", ["cases-project-id"], [projectInfo.name]);
+  const casesLink = createLinkElement(
+    null,
+    "Cases",
+    null,
+    null,
+    urlConstructor("cases.html", ["cases-project-id"], [projectInfo.name])
+  );
 
   const cases = elementFromTag("div", null,
     {type: "complex", element: casesLink},
