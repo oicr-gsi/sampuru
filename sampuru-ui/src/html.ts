@@ -397,6 +397,7 @@ export function createLinkElement(
   link.className = className;
   link.innerText = innerText;
   link.target = "_blank";
+  link.rel = "noopener noreferrer";
   url ? link.href = url : null;
   if (attributes) {
     attributes.forEach((value, qualifiedName) => link.setAttribute(qualifiedName, value));
