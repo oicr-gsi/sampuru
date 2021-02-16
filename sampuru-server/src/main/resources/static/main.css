@@ -62,7 +62,31 @@
     padding-right: 5px;
 }
 
-h2 {
-    padding: 20px;
+h2, h3 {
+    padding: 15px;
 }
 
+#table {
+    font-size: 13px !important;
+}
+
+.qcable-table-donor-case {
+    font-size: 13px !important;
+    cursor: default !important;
+    padding: 3px 6px 3px 6px !important;
+}
+
+.fixed-table-pagination, .fixed-table-pagination button, .fixed-table-toolbar input {
+    font-size: 14px !important;
+}
+
+#table td {
+    cursor: pointer;
+    font-size: 0;
+    border-radius: 4px;
+}
+
+#table .card .card-body {
+    font-size: 12px !important;
+    padding: 0 !important;
+}
