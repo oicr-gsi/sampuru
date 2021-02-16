@@ -399,12 +399,12 @@ export function createLinkElement(
   url: string | null
 ): HTMLElement {
   const link = document.createElement("a");
-  className? link.className = className : null;
+  if (className) link.className = className;
   link.innerText = innerText;
-  title? link.title = innerText : title;
+  link.title = title? title : innerText;
   link.target = "_self";
   link.rel = "noopener noreferrer";
-  url ? link.href = url : null;
+  if (url) link.href = url;
   if (attributes) {
     attributes.forEach((value, qualifiedName) => link.setAttribute(qualifiedName, value));
   }
