@@ -1,12 +1,13 @@
 package ca.on.oicr.gsi.sampuru.server;
 
+import com.zaxxer.hikari.HikariConfig;
 import org.jooq.Record;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.postgresql.ds.PGConnectionPoolDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,13 +27,14 @@ public class DBConnector {
     private String dbUser = properties.getProperty("dbUser");
     private String pw = properties.getProperty("dbPassword");
     private String url = properties.getProperty("dbUrl");
-    private static PGConnectionPoolDataSource pgDataSource;
+    private static HikariDataSource pgDataSource;
 
     public DBConnector() {
         if (pgDataSource == null) {
-            PGConnectionPoolDataSource pgDataSource = new PGConnectionPoolDataSource();
-            pgDataSource.setUrl(url);
-            pgDataSource.setUser(dbUser);
+            HikariDataSource pgDataSource = new HikariDataSource();
+            HikariConfig config = new HikariConfig();
+            pgDataSource.setJdbcUrl(url);
+            pgDataSource.setUsername(dbUser);
             pgDataSource.setPassword(pw);
             this.pgDataSource = pgDataSource;
         }
