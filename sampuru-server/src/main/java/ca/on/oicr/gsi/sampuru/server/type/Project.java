@@ -6,6 +6,7 @@ import org.jooq.Result;
 import org.jooq.TableField;
 import org.jooq.util.postgres.PostgresDSL;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -57,7 +58,7 @@ public class Project extends SampuruType {
         return getAll(PROJECT, Project.class, username);
     }
 
-    public List<Case> getCases(String username) {
+    public List<Case> getCases(String username) throws SQLException {
         List<Case> cases = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL
@@ -80,7 +81,7 @@ public class Project extends SampuruType {
         return cases;
     }
 
-    public List<ProjectInfoItem> getInfoItems(String username) {
+    public List<ProjectInfoItem> getInfoItems(String username) throws SQLException {
         List<ProjectInfoItem> projectInfoItems = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL
@@ -103,7 +104,7 @@ public class Project extends SampuruType {
         return projectInfoItems;
     }
 
-    public List<Deliverable> getDeliverables(String username) {
+    public List<Deliverable> getDeliverables(String username) throws SQLException {
         List<Deliverable> deliverableList = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL

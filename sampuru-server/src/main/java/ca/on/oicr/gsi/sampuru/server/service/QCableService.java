@@ -11,6 +11,7 @@ import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class QCableService extends Service<QCable> {
     }
 
     @Override
-    public List<QCable> getAll(String username) {
+    public List<QCable> getAll(String username) throws SQLException {
         List<QCable> qcables = new LinkedList<>();
 
         // NOTE: need to use specifically PostgresDSL.array() rather than DSL.array(). The latter breaks it
@@ -58,7 +59,7 @@ public class QCableService extends Service<QCable> {
     }
 
     @Override
-    public List<QCable> search(String term, String username) {
+    public List<QCable> search(String term, String username) throws SQLException {
         List<QCable> qcables = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL
@@ -146,7 +147,7 @@ public class QCableService extends Service<QCable> {
         }
     }
 
-    private JSONArray getQcableTableFromCase(String caseId, String username){
+    private JSONArray getQcableTableFromCase(String caseId, String username) throws SQLException {
         return buildQcableTable(new DBConnector().fetch(PostgresDSL
                 .select()
                 .from(QCABLE_TABLE)
@@ -161,7 +162,7 @@ public class QCableService extends Service<QCable> {
                                 .where(USER_ACCESS.USERNAME.eq(username))))))));
     }
 
-    private JSONArray getQcableTableFromProject(String projectId, String username){
+    private JSONArray getQcableTableFromProject(String projectId, String username) throws SQLException {
         return buildQcableTable(new DBConnector().fetch(PostgresDSL
                 .select()
                 .from(QCABLE_TABLE)

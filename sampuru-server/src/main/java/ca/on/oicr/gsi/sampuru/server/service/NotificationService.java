@@ -11,6 +11,7 @@ import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class NotificationService extends Service<Notification> {
     }
 
     @Override
-    public List<Notification> search(String term, String username) {
+    public List<Notification> search(String term, String username) throws SQLException {
         List<Notification> notifications = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL
@@ -81,14 +82,14 @@ public class NotificationService extends Service<Notification> {
         return jsonArray.toJSONString();
     }
 
-    public static void getActiveParams(HttpServerExchange hse) {
+    public static void getActiveParams(HttpServerExchange hse) throws SQLException {
         String username = hse.getRequestHeaders().get("X-Remote-User").element();
         NotificationService ns = new NotificationService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseSender().send(ns.toJson(ns.getActiveNotifications(username), username));
     }
 
-    private List<Notification> getActiveNotifications(String username) {
+    private List<Notification> getActiveNotifications(String username) throws SQLException {
         Result<Record> results = new DBConnector().fetch(
                 PostgresDSL.select()
                 .from(NOTIFICATION)

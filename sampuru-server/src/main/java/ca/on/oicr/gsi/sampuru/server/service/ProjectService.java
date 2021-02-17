@@ -11,6 +11,7 @@ import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -191,7 +192,7 @@ public class ProjectService extends Service<Project> {
     }
 
     @Override
-    public List<Project> getAll(String username) {
+    public List<Project> getAll(String username) throws SQLException {
         List<Project> projects = new LinkedList<>();
 
         Result<Record> results = new DBConnector().fetch(
@@ -220,7 +221,7 @@ public class ProjectService extends Service<Project> {
     }
 
     @Override
-    public List<Project> search(String term, String username) {
+    public List<Project> search(String term, String username) throws SQLException {
         List<Project> projects = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL
