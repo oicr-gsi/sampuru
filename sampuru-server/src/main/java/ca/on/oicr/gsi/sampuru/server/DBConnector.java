@@ -48,29 +48,29 @@ public class DBConnector {
         }
     }
 
-    private DSLContext getContext() {
-        return getContext(getConnection());
-    }
-
     private DSLContext getContext(Connection connection){
         return DSL.using(connection, SQLDialect.POSTGRES);
     }
 
     //TODO: I wanted this as a catch all to do a filter by username but it doesn't look like al's gonna be so lucky
-    public Result fetch(SelectConnectByStep<Record> select){
-        return getContext().fetch(select);
+    public Result fetch(SelectConnectByStep<Record> select) throws SQLException {
+        try(final Connection connection = getConnection()){
+            return getContext(connection).fetch(select);
+        }
     }
 
     //TODO: filter by username, probably by removing me
     public Record getUniqueRow(TableField field, Object toMatch) throws Exception {
         String tableName = field.getTable().getName();
-        Result<Record> rowResult = getContext().select().from(field.getTable()).where(field.eq(toMatch)).fetch();
-        if(rowResult.isEmpty()){
-            throw new Exception(tableName + " does not exist"); // TODO: more precise exception
-        } else if (rowResult.size() > 1){
-            throw new Exception("Found >1 record for "+ tableName +" identifier " + toMatch); // TODO: more precise exception
+        try(final Connection connection = getConnection()){
+            Result<Record> rowResult = getContext(connection).select().from(field.getTable()).where(field.eq(toMatch)).fetch();
+            if(rowResult.isEmpty()){
+                throw new Exception(tableName + " does not exist"); // TODO: more precise exception
+            } else if (rowResult.size() > 1){
+                throw new Exception("Found >1 record for "+ tableName +" identifier " + toMatch); // TODO: more precise exception
+            }
+            return rowResult.get(0);
         }
-        return rowResult.get(0);
     }
 
     // TODO: look at https://www.jooq.org/doc/3.14/manual/sql-building/dynamic-sql/
@@ -97,42 +97,43 @@ public class DBConnector {
 
         //TODO: Adding Collection of VALUEs to Insert is coming in jOOQ 3.15 apparently. They disapprove of this approach
         if(!unknownDeliverables.isEmpty()) {
-
-            // Write the new deliverables to the database and get back the new SERIAL ids
-            // Wrapped in transaction to ensure rollback on bad case_id
-            getContext().transaction(configuration -> {
-                InsertSetStep deliverableInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_FILE),
-                    deliverableCaseInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_CASE);
-                InsertValuesStepN deliverableInsertValuesStepN = null,
-                        deliverableCaseInsertValuesStepN = null;
-                for(Object obj: unknownDeliverables){
-                    JSONObject nextDeliverable = (JSONObject) obj;
-                    deliverableInsertValuesStepN = deliverableInsertSetStep.values(
-                            PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
-                            checkWritePermission(nextDeliverable.get("project_id"), username),
-                            checkWritePermission(nextDeliverable.get("location"), username),
-                            checkWritePermission(nextDeliverable.get("notes"), username),
-                            checkWritePermission(PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()), username)
-                    );
-
-                }
-                Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
-
-                // Associate the new ids with the appropriate case ids and write to deliverables_case table
-                for(int i = 0; i < ids.size(); i++){
-                    Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
-                    JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
-                    for(Object obj: casesForId){
-                        String strObject = (String) obj;
-                        deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
-                                checkWritePermission(thisId, username),
-                                checkWritePermission(strObject, username)
+            try(final Connection connection = getConnection()){
+                // Write the new deliverables to the database and get back the new SERIAL ids
+                // Wrapped in transaction to ensure rollback on bad case_id
+                getContext(connection).transaction(configuration -> {
+                    InsertSetStep deliverableInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_FILE),
+                            deliverableCaseInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_CASE);
+                    InsertValuesStepN deliverableInsertValuesStepN = null,
+                            deliverableCaseInsertValuesStepN = null;
+                    for(Object obj: unknownDeliverables){
+                        JSONObject nextDeliverable = (JSONObject) obj;
+                        deliverableInsertValuesStepN = deliverableInsertSetStep.values(
+                                PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
+                                checkWritePermission(nextDeliverable.get("project_id"), username),
+                                checkWritePermission(nextDeliverable.get("location"), username),
+                                checkWritePermission(nextDeliverable.get("notes"), username),
+                                checkWritePermission(PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()), username)
                         );
-                    }
-                }
-                deliverableCaseInsertValuesStepN.execute();
-            });
 
+                    }
+                    Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
+
+                    // Associate the new ids with the appropriate case ids and write to deliverables_case table
+                    for(int i = 0; i < ids.size(); i++){
+                        Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
+                        JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
+                        for(Object obj: casesForId){
+                            String strObject = (String) obj;
+                            deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
+                                    checkWritePermission(thisId, username),
+                                    checkWritePermission(strObject, username)
+                            );
+                        }
+                    }
+                    deliverableCaseInsertValuesStepN.execute();
+                });
+
+            }
         }
     }
 
@@ -141,83 +142,93 @@ public class DBConnector {
     }
 
     //TODO: filter by username, probably by rewrite
-    public List<Integer> getAllIds(Table getFrom){
+    public List<Integer> getAllIds(Table getFrom) throws SQLException {
         List<Integer> newList = new LinkedList<>();
         Field<Integer> idField = getFrom.field("id");
 
-        Result<Record1<Integer>> idsFromDb = getContext().select(idField).from(getFrom).fetch();
+        try(final Connection connection = getConnection()){
+            Result<Record1<Integer>> idsFromDb = getContext(connection).select(idField).from(getFrom).fetch();
 
-        for(Record r: idsFromDb){
-            newList.add(r.get(idField));
+            for(Record r: idsFromDb){
+                newList.add(r.get(idField));
+            }
         }
 
         return newList;
     }
 
     //TODO: filter by username?? maybe?? probably by rewrite
-    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch){
+    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch) throws SQLException {
         return getChildIdList(getFrom, matchField, toMatch, getFrom.field("id"));
     }
 
-    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch, Field idField){
+    public List<Object> getChildIdList(Table getFrom, TableField matchField, Object toMatch, Field idField) throws SQLException {
         List<Object> newList = new LinkedList<>();
 
-        Result<Record1<Object>> idsFromDb = getContext()
-                .select(idField)
-                .from(getFrom)
-                .where(matchField.eq(toMatch))
-                .fetch();
+        try(final Connection connection = getConnection()){
+            Result<Record1<Object>> idsFromDb = getContext(connection)
+                    .select(idField)
+                    .from(getFrom)
+                    .where(matchField.eq(toMatch))
+                    .fetch();
 
-        for(Record r: idsFromDb){
-            newList.add(r.get(idField));
+            for(Record r: idsFromDb){
+                newList.add(r.get(idField));
+            }
         }
 
         return newList;
     }
 
-    public int getTotalCount(Table getFrom, TableField matchField, Object toMatch) {
-        Record1<Integer> countFromDb = getContext()
-                .selectCount()
-                .from(getFrom)
-                .where(matchField.eq(toMatch))
-                .fetchOne();
+    public int getTotalCount(Table getFrom, TableField matchField, Object toMatch) throws SQLException {
+        try(final Connection connection = getConnection()){
+            Record1<Integer> countFromDb = getContext(connection)
+                    .selectCount()
+                    .from(getFrom)
+                    .where(matchField.eq(toMatch))
+                    .fetchOne();
 
-        assert countFromDb != null;
-        return (Integer) countFromDb.getValue(0);
+            assert countFromDb != null;
+            return (Integer) countFromDb.getValue(0);
+        }
     }
 
     // TODO not checking deliverables for GP-2583. Re-instate when ready
-    public int getCompletedCases(String id) {
-        Record1<Integer> countFromDb = getContext()
-                .selectCount()
-                .from(PostgresDSL
-                        .selectDistinct(QCABLE.CASE_ID)
-                        .from(QCABLE)
-                        .where(QCABLE.CASE_ID.in(PostgresDSL
-                                .select(DONOR_CASE.ID)
-                                .from(DONOR_CASE)
-                                .where(DONOR_CASE.PROJECT_ID.eq(id)))
-                                .and(QCABLE.QCABLE_TYPE.eq("final_report"))
-                                .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))))
-                .fetchOne();
+    public int getCompletedCases(String id) throws SQLException {
+        try(final Connection connection = getConnection()){
+            Record1<Integer> countFromDb = getContext(connection)
+                    .selectCount()
+                    .from(PostgresDSL
+                            .selectDistinct(QCABLE.CASE_ID)
+                            .from(QCABLE)
+                            .where(QCABLE.CASE_ID.in(PostgresDSL
+                                    .select(DONOR_CASE.ID)
+                                    .from(DONOR_CASE)
+                                    .where(DONOR_CASE.PROJECT_ID.eq(id)))
+                                    .and(QCABLE.QCABLE_TYPE.eq("final_report"))
+                                    .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED))))
+                    .fetchOne();
 
-        assert countFromDb != null;
-        return (Integer) countFromDb.getValue(0);
+            assert countFromDb != null;
+            return (Integer) countFromDb.getValue(0);
+        }
     }
 
-    public int getCompletedQcables(String id) {
-        Record1<Integer> countFromDb = getContext()
-                .selectCount()
-                .from(QCABLE)
-                .where(QCABLE.PROJECT_ID.eq(id)
-                        .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED)))
-                .fetchOne();
+    public int getCompletedQcables(String id) throws SQLException {
+        try(final Connection connection = getConnection()){
+            Record1<Integer> countFromDb = getContext(connection)
+                    .selectCount()
+                    .from(QCABLE)
+                    .where(QCABLE.PROJECT_ID.eq(id)
+                            .and(QCABLE.STATUS.eq(DBConnector.QC_PASSED)))
+                    .fetchOne();
 
-        assert countFromDb != null;
-        return (Integer) countFromDb.getValue(0);
+            assert countFromDb != null;
+            return (Integer) countFromDb.getValue(0);
+        }
     }
 
-    public List<String> getFailedQCablesForProject(String id, String username) {
+    public List<String> getFailedQCablesForProject(String id, String username) throws SQLException {
         List<String> ids = new LinkedList<>();
         Result<Record> result = fetch(PostgresDSL
                 .select()

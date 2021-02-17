@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -36,7 +37,7 @@ public class DeliverableService extends Service<Deliverable> {
         getAllParams(new DeliverableService(), hse);
     }
 
-    public static void endpointDisplayParams(HttpServerExchange hse) {
+    public static void endpointDisplayParams(HttpServerExchange hse) throws SQLException {
         String username = hse.getRequestHeaders().get("X-Remote-User").element();
         DeliverableService ds = new DeliverableService();
 
@@ -44,7 +45,7 @@ public class DeliverableService extends Service<Deliverable> {
         hse.getResponseSender().send(ds.getPortalJson(username));
     }
 
-    private String getPortalJson(String username) {
+    private String getPortalJson(String username) throws SQLException {
         final String CASE_IDS = "case_ids";
         DBConnector dbConnector = new DBConnector();
         Result<Record> deliverableResults = dbConnector.fetch(PostgresDSL
@@ -113,7 +114,7 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     @Override
-    public List<Deliverable> search(String term, String username) {
+    public List<Deliverable> search(String term, String username) throws SQLException {
         List<Deliverable> deliverables = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL
@@ -173,7 +174,12 @@ public class DeliverableService extends Service<Deliverable> {
                 hse.setStatusCode(503);
                 hse.getResponseSender().send("Sampuru Server was unable to write deliverables to database: " + e.getMessage());
             }
-            hse.getResponseSender().send(ds.getPortalJson(username));
+            try {
+                hse.getResponseSender().send(ds.getPortalJson(username));
+            } catch (SQLException sqle) {
+                hse.setStatusCode(503);
+                hse.getResponseSender().send("Sampuru Server was unable to get the full portal JSON after writing deliverables: " + sqle.getMessage());
+            }
         });
 
     }

@@ -5,6 +5,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.*;
 
 public abstract class Service<T extends SampuruType> {
@@ -42,7 +43,7 @@ public abstract class Service<T extends SampuruType> {
         hse.getResponseSender().send(targetService.toJson(targetService.getAll(username), username));
     }
 
-    public abstract List<T> search(String term, String username);
+    public abstract List<T> search(String term, String username) throws SQLException;
 
     public abstract String toJson(Collection<? extends  SampuruType> toWrite, String username) throws Exception;
 

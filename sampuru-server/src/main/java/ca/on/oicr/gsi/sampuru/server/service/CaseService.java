@@ -11,6 +11,7 @@ import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -246,7 +247,7 @@ public class CaseService extends Service<Case> {
     }
 
     @Override
-    public List<Case> search(String term, String username) {
+    public List<Case> search(String term, String username) throws SQLException {
         List<Case> cases = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
         Result<Record> results = dbConnector.fetch(PostgresDSL
