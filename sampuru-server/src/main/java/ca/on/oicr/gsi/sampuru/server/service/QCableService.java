@@ -184,6 +184,7 @@ public class QCableService extends Service<QCable> {
 
             jsonObject.put("project_id", row.get(QCABLE_TABLE.PROJECT_ID));
             jsonObject.put("case_id", row.get(QCABLE_TABLE.CASE_ID));
+            jsonObject.put("case_external_id", row.get(QCABLE_TABLE.CASE_EXTERNAL_ID));
             jsonObject.put("tissue_qcable_alias", row.get(QCABLE_TABLE.TISSUE_QCABLE_ALIAS));
             jsonObject.put("tissue_qcable_status", row.get(QCABLE_TABLE.TISSUE_QCABLE_STATUS));
             jsonObject.put("extraction_qcable_alias", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_ALIAS));

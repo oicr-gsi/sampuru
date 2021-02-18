@@ -2,6 +2,7 @@ CREATE VIEW qcable_table AS
 SELECT
 tissue_qcable.project_id AS project_id,
 tissue_qcable.case_id AS case_id,
+tissue_qcable.case_external_id AS case_external_id,
 library_preparation_qcable.library_design AS library_design,
 tissue_qcable.oicr_alias AS tissue_qcable_alias, 
 tissue_qcable.status AS tissue_qcable_status,
