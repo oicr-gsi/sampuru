@@ -51,7 +51,7 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     .forEach((qcable) => {
       tableRows.push(tableRow(null,
         {
-          contents: qcable.case_external_id,
+          contents: qcable.case_external_name,
           className: "qcable-table-donor-case"
         },
         {
@@ -87,7 +87,7 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     });
 
   const tableHeaders = new Map([
-    ["case_external_id", "Case"],
+    ["case_external_name", "Case"],
     ["tissue_qcable_alias", "Receipt/Inspection"],
     ["extraction_qcable_alias", "Extraction"],
     ["library_preparation_qcable_alias", "Library Preparation"],

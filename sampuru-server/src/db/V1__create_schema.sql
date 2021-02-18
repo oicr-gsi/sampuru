@@ -20,7 +20,6 @@ CREATE TABLE qcable (
     qcable_type text NOT NULL,
     project_id text NOT NULL,
     case_id text NOT NULL,
-    case_external_id text NOT NULL,
     oicr_alias text NOT NULL,
     status text NOT NULL,
     failure_reason text,

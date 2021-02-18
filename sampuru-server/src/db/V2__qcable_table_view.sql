@@ -2,7 +2,7 @@ CREATE VIEW qcable_table AS
 SELECT
 tissue_qcable.project_id AS project_id,
 tissue_qcable.case_id AS case_id,
-tissue_qcable.case_external_id AS case_external_id,
+donor_case.name AS case_external_name,
 library_preparation_qcable.library_design AS library_design,
 tissue_qcable.oicr_alias AS tissue_qcable_alias, 
 tissue_qcable.status AS tissue_qcable_status,
@@ -19,6 +19,7 @@ informatics_interpretation_qcable.status AS informatics_interpretation_qcable_st
 final_report_qcable.oicr_alias AS final_report_qcable_alias,
 final_report_qcable.status AS final_report_qcable_status
 FROM (SELECT * FROM qcable WHERE qcable_type = 'receipt_inspection') AS tissue_qcable
+LEFT JOIN (SELECT * FROM donor_case) AS donor_case ON tissue_qcable.case_id = donor_case.id
 LEFT JOIN (SELECT * FROM qcable WHERE qcable_type = 'extraction') AS extraction_qcable ON extraction_qcable.parent_id = tissue_qcable.id
 LEFT JOIN (SELECT * FROM qcable WHERE qcable_type = 'library_preparation') AS library_preparation_qcable ON extraction_qcable.id = library_preparation_qcable.parent_id
 LEFT JOIN (SELECT * FROM qcable WHERE qcable_type = 'low_pass_sequencing') AS low_pass_sequencing_qcable ON library_preparation_qcable.id = low_pass_sequencing_qcable.parent_id

@@ -69,7 +69,7 @@ export interface ProjectInfo {
 export interface QCable {
   project_id: string,
   case_id: string,
-  case_external_id: string,
+  case_external_name: string,
   tissue_qcable_alias: string | null,
   tissue_qcable_status: string | null,
   extraction_qcable_alias: string | null,
