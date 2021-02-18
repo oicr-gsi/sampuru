@@ -188,16 +188,22 @@ public class QCableService extends Service<QCable> {
             jsonObject.put("tissue_qcable_external_name", row.get(QCABLE_TABLE.TISSUE_QCABLE_EXTERNAL_NAME));
             jsonObject.put("tissue_qcable_status", row.get(QCABLE_TABLE.TISSUE_QCABLE_STATUS));
             jsonObject.put("extraction_qcable_alias", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_ALIAS));
+            jsonObject.put("extraction_qcable_external_name", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_EXTERNAL_NAME));
             jsonObject.put("extraction_qcable_status", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_STATUS));
             jsonObject.put("library_preparation_qcable_alias", row.get(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_ALIAS));
+            jsonObject.put("library_preparation_qcable_external_name", row.get(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_EXTERNAL_NAME));
             jsonObject.put("library_preparation_qcable_status", row.get(QCABLE_TABLE.LIBRARY_PREPARATION_QCABLE_STATUS));
             jsonObject.put("low_pass_sequencing_qcable_alias", row.get(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_ALIAS));
+            jsonObject.put("low_pass_sequencing_qcable_external_name", row.get(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_EXTERNAL_NAME));
             jsonObject.put("low_pass_sequencing_qcable_status", row.get(QCABLE_TABLE.LOW_PASS_SEQUENCING_QCABLE_STATUS));
             jsonObject.put("full_depth_sequencing_qcable_alias", row.get(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_ALIAS));
+            jsonObject.put("full_depth_sequencing_qcable_external_name", row.get(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_EXTERNAL_NAME));
             jsonObject.put("full_depth_sequencing_qcable_status", row.get(QCABLE_TABLE.FULL_DEPTH_SEQUENCING_QCABLE_STATUS));
             jsonObject.put("informatics_interpretation_qcable_alias", row.get(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_ALIAS));
+            jsonObject.put("informatics_interpretation_qcable_external_name", row.get(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_EXTERNAL_NAME));
             jsonObject.put("informatics_interpretation_qcable_status", row.get(QCABLE_TABLE.INFORMATICS_INTERPRETATION_QCABLE_STATUS));
             jsonObject.put("final_report_qcable_alias", row.get(QCABLE_TABLE.FINAL_REPORT_QCABLE_ALIAS));
+            jsonObject.put("final_report_qcable_external_name", row.get(QCABLE_TABLE.FINAL_REPORT_QCABLE_EXTERNAL_NAME));
             jsonObject.put("final_report_qcable_status", row.get(QCABLE_TABLE.FINAL_REPORT_QCABLE_STATUS));
 
             jsonArray.add(jsonObject);
