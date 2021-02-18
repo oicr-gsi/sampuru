@@ -13,7 +13,7 @@ CREATE TABLE project (
 CREATE TABLE donor_case (
     id text PRIMARY KEY,
     project_id text NOT NULL,
-    name text NOT NULL);
+    name text UNIQUE NOT NULL);
  
 CREATE TABLE qcable (
     id text PRIMARY KEY,
