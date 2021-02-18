@@ -21,6 +21,7 @@ CREATE TABLE qcable (
     project_id text NOT NULL,
     case_id text NOT NULL,
     oicr_alias text NOT NULL,
+    external_name text,
     status text NOT NULL,
     failure_reason text,
     library_design text,
