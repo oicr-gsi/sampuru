@@ -5,10 +5,10 @@ import {
   staticCard,
   navbar,
   DOMElement, progressBar,
-  createLinkElement
+  createLinkElement, ComplexElement, tableRow, bootstrapTable, tableBodyFromRows
 } from "./html.js";
 import {fetchAsPromise, urlConstructor} from "./io.js";
-import { ProjectInfo } from "./data-transfer-objects.js";
+import {Case, Changelog, ProjectInfo} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
 
@@ -19,6 +19,51 @@ if(projectId) {
   document.body.appendChild(navbar());
   initialiseProjectOverview(projectId);
 }
+
+
+export function failedChangelog(changelogContent: string): string {
+  if(changelogContent.includes("fail")) {
+    return "table-danger";
+  } else {
+    return "";
+  }
+}
+
+export function changelogTable(cases: Case[]) {
+  const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
+  cases
+    .forEach((donor_case) => {
+      donor_case.changelog.forEach((changelog) => {
+        tableRows.push(tableRow(null,
+          {
+            contents: donor_case.name,
+            className: failedChangelog(changelog.content)
+          },
+          {
+            contents: changelog.content,
+            className: failedChangelog(changelog.content)
+          },
+          {
+            contents: changelog.change_date,
+            className: failedChangelog(changelog.content)
+          }))
+      });
+    });
+
+  const tableHeaders = new Map([
+    ["donor_case_name", "Case"],
+    ["content", "Content"],
+    ["change_date", "Change Date"]
+  ]);
+
+  const table = bootstrapTable(tableHeaders, true, true);
+  const tableBody = tableBodyFromRows("changelog-table", tableRows); //todo: want to apply css to this table?
+
+  table.appendChild(tableBody);
+
+  return table;
+}
+
 
 export function project(projectInfo: ProjectInfo): HTMLElement {
   const pageContainer = document.createElement("div");
@@ -122,8 +167,8 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
     title: projectInfo.name + " QCables", tagId: projectInfo.name + "-qcables"};
 
   const failures = elementFromTag("div", null, projectInfo.failures.join("\n"));
-  const failuresCard: Card = {contents: failures.element, header: "Failures",
-    title: projectInfo.name + " Failures", tagId: projectInfo.name + "-failures"};
+  const failuresCard: Card = {contents: failures.element, header: "Changelogs",
+    title: projectInfo.name + " Changelogs", tagId: projectInfo.name + "-changelogs"};
 
   const deliverables = elementFromTag("div", null, projectInfo.deliverables.join("\n"));
   const deliverablesCard: Card = {contents: deliverables.element, header: "Files",
@@ -149,6 +194,10 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
 export function initialiseProjectOverview(project_id: string) {
   const closeBusy = busyDialog();
+
+  //want to Promise.all both of these
+  //fetchAsPromise<CaseCard>("api/cases_cards/" + project_id, {body: null} )
+  // pass in the cases
 
   fetchAsPromise<ProjectInfo>("api/project_overview/" + project_id, {body: null})
     .then((data) => {

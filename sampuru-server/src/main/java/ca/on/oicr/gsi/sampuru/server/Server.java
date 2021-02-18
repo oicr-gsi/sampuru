@@ -34,6 +34,7 @@ public class Server {
                     .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
                     .get("/notifications-active", NotificationService::getActiveParams)
                     .get("/notifications-historic", NotificationService::getAllParams) // This is the same as the all endpoint was, just want naming consistency
+                    .get("/changelogs/{filterType}/{filterId}", ChangelogService::getFilteredChangelogs)
                     .get("/deliverables", DeliverableService::endpointDisplayParams)
                     .get("/search/{type}/{term}", Server::doSearch)
                     .get("/home", Server::helloWorld)
