@@ -86,10 +86,16 @@ export interface QCable {
   final_report_qcable_status: string | null
 }
 
-export interface Changelog {
+export interface BaseChangelog {
   id: number,
   change_date: string,
   content: string
+}
+
+export interface Changelog extends BaseChangelog {
+  project_id: string,
+  case_id: string,
+  qcable_id: string
 }
 
 export interface Step {
@@ -108,5 +114,5 @@ export interface Case {
   name: string,
   id: string,
   bars: Bar[],
-  changelog: Changelog[]
+  changelog: BaseChangelog[]
 }

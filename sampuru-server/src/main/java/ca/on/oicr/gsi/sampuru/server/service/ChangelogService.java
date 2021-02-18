@@ -167,7 +167,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
 
             jsonObject.put("project_id", row.get(CHANGELOG.PROJECT_ID));
             jsonObject.put("case_id", row.get(CHANGELOG.CASE_ID));
-            jsonObject.put("qcable_id", row.get(CHANGELOG.QCABLE_ID)); //todo: this might break things
+            jsonObject.put("qcable_id", row.get(CHANGELOG.QCABLE_ID) == null ? "null": row.get(CHANGELOG.QCABLE_ID)); //todo: this might break things
             jsonObject.put("change_date", row.get(CHANGELOG.CHANGE_DATE));
             jsonObject.put("content", row.get(CHANGELOG.CONTENT));
 
