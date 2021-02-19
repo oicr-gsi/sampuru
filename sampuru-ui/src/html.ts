@@ -293,6 +293,26 @@ export function bootstrapTable(
 }
 
 export function caseCard(caseContent: Case): HTMLElement {
+  const changelogs = createLinkElement(
+    "pull-right",
+    "Changelogs",
+    caseContent.name + "changelogs",
+    null,
+    "#changelogs"
+  );
+
+  const changelogRows: DOMElement[] = [];
+  caseContent.changelog.forEach((changelog) => {
+    changelogRows.push(elementFromTag("div", "row",
+      elementFromTag("p", null, changelog.change_date),
+      elementFromTag("p", null, changelog.content)))
+  });
+
+  const changelogCard = elementFromTag("div", "collapse",
+    elementFromTag("div", "card card-body changelog-card", changelogRows));
+
+  changelogCard.element.id = "changelogs";
+
   const caseProgess: DOMElement[] = [];
   // sort list so blank library designs are displayed first
   caseContent.bars.sort((a, b) => libDesignSort(a.library_design, b.library_design));
@@ -321,7 +341,8 @@ export function caseCard(caseContent: Case): HTMLElement {
       { type: "complex", element: progressBarContainer }));
   });
 
-  const container = elementFromTag("div", "container", caseProgess);
+  const container = elementFromTag("div", "container",
+    {type: "complex", element: changelogs}, changelogCard, caseProgess);
   return container.element;
 }
 
