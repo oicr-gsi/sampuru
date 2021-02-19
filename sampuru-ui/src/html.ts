@@ -306,16 +306,21 @@ export function bootstrapTable(
 }
 
 export function caseCard(caseContent: Case): HTMLElement {
+
+
   const changelogs = createLinkElement(
-    "pull-right",
+    null,
     "Changelogs",
     caseContent.name + "changelogs",
-    null,
-    "#changelogs"
+    new Map([
+      ["data-toggle", "collapse"],
+      ["style", "float:right"]]),
+    "#" + caseContent.id + "-changelogs"
   );
 
   const changelogRows: DOMElement[] = [];
   if(caseContent.changelog) {
+    //todo: eventually will want to display onlt the latest changelogs or implement scrolling
     caseContent.changelog.forEach((changelog) => {
       changelogRows.push(elementFromTag("div", "row",
         elementFromTag("p", null, changelog.change_date),
@@ -325,11 +330,10 @@ export function caseCard(caseContent: Case): HTMLElement {
     changelogRows.push(elementFromTag("div", null, "None."));
   }
 
-
-  const changelogCard = elementFromTag("div", "collapse",
+  const changelogCard = elementFromTag("div", "changelog collapse",
     elementFromTag("div", "card card-body changelog-card", changelogRows));
 
-  changelogCard.element.id = "changelogs";
+  changelogCard.element.id = caseContent.id + "-changelogs";
 
   const caseProgess: DOMElement[] = [];
   // sort list so blank library designs are displayed first

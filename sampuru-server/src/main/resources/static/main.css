@@ -1,3 +1,7 @@
+/**
+Most of these will have !important to override default bootstrap styling
+**/
+
 .cases .container {
     width: 100%;
 }
@@ -30,8 +34,17 @@
 }
 
 .changelog-card {
-    position: absolute;
-    z-index: 1;
+    z-index: 1 !important;
+    margin: 5px;
+    float: right;
+    top: 20px;
+    left: 90px;
+}
+
+.changelog.collapsing {
+    -webkit-transition: none;
+    transition: none;
+    display: none;
 }
 
 .changelog-table {
