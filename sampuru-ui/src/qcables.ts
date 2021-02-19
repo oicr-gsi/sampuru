@@ -39,12 +39,20 @@ function statusToClassName(status: string | null) {
   }
 }
 
-export function qcablesTable(qcables: QCable[], changelogs: Changelog[], projectName: string): void {
+export function qcablesTable(
+  qcables: QCable[],
+  changelogs: Changelog[],
+  filterType: string,
+  filterId: string): void {
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h3");
-  pageHeader.innerText = "QCables (" + projectName + ")";
+  if(filterType === "case") {
+    const caseExtName = qcables[0].case_external_name;
+    pageHeader.innerText = "QCables (" + caseExtName + ")";
+  } else {
+    pageHeader.innerText = "QCables (" + filterId + ")";
+  }
 
-  //todo: click on a cell and show alias??
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
   qcables
     .forEach((qcable) => {
@@ -119,6 +127,11 @@ export function qcablesTable(qcables: QCable[], changelogs: Changelog[], project
     });
 
     const displayChangelogs: DOMElement[] = [];
+    if(filteredChangelogs.length) {
+      displayChangelogs.push(elementFromTag("b", null,
+        elementFromTag("br", null), "Changelogs:"));
+    }
+
     filteredChangelogs.map((item) => {
         displayChangelogs.push(elementFromTag("p", null, item.content, null));
     });
@@ -162,7 +175,7 @@ export function initialiseQCables(filterType: string, filterId: string) {
       const qcables = responses[0] as QCable[]
       const changelogs = responses[1] as Changelog[]
 
-      qcablesTable(qcables, changelogs, filterId);
+      qcablesTable(qcables, changelogs, filterType, filterId);
     })
     .finally(closeBusy);
 
