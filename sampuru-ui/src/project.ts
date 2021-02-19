@@ -17,7 +17,7 @@ const projectId = urlParams.get("project-overview-id");
 
 if(projectId) {
   document.body.appendChild(navbar());
-  initialiseProjectOverview(projectId, "project", projectId);
+  initialiseProjectOverview(projectId);
 }
 
 
@@ -191,12 +191,12 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 }
 
 
-export function initialiseProjectOverview(projectId: string, filterType: string, filterId: string) {
+export function initialiseProjectOverview(projectId: string) {
   const closeBusy = busyDialog();
 
   Promise.all([
-    fetch("api/project_overview/" + projectId, {body: null}),
-    fetch("api/changelogs/" + filterType + "/" + filterId, {body: null})
+    fetch("api/project_overview/" + projectId),
+    fetch("api/changelogs/project/" + projectId)
   ])
     .then(responses => Promise.all(responses.map(response => response.json())))
     .then((responses) => {

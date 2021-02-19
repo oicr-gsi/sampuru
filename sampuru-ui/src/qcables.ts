@@ -11,7 +11,7 @@ import {
   tableRow
 } from "./html.js";
 import {fetchAsPromise} from "./io.js";
-import {QCable} from "./data-transfer-objects.js";
+import {Changelog, QCable} from "./data-transfer-objects.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const filterType = urlParams.get("qcables-filter-type");
@@ -40,7 +40,7 @@ function statusToClassName(status: string | null) {
   }
 }
 
-export function qcablesTable(qcables: QCable[], projectName: string): void {
+export function qcablesTable(qcables: QCable[], changelogs: Changelog[], projectName: string): void {
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h3");
   pageHeader.innerText = "QCables (" + projectName + ")";
@@ -144,9 +144,23 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
 export function initialiseQCables(filterType: string, filterId: string) {
   const closeBusy = busyDialog();
 
+  Promise.all([
+    fetch("api/qcables_table/" + filterType + "/" + filterId),
+    fetch("api/changelogs/" + filterType + "/" + filterId)
+  ])
+    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then((responses) => {
+      const qcables = responses[0] as QCable[]
+      const changelogs = responses[1] as Changelog[]
+
+      qcablesTable(qcables, changelogs, filterId);
+    })
+    .finally(closeBusy);
+
+  /*
   fetchAsPromise<QCable[]>("api/qcables_table/" + filterType + "/" + filterId, {body: null})
     .then((data) => {
       qcablesTable(data, filterId);
     })
-    .finally(closeBusy);
+    .finally(closeBusy);*/
 }
