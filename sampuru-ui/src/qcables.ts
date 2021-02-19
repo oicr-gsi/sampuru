@@ -5,7 +5,7 @@
 import {
   bootstrapTable,
   busyDialog,
-  ComplexElement, elementFromTag,
+  ComplexElement, DOMElement, elementFromTag,
   navbar,
   tableBodyFromRows,
   tableRow
@@ -114,8 +114,17 @@ export function qcablesTable(qcables: QCable[], changelogs: Changelog[], project
   });
 
   $('#table').on('click-cell.bs.table', function(event, field, value, row, $element) {
+    const filteredChangelogs = changelogs.filter((item) => {
+      return item.qcable_id === value
+    });
+
+    const displayChangelogs: DOMElement[] = [];
+    filteredChangelogs.map((item) => {
+        displayChangelogs.push(elementFromTag("p", null, item.content, null));
+    });
+
     const cellValue = elementFromTag("div", "card",
-      elementFromTag("div", "card-body", value));
+      elementFromTag("div", "card-body", value, displayChangelogs));
 
     const selection = window.getSelection();
     const isEmpty = (selection != null) ? selection.toString() : "";
