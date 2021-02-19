@@ -59,7 +59,7 @@ export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElem
   ]);
 
   const table = bootstrapTable(tableHeaders, true, true, "project-changelog");
-  const tableBody = tableBodyFromRows(null, tableRows); //todo: want to apply css to this table?
+  const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
   table.className = "changelog-table";
@@ -222,15 +222,4 @@ export function initialiseProjectOverview(projectId: string) {
       console.log(error); //todo: write to actual logs
     })
     .finally(closeBusy);
-
-  /*
-  fetchAsPromise<ProjectInfo>("api/project_overview/" + projectId, {body: null})
-    .then((data) => {
-      document.body.appendChild(project(data));
-      return data;
-    })
-    .then((data) => {
-      drawSankey(data.sankey_transitions);
-    })
-    .finally(closeBusy);*/
 }

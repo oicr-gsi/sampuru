@@ -320,7 +320,7 @@ export function caseCard(caseContent: Case): HTMLElement {
 
   const changelogRows: DOMElement[] = [];
   if(caseContent.changelog) {
-    //todo: eventually will want to display onlt the latest changelogs or implement scrolling
+    //todo: eventually will want to display only the latest changelogs or implement scrolling
     caseContent.changelog.forEach((changelog) => {
       changelogRows.push(elementFromTag("div", "row",
         elementFromTag("p", null, changelog.change_date),

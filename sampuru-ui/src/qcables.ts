@@ -178,11 +178,4 @@ export function initialiseQCables(filterType: string, filterId: string) {
       qcablesTable(qcables, changelogs, filterType, filterId);
     })
     .finally(closeBusy);
-
-  /*
-  fetchAsPromise<QCable[]>("api/qcables_table/" + filterType + "/" + filterId, {body: null})
-    .then((data) => {
-      qcablesTable(data, filterId);
-    })
-    .finally(closeBusy);*/
 }
