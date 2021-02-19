@@ -306,7 +306,7 @@ export function bootstrapTable(
 }
 
 export function caseCard(caseContent: Case): HTMLElement {
-
+  const formattedId = caseContent.id.replace(/[:]+/g, '');
 
   const changelogs = createLinkElement(
     null,
@@ -315,7 +315,7 @@ export function caseCard(caseContent: Case): HTMLElement {
     new Map([
       ["data-toggle", "collapse"],
       ["style", "float:right"]]),
-    "#" + caseContent.id + "-changelogs"
+    "#" + formattedId + "-changelogs"
   );
 
   const changelogRows: DOMElement[] = [];
@@ -333,7 +333,7 @@ export function caseCard(caseContent: Case): HTMLElement {
   const changelogCard = elementFromTag("div", "changelog collapse",
     elementFromTag("div", "card card-body changelog-card", changelogRows));
 
-  changelogCard.element.id = caseContent.id + "-changelogs";
+  changelogCard.element.id = formattedId + "-changelogs";
 
   const caseProgess: DOMElement[] = [];
   // sort list so blank library designs are displayed first
