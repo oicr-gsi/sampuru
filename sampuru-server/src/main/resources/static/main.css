@@ -29,6 +29,11 @@
     text-align: center;
 }
 
+.changelog-card {
+    position: absolute;
+    z-index: 1;
+}
+
 .pending {
     background-color: #fcc874 !important;
 }
