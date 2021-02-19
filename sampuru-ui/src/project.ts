@@ -8,7 +8,7 @@ import {
   createLinkElement, ComplexElement, tableRow, bootstrapTable, tableBodyFromRows
 } from "./html.js";
 import {fetchAsPromise, urlConstructor} from "./io.js";
-import {Case, BaseChangelog, ProjectInfo} from "./data-transfer-objects.js";
+import {Case, BaseChangelog, ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
 
@@ -17,7 +17,7 @@ const projectId = urlParams.get("project-overview-id");
 
 if(projectId) {
   document.body.appendChild(navbar());
-  initialiseProjectOverview(projectId);
+  initialiseProjectOverview(projectId, "project", projectId);
 }
 
 
@@ -29,25 +29,24 @@ export function failedChangelog(changelogContent: string): string {
   }
 }
 
-export function changelogTable(cases: Case[]) {
+export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElement> {
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
-  cases
-    .forEach((donor_case) => {
-      donor_case.changelog.forEach((changelog) => {
-        tableRows.push(tableRow(null,
-          {
-            contents: donor_case.name,
-            className: failedChangelog(changelog.content)
-          },
-          {
-            contents: changelog.content,
-            className: failedChangelog(changelog.content)
-          },
-          {
-            contents: changelog.change_date,
-            className: failedChangelog(changelog.content)
-          }))
-      });
+
+  changelogs
+    .forEach((changelog) => {
+      tableRows.push(tableRow(null,
+        {
+          contents: changelog.case_id,
+          className: failedChangelog(changelog.content)
+        },
+        {
+          contents: changelog.content,
+          className: failedChangelog(changelog.content)
+        },
+        {
+          contents: changelog.change_date,
+          className: failedChangelog(changelog.content)
+        }))
     });
 
   const tableHeaders = new Map([
@@ -61,11 +60,11 @@ export function changelogTable(cases: Case[]) {
 
   table.appendChild(tableBody);
 
-  return table;
+  return {type: "complex", element: table};
 }
 
 
-export function project(projectInfo: ProjectInfo): HTMLElement {
+export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTMLElement {
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h2");
   pageHeader.innerText = projectInfo.name;
@@ -166,8 +165,8 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   const qcablesCard: Card = {contents: sankeyContainer, header: "QCables",
     title: projectInfo.name + " QCables", tagId: projectInfo.name + "-qcables"};
 
-  const failures = elementFromTag("div", null, projectInfo.failures.join("\n"));
-  const failuresCard: Card = {contents: failures.element, header: "Changelogs",
+  const table = elementFromTag("div", null, changelogTable(changelogs));
+  const changelogsCard: Card = {contents: table.element, header: "Changelogs",
     title: projectInfo.name + " Changelogs", tagId: projectInfo.name + "-changelogs"};
 
   const deliverables = elementFromTag("div", null, projectInfo.deliverables.join("\n"));
@@ -176,7 +175,7 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
   cards.push(projectSummary.element);
   cards.push(staticCard(qcablesCard));
-  cards.push(staticCard(failuresCard));
+  cards.push(staticCard(changelogsCard));
   cards.push(staticCard(deliverablesCard));
 
   cards
@@ -192,14 +191,27 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 }
 
 
-export function initialiseProjectOverview(project_id: string) {
+export function initialiseProjectOverview(projectId: string, filterType: string, filterId: string) {
   const closeBusy = busyDialog();
 
-  //want to Promise.all both of these
-  //fetchAsPromise<CaseCard>("api/cases_cards/" + project_id, {body: null} )
-  // pass in the cases
+  Promise.all([
+    fetch("api/project_overview/" + projectId, {body: null}),
+    fetch("api/changelogs/" + filterType + "/" + filterId, {body: null})
+  ])
+    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then((responses) => {
+      const projectInfo = responses[0] as ProjectInfo
+      const changelogs = responses[1] as Changelog[]
 
-  fetchAsPromise<ProjectInfo>("api/project_overview/" + project_id, {body: null})
+      document.body.appendChild(project(projectInfo, changelogs));
+    })
+    .catch((error) => {
+      throw new Error(error);
+    })
+    .finally(closeBusy);
+
+  /*
+  fetchAsPromise<ProjectInfo>("api/project_overview/" + projectId, {body: null})
     .then((data) => {
       document.body.appendChild(project(data));
       return data;
@@ -207,5 +219,5 @@ export function initialiseProjectOverview(project_id: string) {
     .then((data) => {
       drawSankey(data.sankey_transitions);
     })
-    .finally(closeBusy);
+    .finally(closeBusy);*/
 }
