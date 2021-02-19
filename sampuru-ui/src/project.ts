@@ -1,3 +1,7 @@
+/// <reference types="jquery" />
+/// <reference types="bootstrap" />
+/// <reference types="bootstrap-table" />
+
 import {
   busyDialog,
   Card,
@@ -10,7 +14,6 @@ import {
 import {fetchAsPromise, urlConstructor} from "./io.js";
 import {Case, BaseChangelog, ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
-
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
@@ -55,10 +58,11 @@ export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElem
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true);
-  const tableBody = tableBodyFromRows("changelog-table", tableRows); //todo: want to apply css to this table?
+  const table = bootstrapTable(tableHeaders, true, true, "project-changelog");
+  const tableBody = tableBodyFromRows(null, tableRows); //todo: want to apply css to this table?
 
   table.appendChild(tableBody);
+  table.className = "changelog-table";
 
   return {type: "complex", element: table};
 }
@@ -204,9 +208,18 @@ export function initialiseProjectOverview(projectId: string) {
       const changelogs = responses[1] as Changelog[]
 
       document.body.appendChild(project(projectInfo, changelogs));
+      return projectInfo;
+    })
+    .then((data) => {
+      drawSankey(data.sankey_transitions);
+    })
+    .then(() => {
+      $(function () {
+        $('#project-changelog').bootstrapTable({});
+      });
     })
     .catch((error) => {
-      throw new Error(error);
+      console.log(error); //todo: write to actual logs
     })
     .finally(closeBusy);
 

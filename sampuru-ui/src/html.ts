@@ -210,7 +210,18 @@ export function tableBodyFromRows(
   className: string | null,
   rows: ComplexElement<HTMLTableRowElement>[]
 ): HTMLElement {
-  const tbody = elementFromTag("tbody", (typeof className == "string") ? className : null, ...rows);
+  let tbody;
+  if(!rows.length) {
+    const emptyCell = elementFromTag("td", null, "No elements.");
+    emptyCell.element.setAttribute("colspan", "100");
+    emptyCell.element.setAttribute("style", "text-align:center");
+
+    tbody = elementFromTag("tbody", (typeof className == "string") ? className : null,
+      elementFromTag("tr", null, emptyCell));
+  } else {
+    tbody = elementFromTag("tbody", (typeof className == "string") ? className : null, ...rows);
+  }
+
   return tbody.element;
 }
 
@@ -257,15 +268,17 @@ export function tableRow(
  * @param headers -> map of data-field to header innerText
  * @param pagination -> boolean for paginating table
  * @param search -> boolean for adding a search to table
+ * @param tableId -> id for table
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
   pagination: boolean,
-  search: boolean
+  search: boolean,
+  tableId: string
 ): HTMLElement {
   
   const table = document.createElement("table");
-  table.id = "table";
+  table.id = tableId;
   table.setAttribute("data-toggle", "table");
 
   if (pagination) {
@@ -302,11 +315,16 @@ export function caseCard(caseContent: Case): HTMLElement {
   );
 
   const changelogRows: DOMElement[] = [];
-  caseContent.changelog.forEach((changelog) => {
-    changelogRows.push(elementFromTag("div", "row",
-      elementFromTag("p", null, changelog.change_date),
-      elementFromTag("p", null, changelog.content)))
-  });
+  if(caseContent.changelog) {
+    caseContent.changelog.forEach((changelog) => {
+      changelogRows.push(elementFromTag("div", "row",
+        elementFromTag("p", null, changelog.change_date),
+        elementFromTag("p", null, changelog.content)))
+    });
+  } else {
+    changelogRows.push(elementFromTag("div", null, "None."));
+  }
+
 
   const changelogCard = elementFromTag("div", "collapse",
     elementFromTag("div", "card card-body changelog-card", changelogRows));

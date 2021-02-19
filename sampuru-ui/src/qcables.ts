@@ -10,7 +10,6 @@ import {
   tableBodyFromRows,
   tableRow
 } from "./html.js";
-import {fetchAsPromise} from "./io.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -96,7 +95,7 @@ export function qcablesTable(qcables: QCable[], changelogs: Changelog[], project
     ["informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
     ["final_report_qcable_alias", "Final Report"]])
 
-  const table = bootstrapTable(tableHeaders, true, true);
+  const table = bootstrapTable(tableHeaders, true, true, "table");
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
@@ -112,6 +111,7 @@ export function qcablesTable(qcables: QCable[], changelogs: Changelog[], project
       }
     });
   });
+
 
   $('#table').on('click-cell.bs.table', function(event, field, value, row, $element) {
     const filteredChangelogs = changelogs.filter((item) => {
