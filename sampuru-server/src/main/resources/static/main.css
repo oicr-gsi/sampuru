@@ -39,6 +39,7 @@ Most of these will have !important to override default bootstrap styling
     float: right;
     top: 20px;
     left: 90px;
+    padding: 15px !important;
 }
 
 .changelog.collapsing {
