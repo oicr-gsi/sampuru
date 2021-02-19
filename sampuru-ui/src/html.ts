@@ -560,6 +560,9 @@ export function projectCard(
   project: Project
 ): HTMLElement {
 
+  const lastUpdatedTime = elementFromTag("p", null, project.last_update);
+  lastUpdatedTime.element.setAttribute("style", "float:right");
+
   //todo: refactor so it's extensible to other pages
   const casesProgress = progressBar(project.cases_total, project.cases_completed);
   const qcablesProgress = progressBar(project.qcables_total, project.qcables_completed);
@@ -595,7 +598,7 @@ export function projectCard(
 
   const container = document.createElement("div");
   container.className = "card-container";
-  //todo: add last update time
+  container.appendChild(lastUpdatedTime.element);
   container.appendChild(cases);
   container.appendChild(qcables);
   return container;

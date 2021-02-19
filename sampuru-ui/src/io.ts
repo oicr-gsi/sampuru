@@ -1,4 +1,4 @@
-import {Project, ProjectJSON} from "./data-transfer-objects.js";
+import {Project} from "./data-transfer-objects.js";
 
 /**
  * Perform JSON fetch operation with a callback
@@ -67,15 +67,6 @@ export function fetchOperation<T>(
     })
   )
     .catch((error) => alert(error.nessage)); //TODO: better error handling
-}
-
-/**
- * Convert ProjectJson object to Project
-* */
-export function decodeProject(json: ProjectJSON): Project {
-  return Object.assign({}, json, {
-    last_update: new Date(json.last_update)
-  });
 }
 
 

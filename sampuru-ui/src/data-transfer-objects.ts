@@ -1,17 +1,8 @@
 /**
  * Data returned from api/active_projects
  * */
-export interface Project {
-  id: string,
-  name: string,
-  cases_total: number,
-  cases_completed: number,
-  qcables_total: number,
-  qcables_completed: number,
-  last_update: Date,
-}
 
-export interface ProjectJSON {
+export interface Project {
   id: string,
   name: string,
   cases_total: number,
