@@ -78,7 +78,6 @@ public class DBConnector {
         if (deliverableArray.isEmpty()) return;
 
         // Front end will provide ID if deliverable is pre-existing. If no ID or ID is null, INSERT instead of UPDATE
-        // Currently, nothing is being done with knownDeliverables. To be implemented (GP-2520)
         JSONArray knownDeliverables = new JSONArray(),
                 unknownDeliverables = new JSONArray();
         for(Object obj: deliverableArray){
