@@ -11,6 +11,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static tables_generated.Tables.*;
@@ -100,8 +101,8 @@ public class DBConnector {
                 // Write the new deliverables to the database and get back the new SERIAL ids
                 // Wrapped in transaction to ensure rollback on bad case_id
                 getContext(connection).transaction(configuration -> {
-                    InsertSetStep deliverableInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_FILE),
-                            deliverableCaseInsertSetStep = PostgresDSL.insertInto(DELIVERABLE_CASE);
+                    InsertSetStep deliverableInsertSetStep = PostgresDSL.using(configuration).insertInto(DELIVERABLE_FILE),
+                            deliverableCaseInsertSetStep = PostgresDSL.using(configuration).insertInto(DELIVERABLE_CASE);
                     InsertValuesStepN deliverableInsertValuesStepN = null,
                             deliverableCaseInsertValuesStepN = null;
                     for(Object obj: unknownDeliverables){
@@ -136,19 +137,41 @@ public class DBConnector {
         }
 
         // Update the existing deliverables
-        if(!knownDeliverables.isEmpty()){
             try(final Connection connection = getConnection()){
                 getContext(connection).transaction(configuration -> {
+                    InsertSetStep deliverableCaseInsertSetStep = PostgresDSL.using(connection).insertInto(DELIVERABLE_CASE);
+                    InsertValuesStepN deliverableCaseInsertValuesStepN = null;
                     for(Object obj: knownDeliverables){
                         JSONObject nextDeliverable = (JSONObject) obj;
-                        UpdateSetStep deliverableUpdateSetStep = PostgresDSL.update(DELIVERABLE_FILE),
-                                deliverableCaseUpdateSetStep = PostgresDSL.update(DELIVERABLE_CASE);
+                        Integer deliverableId = Math.toIntExact((Long)nextDeliverable.get("id"));
+                        PostgresDSL.using(configuration).update(DELIVERABLE_FILE)
+                                .set(DELIVERABLE_FILE.PROJECT_ID, (String)nextDeliverable.get("project_id"))
+                                .set(DELIVERABLE_FILE.LOCATION, (String)nextDeliverable.get("location"))
+                                .set(DELIVERABLE_FILE.NOTES, (String)nextDeliverable.get("notes"))
+                                .set(DELIVERABLE_FILE.EXPIRY_DATE, PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
+                                .where(DELIVERABLE_FILE.ID.eq(deliverableId)
+                                        .and(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))))
+                                .execute();
 
+
+                        // drop the old deliverable-case associations and rebuild
+                        PostgresDSL.using(connection).delete(DELIVERABLE_CASE)
+                                .where(DELIVERABLE_CASE.DELIVERABLE_ID.eq(Math.toIntExact((Long)nextDeliverable.get("id")))
+                                        .and(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))))
+                                .execute();
+                        JSONArray casesForId = ((JSONArray) nextDeliverable.get("case_id"));
+
+                        for(Object caseObj: casesForId){
+                            String caseId = (String) caseObj;
+                            deliverableCaseInsertValuesStepN = 
+                                    deliverableCaseInsertSetStep.values(checkWritePermission(deliverableId, username),
+                                    checkWritePermission(caseId, username));
+                        }
                     }
+                    deliverableCaseInsertValuesStepN.execute();
                 });
             }
         }
-    }
 
     private Object checkWritePermission(Object value, String username){
         return PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), value);
