@@ -137,7 +137,16 @@ public class DBConnector {
 
         // Update the existing deliverables
         if(!knownDeliverables.isEmpty()){
+            try(final Connection connection = getConnection()){
+                getContext(connection).transaction(configuration -> {
+                    for(Object obj: knownDeliverables){
+                        JSONObject nextDeliverable = (JSONObject) obj;
+                        UpdateSetStep deliverableUpdateSetStep = PostgresDSL.update(DELIVERABLE_FILE),
+                                deliverableCaseUpdateSetStep = PostgresDSL.update(DELIVERABLE_CASE);
 
+                    }
+                });
+            }
         }
     }
 
