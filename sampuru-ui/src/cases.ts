@@ -1,6 +1,6 @@
 import {busyDialog, Card, caseCard, collapsibleCard, navbar} from "./html.js";
 import {fetchAsPromise} from "./io.js";
-import {Case} from "./data-transfer-objects.js";
+import {CaseCard} from "./data-transfer-objects.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("cases-project-id");
@@ -10,7 +10,7 @@ if (projectId) {
   initialiseCases(projectId);
 }
 
-export function casesPage(cases: Case[]): HTMLElement {
+export function casesPage(cases: CaseCard[]): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
@@ -23,7 +23,7 @@ export function casesPage(cases: Case[]): HTMLElement {
     .forEach((caseItem) => {
       const cardContent = caseCard(caseItem);
       const card: Card = {contents: cardContent, header: caseItem.name, title: caseItem.name, tagId: caseItem.id};
-      cards.push(collapsibleCard("cases", null, card));
+      cards.push(collapsibleCard("cases", null, card, true));
     });
 
   cards
@@ -39,8 +39,7 @@ export function casesPage(cases: Case[]): HTMLElement {
 export function initialiseCases(projectId: string) {
   const closeBusy = busyDialog();
 
-
-  fetchAsPromise<Case[]>("api/cases_cards/" + projectId, {body: null})
+  fetchAsPromise<CaseCard[]>("api/cases_cards/" + projectId, {body: null})
     .then((data) => {
       document.body.appendChild(casesPage(data));
     })

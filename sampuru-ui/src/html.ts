@@ -1,6 +1,7 @@
-import { Case, Project } from "./data-transfer-objects.js";
-import { formatQualityGateNames, formatLibraryDesigns, libDesignSort } from "./common.js";
+import {CaseCard, ActiveProject} from "./data-transfer-objects.js";
+import {formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
 import {urlConstructor} from "./io.js";
+
 
 /**
  * The callback for handling mouse events
@@ -268,7 +269,7 @@ export function tableRow(
  * @param headers -> map of data-field to header innerText
  * @param pagination -> boolean for paginating table
  * @param search -> boolean for adding a search to table
- * @param tableId -> id for table
+ * @param tableId -> id to associate with table for jQuery to apply bootstrapTable styling and js to the right objects
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
@@ -305,7 +306,7 @@ export function bootstrapTable(
   return table;
 }
 
-export function caseCard(caseContent: Case): HTMLElement {
+export function caseCard(caseContent: CaseCard): HTMLElement {
   const formattedId = caseContent.id.replace(/[:]+/g, '');
 
   const changelogs = createLinkElement(
@@ -412,24 +413,31 @@ export function navbar(): HTMLElement {
     null,
     "/");
 
-  const searchForm = document.createElement("form");
-  searchForm.className = "form-inline mx-lg-auto";
-
-  const inputBox = document.createElement("input");
-  inputBox.className = "form-control mr-sm-2";
-  inputBox.type = "search";
-  inputBox.placeholder = "Search Sampuru";
+  const textBox = document.createElement("input");
+  textBox.type = "text";
+  textBox.className = "form-control";
+  textBox.placeholder = "Search Sampuru";
 
   const submitButton = document.createElement("button");
-  submitButton.className = "btn btn-outline-secondary my-2 my-sm-0";
-  submitButton.type = "submit";
+  submitButton.type = "button";
+  submitButton.className = "btn btn-secondary";
   submitButton.innerText = "Search";
+  submitButton.addEventListener("click", () => {
+    window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
+  });
+  submitButton.addEventListener("keyup", (event) => {
+    if (event.code === 'Enter') {
+      window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
+    }
+  });
 
-  searchForm.appendChild(inputBox);
-  searchForm.appendChild(submitButton);
+  const search = elementFromTag("div", "input-group",
+    {type: "complex", element: textBox},
+    elementFromTag("div", "input-group-append",
+      {type: "complex", element: submitButton}))
 
   nav.appendChild(sampuru);
-  nav.appendChild(searchForm);
+  nav.appendChild(search.element);
 
   return nav;
 }
@@ -458,19 +466,12 @@ export function createLinkElement(
 export function collapsibleCard(
   referer: string,
   click: ClickHandler | null,
-  content: Card
+  content: Card,
+  show: boolean
 ): HTMLElement {
 
-  // todo: this is for Boostrap card collapsing
-  /*
-  let attributes = new Map();
-  attributes.set('data-toggle', 'collapse');
-  attributes.set('href', `#${content.tagId}`);
-
-  const cardLink = createLinkElement("card-link", content.header, attributes, null);*/
-
   let cardLink;
-  if (referer == "active_projects") {
+  if (referer == "projects") {
     cardLink = createLinkElement(
         "card-link",
         content.header,
@@ -494,8 +495,16 @@ export function collapsibleCard(
     cardLink.innerText = content.header;
   }
 
-  const cardHeader = document.createElement("div");
+  const cardHeader = document.createElement("button");
+  cardHeader.type = "button";
   cardHeader.className = "card-header";
+  cardHeader.setAttribute("data-toggle", "collapse");
+  cardHeader.setAttribute("data-target", `#${content.tagId.replace(/[:]+/g, '')}`);
+
+  const headerIcon = document.createElement("i");
+  headerIcon.className = "fa fa-chevron-down pull-right";
+
+  cardHeader.appendChild(headerIcon);
   cardHeader.appendChild(cardLink);
 
   const cardBodyInner = document.createElement("div");
@@ -503,7 +512,8 @@ export function collapsibleCard(
   cardBodyInner.appendChild(content.contents);
 
   const cardBody = document.createElement("div");
-  cardBody.className = "collapse show";
+  cardBody.id = `${content.tagId.replace(/[:]+/g, '')}`;
+  cardBody.className = show ? "collapse show" : "collapse";
   cardBody.appendChild(cardBodyInner);
 
   const card = document.createElement("div");
@@ -557,7 +567,7 @@ export function progressBar(
 }
 
 export function projectCard(
-  project: Project
+  project: ActiveProject
 ): HTMLElement {
   //todo: refactor so it's extensible to other pages
   const casesProgress = progressBar(project.cases_total, project.cases_completed);

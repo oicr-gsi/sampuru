@@ -1,5 +1,3 @@
-import {Project} from "./data-transfer-objects.js";
-
 /**
  * Perform JSON fetch operation with a callback
  */

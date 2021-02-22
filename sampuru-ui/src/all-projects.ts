@@ -6,9 +6,10 @@ import {
 import {
   fetchAsPromise,
 } from "./io.js";
-import {Project} from "./data-transfer-objects.js";
+import {ActiveProject} from "./data-transfer-objects.js";
 
-export function activeProjects(projects: Project[]): HTMLElement {
+
+export function activeProjects(projects: ActiveProject[]): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
@@ -17,7 +18,7 @@ export function activeProjects(projects: Project[]): HTMLElement {
     .forEach((project) => {
       const cardContent = projectCard(project);
       const card: Card = {contents: cardContent, header: project.name, title: project.name, tagId: project.id};
-      cards.push(collapsibleCard("active_projects", null, card));
+      cards.push(collapsibleCard("projects", null, card, true));
     })
 
   // todo: move this out to a function
@@ -38,7 +39,7 @@ export function activeProjects(projects: Project[]): HTMLElement {
 export function initialiseActiveProjects() {
   const closeBusy = busyDialog();
 
-  fetchAsPromise<Project[]>("api/active_projects", {body: null})
+  fetchAsPromise<ActiveProject[]>("api/active_projects", {body: null})
     .then((projects) => {
       document.body.appendChild(activeProjects(projects));
     })//todo: catch errors

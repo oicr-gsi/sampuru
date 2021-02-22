@@ -11,11 +11,24 @@
   <name>Sampuru</name>
 
   <!-- TODO: url, licence, developers -->
+  <!-- Maven Filter Plugin corrupts binary font files, so includes and excludes are needed to avoid this -->
   <build>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
+        <excludes>
+          <exclude>**/*.woff*</exclude>
+          <exclude>**/*.ttf</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*.woff*</include>
+          <include>**/*.ttf</include>
+        </includes>
       </resource>
     </resources>
 

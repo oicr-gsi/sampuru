@@ -1,16 +1,23 @@
 export function formatQualityGateNames(name: string) {
   switch(name){
     case "receipt":
-      return "Receipt + Inspection";
+    case "receipt_inspection":
+      return "Receipt/Inspection";
     case "extraction":
       return "Extraction";
     case "library_prep":
+    case "library_preparation":
       return "Library Preparation";
     case "low_pass":
       return "Low-Pass";
+    case "low_pass_sequencing":
+      return "Low-Pass Sequencing";
     case "full_depth":
       return "Full-Depth";
+    case "full_depth_sequencing":
+      return "Full-Depth Sequencing";
     case "informatics":
+    case "informatics_interpretation":
       return "Informatics + Interpretation";
     case "final_report":
       return "Final Report";
@@ -61,3 +68,4 @@ export function libDesignSort(a: string | null, b: string | null) {
     return a < b ? -1 : 1;
   }
 }
+

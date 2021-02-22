@@ -1,3 +1,16 @@
+body {
+    padding-bottom: 100px;
+}
+
+.card-header {
+    border: 1px solid rgba(0,0,0,.125) !important;
+    text-align: left;
+}
+
+.pull-right {
+    float: right;
+}
+
 /**
 Most of these will have !important to override default bootstrap styling
 **/
@@ -74,8 +87,9 @@ Most of these will have !important to override default bootstrap styling
     background-color: #c42d2d !important;
 }
 
-.navbar input[type=search] {
-    width:400px !important;
+.navbar .input-group {
+    width:500px !important;
+    margin: auto;
 }
 
 .container .project-overview {
@@ -100,6 +114,10 @@ h2, h3 {
 }
 
 #table {
+    font-size: 13px !important;
+}
+
+.generic-tables {
     font-size: 13px !important;
 }
 

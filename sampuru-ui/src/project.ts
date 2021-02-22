@@ -11,8 +11,8 @@ import {
   DOMElement, progressBar,
   createLinkElement, ComplexElement, tableRow, bootstrapTable, tableBodyFromRows
 } from "./html.js";
-import {fetchAsPromise, urlConstructor} from "./io.js";
-import {Case, BaseChangelog, ProjectInfo, Changelog} from "./data-transfer-objects.js";
+import {urlConstructor} from "./io.js";
+import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -155,7 +155,8 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
   const cases = elementFromTag("div", null,
     {type: "complex", element: casesLink},
-    {type: "complex", element: progressBar(projectInfo.cases_total, projectInfo.cases_completed)});
+    {type: "complex", element: progressBar(typeof projectInfo.cases_total !== "undefined" ? projectInfo.cases_total : 0,
+        typeof projectInfo.cases_completed !== "undefined" ? projectInfo.cases_completed : 0)});
 
   const projectSummary = elementFromTag("div", "row",
     elementFromTag("div", "col col-md-8", {type: "complex", element: staticCard(infoCard)}),

@@ -1,23 +1,20 @@
 /**
- * Data returned from api/active_projects
+ * Object returned from api/active_projects
  * */
-
-export interface Project {
+export interface ActiveProject {
   id: string,
   name: string,
   cases_total: number,
   cases_completed: number,
   qcables_total: number,
   qcables_completed: number,
-  last_update: string,
+  last_update: string
 }
-
 
 /**
  * Data returned from api/project_overview
  *
  */
-
 export interface SankeyTransition {
   receipt: {total: number, pending: number, extraction: number, failed: number},
   extraction: {total: number, pending: number, library_preparation: number, failed: number},
@@ -36,7 +33,7 @@ export interface InfoItem {
   received: number | string
 }
 
-export interface ProjectInfo {
+export interface BaseProject<I> {
   id: string,
   name: string,
   contact_name: string,
@@ -46,17 +43,33 @@ export interface ProjectInfo {
   created_date: string,
   reference_genome: string,
   kits: string,
-  info_items: InfoItem[],
+  info_items: I[],
+  deliverables: string[],
+  completion_date: string,
+}
+
+/**
+ * Object returned from api/project_overview
+ * */
+export interface ProjectInfo extends BaseProject<InfoItem> {
   failures: string[],
   sankey_transitions: SankeyTransition,
-  deliverables: string[],
   qcables_total: number,
   qcables_completed: number,
   cases_total: number,
-  cases_completed: number,
-  completion_date: string
+  cases_completed: number
 }
 
+/**
+ * Object returned from api/search/project
+ * */
+export interface SearchedProject extends BaseProject<string> {
+  donor_cases: string[]
+}
+
+/**
+ * Object returned from api/qcables_table/
+ * */
 export interface QCable {
   project_id: string,
   case_id: string,
@@ -84,6 +97,20 @@ export interface QCable {
   final_report_qcable_status: string | null
 }
 
+/**
+ * Object returned from api/search/qcable
+ * */
+export interface SearchedQCable {
+  id: string,
+  type: string,
+  status: string,
+  library_design: string,
+  parent_id: string,
+  alias: string,
+  changelog: string[],
+  failure_reason: string
+}
+
 export interface BaseChangelog {
   id: number,
   change_date: string,
@@ -108,9 +135,39 @@ export interface Bar {
   steps: Step[]
 }
 
-export interface Case {
+export interface BaseCase<C> {
   name: string,
   id: string,
-  bars: Bar[],
-  changelog: BaseChangelog[]
+  changelog: C[]
+}
+
+/**
+ * Object returned from api/case_cards/
+ * */
+export interface CaseCard extends BaseCase<Changelog> {
+  bars: Bar[]
+}
+
+/**
+ * Object returned from api/search/case/
+ * */
+export interface SearchedCase extends BaseCase<string> {
+  qcables: string[],
+  deliverables: string[]
+}
+
+export interface Notification {
+  id: number,
+  user_id: string,
+  issue_date: string,
+  resolved_date: string,
+  content: string
+}
+
+export interface DeliverableFile {
+  id: number,
+  project_id: string,
+  location: string,
+  notes: string,
+  expiry_date: string
 }

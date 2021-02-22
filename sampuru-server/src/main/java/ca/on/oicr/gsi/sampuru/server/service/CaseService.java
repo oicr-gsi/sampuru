@@ -269,6 +269,8 @@ public class CaseService extends Service<Case> {
                                 .as(Case.CHANGELOG_IDS))
                 .from(DONOR_CASE)
                 .where(DONOR_CASE.PROJECT_ID.like("%"+term+"%")
+                        .or(DONOR_CASE.ID.like("%"+term+"%"))
+                        .or(DONOR_CASE.NAME.like("%"+term+"%"))
                         .and(DONOR_CASE.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
