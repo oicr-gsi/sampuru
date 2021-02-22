@@ -19,6 +19,7 @@ import {
   SearchedProject,
   SearchedQCable
 } from "./data-transfer-objects.js";
+import {formatLibraryDesigns, formatQualityGateNames} from "./common.js";
 
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -140,10 +141,10 @@ export function defaultSearchResults(
 
   if (qcables && qcables.length) {
     const table = genericTable<SearchedQCable>(qcables, "qcables",
-      ["Type", (x) => x.type],
-      ["Status", (x) => x.status],
-      ["Library Design", (x) => x.library_design],
-      ["Parent ID", (x) => x.parent_id],
+      ["Type", (x) => formatQualityGateNames(x.type)],
+      ["Status", (x) => x.status.charAt(0).toUpperCase() + x.status.slice(1)],
+      ["Library Design", (x) => formatLibraryDesigns(x.library_design)],
+      ["Parent ID", (x) => x.parent_id == "null" ? "None" : x.parent_id],
       ["OICR Alias", (x) => x.alias]);
 
     const qcablesTable = elementFromTag("div", "container", table);
