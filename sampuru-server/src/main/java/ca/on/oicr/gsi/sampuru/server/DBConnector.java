@@ -138,7 +138,7 @@ public class DBConnector {
         // Update the existing deliverables
             try(final Connection connection = getConnection()){
                 getContext(connection).transaction(configuration -> {
-                    InsertSetStep deliverableCaseInsertSetStep = PostgresDSL.using(connection).insertInto(DELIVERABLE_CASE);
+                    InsertSetStep deliverableCaseInsertSetStep = PostgresDSL.using(configuration).insertInto(DELIVERABLE_CASE);
                     InsertValuesStepN deliverableCaseInsertValuesStepN = null;
                     for(Object obj: knownDeliverables){
                         JSONObject nextDeliverable = (JSONObject) obj;
@@ -154,7 +154,7 @@ public class DBConnector {
 
 
                         // drop the old deliverable-case associations and rebuild
-                        PostgresDSL.using(connection).delete(DELIVERABLE_CASE)
+                        PostgresDSL.using(configuration).delete(DELIVERABLE_CASE)
                                 .where(DELIVERABLE_CASE.DELIVERABLE_ID.eq(Math.toIntExact((Long)nextDeliverable.get("id")))
                                         .and(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))))
                                 .execute();
