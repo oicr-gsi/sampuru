@@ -131,9 +131,7 @@ export function defaultSearchResults(
           {type: "a", href: urlConstructor("cases.html", ["cases-project-id"], [project.name]),
           innerText: "All", className: "", title: "All Cases for " + project.name}))
 
-        const table = genericTable<string>(project.donor_cases, project.id + "-donor-cases",
-          ["Case", (x) => x]);
-        const info = elementFromTag("div", "container project-overview", infoItems, table);
+        const info = elementFromTag("div", "container project-overview", infoItems);
         const infoCard: Card = {contents: info.element, header: "Project Overview: " + project.name, title: project.name, tagId: project.id}
         cards.push(collapsibleCard("projects", null, infoCard, false));
       });
