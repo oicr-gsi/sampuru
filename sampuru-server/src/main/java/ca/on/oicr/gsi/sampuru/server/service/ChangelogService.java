@@ -98,7 +98,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String filterType = ptm.getParameters().get("filterType");
         String filterId = ptm.getParameters().get("filterId");
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "applicatin/json");
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         switch(filterType) {
             case "project":
                 hse.getResponseSender().send(cs.getChangelogsByProject(filterId, username).toJSONString());
@@ -167,7 +167,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
 
             jsonObject.put("project_id", row.get(CHANGELOG.PROJECT_ID));
             jsonObject.put("case_id", row.get(CHANGELOG.CASE_ID));
-            jsonObject.put("qcable_id", row.get(CHANGELOG.QCABLE_ID) == null ? "null": row.get(CHANGELOG.QCABLE_ID)); //todo: this might break things
+            jsonObject.put("qcable_id", row.get(CHANGELOG.QCABLE_ID) == null ? "null": row.get(CHANGELOG.QCABLE_ID));
             jsonObject.put("change_date", row.get(CHANGELOG.CHANGE_DATE).toString());
             jsonObject.put("content", row.get(CHANGELOG.CONTENT));
 
