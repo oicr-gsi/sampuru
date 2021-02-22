@@ -6,6 +6,11 @@
 .card-header .fa {
     transition: .3s transform ease-in-out;
 }
+
+.pull-right {
+    float: right;
+}
+
 .card-header.collapsed .fa {
     transform: rotate(90deg);
 }
