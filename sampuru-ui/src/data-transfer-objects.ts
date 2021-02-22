@@ -8,18 +8,7 @@ export interface ActiveProject {
   cases_completed: number,
   qcables_total: number,
   qcables_completed: number,
-  last_update: Date,
-}
-
-//todo: probably not the best way to handle timestamp's from the server
-export interface ActiveProjectJSON {
-  id: string,
-  name: string,
-  cases_total: number,
-  cases_completed: number,
-  qcables_total: number,
-  qcables_completed: number,
-  last_update: string,
+  last_update: string
 }
 
 export interface SankeyTransition {
