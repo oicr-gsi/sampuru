@@ -1,13 +1,11 @@
 export function formatQualityGateNames(name: string) {
   switch(name){
     case "receipt":
-      return "Receipt + Inspection";
     case "receipt_inspection":
       return "Receipt/Inspection";
     case "extraction":
       return "Extraction";
     case "library_prep":
-      return "Library Preparation";
     case "library_preparation":
       return "Library Preparation";
     case "low_pass":
@@ -19,7 +17,6 @@ export function formatQualityGateNames(name: string) {
     case "full_depth_sequencing":
       return "Full-Depth Sequencing";
     case "informatics":
-      return "Informatics + Interpretation";
     case "informatics_interpretation":
       return "Informatics + Interpretation";
     case "final_report":
