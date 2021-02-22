@@ -164,11 +164,12 @@ export function defaultSearchResults(
 
   if (qcables && qcables.length) {
     const table = genericTable<SearchedQCable>(qcables, "qcables",
+      ["ID", (x) => x.id],
+      ["OICR Alias", (x) => x.alias],
       ["Type", (x) => formatQualityGateNames(x.type)],
       ["Status", (x) => x.status.charAt(0).toUpperCase() + x.status.slice(1)],
       ["Library Design", (x) => formatLibraryDesigns(x.library_design)],
-      ["Parent ID", (x) => x.parent_id == "null" ? "None" : x.parent_id],
-      ["OICR Alias", (x) => x.alias]);
+      ["Parent ID", (x) => x.parent_id == "null" ? "None" : x.parent_id]);
 
     const qcablesTable = elementFromTag("div", "container generic-tables", table);
     const caseCard: Card = {contents: qcablesTable.element, header: "QCables" , title: "QCables", tagId: "all-qcables"}
