@@ -4,10 +4,9 @@ import {
 } from "./html.js";
 
 import {
-  decodeProject,
   fetchAsPromise,
 } from "./io.js";
-import {Project, ProjectJSON} from "./data-transfer-objects.js";
+import {Project} from "./data-transfer-objects.js";
 
 export function activeProjects(projects: Project[]): HTMLElement {
   const cardContainer = document.createElement("div");
@@ -39,12 +38,7 @@ export function activeProjects(projects: Project[]): HTMLElement {
 export function initialiseActiveProjects() {
   const closeBusy = busyDialog();
 
-  fetchAsPromise<ProjectJSON[]>("api/active_projects", {body: null})
-    .then((data) => {
-      const projects: Project[] = [];
-      data.forEach(proj => projects.push(decodeProject(proj)));
-      return projects;
-    })
+  fetchAsPromise<Project[]>("api/active_projects", {body: null})
     .then((projects) => {
       document.body.appendChild(activeProjects(projects));
     })//todo: catch errors

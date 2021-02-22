@@ -1,17 +1,8 @@
 /**
  * Data returned from api/active_projects
  * */
-export interface Project {
-  id: string,
-  name: string,
-  cases_total: number,
-  cases_completed: number,
-  qcables_total: number,
-  qcables_completed: number,
-  last_update: Date,
-}
 
-export interface ProjectJSON {
+export interface Project {
   id: string,
   name: string,
   cases_total: number,
@@ -93,10 +84,16 @@ export interface QCable {
   final_report_qcable_status: string | null
 }
 
-export interface Changelog {
+export interface BaseChangelog {
   id: number,
   change_date: string,
   content: string
+}
+
+export interface Changelog extends BaseChangelog {
+  project_id: string,
+  case_id: string,
+  qcable_id: string
 }
 
 export interface Step {
@@ -115,5 +112,5 @@ export interface Case {
   name: string,
   id: string,
   bars: Bar[],
-  changelog: Changelog[]
+  changelog: BaseChangelog[]
 }

@@ -5,13 +5,12 @@
 import {
   bootstrapTable,
   busyDialog,
-  ComplexElement, elementFromTag,
+  ComplexElement, DOMElement, elementFromTag,
   navbar,
   tableBodyFromRows,
   tableRow
 } from "./html.js";
-import {fetchAsPromise} from "./io.js";
-import {QCable} from "./data-transfer-objects.js";
+import {Changelog, QCable} from "./data-transfer-objects.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const filterType = urlParams.get("qcables-filter-type");
@@ -40,12 +39,20 @@ function statusToClassName(status: string | null) {
   }
 }
 
-export function qcablesTable(qcables: QCable[], projectName: string): void {
+export function qcablesTable(
+  qcables: QCable[],
+  changelogs: Changelog[],
+  filterType: string,
+  filterId: string): void {
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h3");
-  pageHeader.innerText = "QCables (" + projectName + ")";
+  if(filterType === "case") {
+    const caseExtName = qcables[0].case_external_name;
+    pageHeader.innerText = "QCables (" + caseExtName + ")";
+  } else {
+    pageHeader.innerText = "QCables (" + filterId + ")";
+  }
 
-  //todo: click on a cell and show alias??
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
   qcables
     .forEach((qcable) => {
@@ -96,7 +103,7 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     ["informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
     ["final_report_qcable_alias", "Final Report"]])
 
-  const table = bootstrapTable(tableHeaders, true, true);
+  const table = bootstrapTable(tableHeaders, true, true, "table");
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
@@ -113,9 +120,24 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
     });
   });
 
+
   $('#table').on('click-cell.bs.table', function(event, field, value, row, $element) {
+    const filteredChangelogs = changelogs.filter((item) => {
+      return item.qcable_id === value
+    });
+
+    const displayChangelogs: DOMElement[] = [];
+    if(filteredChangelogs.length) {
+      displayChangelogs.push(elementFromTag("b", null,
+        elementFromTag("br", null), "Changelogs:"));
+    }
+
+    filteredChangelogs.map((item) => {
+        displayChangelogs.push(elementFromTag("p", null, item.content, null));
+    });
+
     const cellValue = elementFromTag("div", "card",
-      elementFromTag("div", "card-body", value));
+      elementFromTag("div", "card-body", value, displayChangelogs));
 
     const selection = window.getSelection();
     const isEmpty = (selection != null) ? selection.toString() : "";
@@ -144,9 +166,16 @@ export function qcablesTable(qcables: QCable[], projectName: string): void {
 export function initialiseQCables(filterType: string, filterId: string) {
   const closeBusy = busyDialog();
 
-  fetchAsPromise<QCable[]>("api/qcables_table/" + filterType + "/" + filterId, {body: null})
-    .then((data) => {
-      qcablesTable(data, filterId);
+  Promise.all([
+    fetch("api/qcables_table/" + filterType + "/" + filterId),
+    fetch("api/changelogs/" + filterType + "/" + filterId)
+  ])
+    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then((responses) => {
+      const qcables = responses[0] as QCable[]
+      const changelogs = responses[1] as Changelog[]
+
+      qcablesTable(qcables, changelogs, filterType, filterId);
     })
     .finally(closeBusy);
 }

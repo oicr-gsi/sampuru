@@ -39,6 +39,7 @@ export function casesPage(cases: Case[]): HTMLElement {
 export function initialiseCases(projectId: string) {
   const closeBusy = busyDialog();
 
+
   fetchAsPromise<Case[]>("api/cases_cards/" + projectId, {body: null})
     .then((data) => {
       document.body.appendChild(casesPage(data));
