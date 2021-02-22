@@ -113,15 +113,6 @@ export interface Changelog {
   content: string
 }
 
-/**
- * Object returned from api/search/changelog
- * */
-export interface SearchedChangelog extends Changelog {
-  project_id: string,
-  qcable_id: string,
-  case_id: string
-}
-
 export interface Step {
   total: number,
   completed: number,

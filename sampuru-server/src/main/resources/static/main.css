@@ -1,18 +1,14 @@
+body {
+    padding-bottom: 100px;
+}
+
 .card-header {
     border: 1px solid rgba(0,0,0,.125) !important;
     text-align: left;
 }
 
-.card-header .fa {
-    transition: .3s transform ease-in-out;
-}
-
 .pull-right {
     float: right;
-}
-
-.card-header.collapsed .fa {
-    transform: rotate(90deg);
 }
 
 .cases .container {
@@ -85,6 +81,10 @@ h2, h3 {
 }
 
 #table {
+    font-size: 13px !important;
+}
+
+.generic-tables {
     font-size: 13px !important;
 }
 

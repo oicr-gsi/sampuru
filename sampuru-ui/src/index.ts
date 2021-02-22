@@ -5,7 +5,7 @@
 import {
   busyDialog,
   Card,
-  collapsibleCard,
+  collapsibleCard, createLinkElement,
   DOMElement,
   elementFromTag,
   navbar
@@ -13,9 +13,10 @@ import {
 import {initialiseActiveProjects} from "./all-projects.js";
 import {urlConstructor} from "./io.js";
 import {
+  Changelog,
   DeliverableFile,
   Notification,
-  SearchedChangelog,
+  SearchedCase,
   SearchedProject,
   SearchedQCable
 } from "./data-transfer-objects.js";
@@ -84,8 +85,9 @@ export function genericTable<T>(
 export function defaultSearchResults(
   searchString: string,
   projects: SearchedProject[],
+  cases: SearchedCase[],
   qcables: SearchedQCable[],
-  changelogs: SearchedChangelog[],
+  changelogs: Changelog[],
   notifications: Notification[],
   deliverables: DeliverableFile[]
 ): HTMLElement {
@@ -129,14 +131,37 @@ export function defaultSearchResults(
           {type: "a", href: urlConstructor("cases.html", ["cases-project-id"], [project.name]),
           innerText: "All", className: "", title: "All Cases for " + project.name}))
 
-        //const table = oneColumnTable(project.donor_cases, "donor_case", "Donor Case", project.id + "-donor-cases");
-
         const table = genericTable<string>(project.donor_cases, project.id + "-donor-cases",
           ["Case", (x) => x]);
         const info = elementFromTag("div", "container project-overview", infoItems, table);
         const infoCard: Card = {contents: info.element, header: "Project Overview: " + project.name, title: project.name, tagId: project.id}
         cards.push(collapsibleCard("projects", null, infoCard, false));
       });
+  }
+
+  //todo: make text in search result cards smaller
+  if (cases && cases.length) {
+    const table = genericTable<SearchedCase>(cases, "donor-case-qcables",
+      ["Case Name", (x) => {
+      return {type: "complex", element: createLinkElement(
+          null,
+          x.name,
+          null,
+          null,
+          urlConstructor("qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["case", x.id])
+        )}
+      }],
+      ["QCables", (x) => {
+      return elementFromTag("div", null,
+        x.qcables.map((qcable) => {
+          return elementFromTag("div", null, qcable, null);
+        }));
+      }]
+    );
+
+    const casesTable = elementFromTag("div", "container generic-tables", table);
+    const casesCard: Card = {contents: casesTable.element, header: "Cases", title: "Donor Cases", tagId: "donor_cases"}
+    cards.push(collapsibleCard("donor_cases", null, casesCard, false));
   }
 
   if (qcables && qcables.length) {
@@ -147,20 +172,17 @@ export function defaultSearchResults(
       ["Parent ID", (x) => x.parent_id == "null" ? "None" : x.parent_id],
       ["OICR Alias", (x) => x.alias]);
 
-    const qcablesTable = elementFromTag("div", "container", table);
+    const qcablesTable = elementFromTag("div", "container generic-tables", table);
     const caseCard: Card = {contents: qcablesTable.element, header: "QCables" , title: "QCables", tagId: "all-qcables"}
     cards.push(collapsibleCard("qcables", null, caseCard, false));
   }
 
   if (changelogs && changelogs.length) {
-    const table = genericTable<SearchedChangelog>(changelogs, "changelogs",
+    const table = genericTable<Changelog>(changelogs, "searched-changelogs",
       ["Date", (x) => x.change_date],
-      ["Project", (x) => x.project_id],
-      ["Case", (x) => x.case_id],
-      ["QCable", (x) => x.qcable_id],
       ["Content", (x) => x.content]);
 
-    const changelogsTable = elementFromTag("div", "container", table);
+    const changelogsTable = elementFromTag("div", "container generic-tables", table);
     const changelogCard: Card = {contents: changelogsTable.element, header: "Changelogs", title: "Changelogs", tagId: "changelogs"}
     cards.push(collapsibleCard("changelogs", null, changelogCard, false));
   }
@@ -172,7 +194,7 @@ export function defaultSearchResults(
       ["Notes", (x) => x.notes],
       ["Expiry Date", (x) => x.expiry_date]);
 
-    const deliverablesTable = elementFromTag("div", "container", table);
+    const deliverablesTable = elementFromTag("div", "container generic-tables", table);
     const deliverableCard: Card = {contents: deliverablesTable.element, header: "Deliverable Information", title: "Deliverables", tagId: "deliverables"}
     cards.push(collapsibleCard("deliverables", null, deliverableCard, false));
   }
@@ -183,7 +205,7 @@ export function defaultSearchResults(
       ["Issue Date", (x) => x.issue_date],
       ["Resolved Date", (x) => x.resolved_date]);
 
-    const notificationsTable = elementFromTag("div", "container", table);
+    const notificationsTable = elementFromTag("div", "container generic-tables", table);
     const notificationsCard: Card = {contents: notificationsTable.element, header: "Notifications", title: "Notifications", tagId: "notifications"}
     cards.push(collapsibleCard("notifications", null, notificationsCard, false));
   }
@@ -211,6 +233,7 @@ export function defaultSearch(searchString: string) {
 
   Promise.all([
     fetch("api/search/project/" + searchString),
+    fetch("api/search/case/" + searchString),
     fetch("api/search/qcable/" + searchString),
     fetch("api/search/changelog/" + searchString),
     fetch("api/search/notification/" + searchString),
@@ -219,18 +242,14 @@ export function defaultSearch(searchString: string) {
     .then(responses => Promise.all(responses.map(response => response.json())))
     .then((responses) => {
       const projects = responses[0] as SearchedProject[];
-      const qcables = responses[1] as SearchedQCable[];
-      const changelogs = responses[2] as SearchedChangelog[];
-      const notifications = responses[3] as Notification[];
-      const deliverables = responses[4] as DeliverableFile[];
+      const cases = responses[1] as SearchedCase[];
+      const qcables = responses[2] as SearchedQCable[];
+      const changelogs = responses[3] as Changelog[];
+      const notifications = responses[4] as Notification[];
+      const deliverables = responses[5] as DeliverableFile[];
 
-      document.body.appendChild(defaultSearchResults(searchString, projects, qcables, changelogs, notifications, deliverables));
-      return projects;
-    })
-    .then((projects) => {
-      const tableIds = ["donor_case_qcable", "qcables",
-        "changelogs", "deliverables", "notifications"];
-
+      document.body.appendChild(defaultSearchResults(searchString, projects, cases, qcables, changelogs, notifications, deliverables));
+      const tableIds = ["qcables", "searched-changelogs", "deliverables", "notifications", "donor-case-qcables"];
       projects.map(project => tableIds.push(project.id + "-donor-cases"));
 
       tableIds.map(id => {
