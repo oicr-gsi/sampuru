@@ -3,13 +3,12 @@
 /// <reference types="bootstrap-table" />
 
 import {
-  bootstrapTable, busyDialog, Card, collapsibleCard,
-  ComplexElement, DOMElement,
+  busyDialog,
+  Card,
+  collapsibleCard,
+  DOMElement,
   elementFromTag,
-  navbar,
-  tableBodyFromRows,
-  TableCell,
-  tableRow
+  navbar
 } from "./html.js";
 import {initialiseActiveProjects} from "./all-projects.js";
 import {urlConstructor} from "./io.js";
@@ -36,54 +35,49 @@ if (search) {
 /**
  * Sampuru's global search
  * */
+
 export function genericTable<T>(
-  headers: Map<string, string>,
   rows: T[],
-  tableId: string
+  tableId: string,
+  ...headers: [DOMElement, (value: T) => DOMElement][]
 ) {
-  const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
-  rows
-    .forEach((row) => {
-      const cells: TableCell[] = [];
-      Object.values(row).map(x => cells.push({contents: x.toString()}));
-      tableRows.push(tableRow(null, ...cells)); //todo: this probably doesn't work
-    });
+  if (rows.length == 0) return [];
+  const table =  elementFromTag(
+    "table",
+    null,
+    elementFromTag(
+      "thead",
+      null,
+      elementFromTag(
+        "tr",
+        null,
+        headers.map(([name, _func]) => {
+          const header = elementFromTag("th", null, name);
+          if (typeof name === "string") {
+            header.element.setAttribute("data-field", name.replace(/ /g, '_'));
+          }
+          return header;
+        })
+      )
+    ),
+    elementFromTag(
+      "tbody",
+      null,
+      rows.map((row) =>
+        elementFromTag(
+          "tr",
+          null,
+          headers.map(([_name, func]) => elementFromTag("td", null, func(row)))
+        )
+      )
+    )
+  );
 
-  const table = bootstrapTable(headers, true, true, tableId);
-  const tableBody = tableBodyFromRows(null, tableRows);
-  table.appendChild(tableBody);
-
-  return elementFromTag("div", null, {type: "complex", element: table});
-}
-
-export function oneColumnTable(
-  rows: string[],
-  headerDataField: string,
-  header: string,
-  tableId: string
-) {
-  const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
-  rows
-    .forEach((row) => {
-      let content;
-      if (headerDataField == "donor_case") {
-        content = document.createElement("a");
-        content.href = urlConstructor("qcables.html",
-          ["qcables-filter-type", "qcables-filter-id"], ["case", row]);
-        content.innerText = row;
-      } else {
-        content = document.createElement("p");
-        content.innerText = row;
-      }
-      tableRows.push(tableRow(null, {contents: {type: "complex", element: content}}))
-    });
-
-  const tableHeader = new Map([[headerDataField, header]]);
-  const table = bootstrapTable(tableHeader, true, true, tableId);
-  const tableBody = tableBodyFromRows(null, tableRows);
-  table.appendChild(tableBody);
-
-  return elementFromTag("div", null, {type: "complex", element: table});
+  table.element.id = tableId;
+  table.element.setAttribute("data-toggle", "table");
+  table.element.setAttribute("data-pagination", "true");
+  table.element.setAttribute("data-search", "true");
+  return table;
 }
 
 export function defaultSearchResults(
@@ -97,9 +91,9 @@ export function defaultSearchResults(
   const cards : HTMLElement[] = [];
 
   if (projects && projects.length) {
-    const infoItems: DOMElement[] = [];
     projects
       .forEach((project) => {
+        const infoItems: DOMElement[] = [];
         //todo: refactor this as it's currently duplicate code from project.ts
         infoItems.push(elementFromTag("div", "row",
           elementFromTag("b", null, "Name: "),
@@ -134,7 +128,10 @@ export function defaultSearchResults(
           {type: "a", href: urlConstructor("cases.html", ["cases-project-id"], [project.name]),
           innerText: "All", className: "", title: "All Cases for " + project.name}))
 
-        const table = oneColumnTable(project.donor_cases, "donor_case", "Donor Case", "project_donor_case");
+        //const table = oneColumnTable(project.donor_cases, "donor_case", "Donor Case", project.id + "-donor-cases");
+
+        const table = genericTable<string>(project.donor_cases, project.id + "-donor-cases",
+          ["Case", (x) => x]);
         const info = elementFromTag("div", "container project-overview", infoItems, table);
         const infoCard: Card = {contents: info.element, header: "Project Overview: " + project.name, title: project.name, tagId: project.id}
         cards.push(collapsibleCard("projects", null, infoCard, false));
@@ -142,58 +139,51 @@ export function defaultSearchResults(
   }
 
   if (qcables && qcables.length) {
-    const headers = new Map([
-      ["type", "Type"],
-      ["status", "Status"],
-      ["library_design", "Library Design"],
-      ["parent_id", "Parent ID"],
-      ["alias", "OICR Alias"]]);
-    const table = genericTable<SearchedQCable>(headers, qcables, "qcables");
-    const caseCard: Card = {contents: table.element, header: "QCables" , title: "QCables", tagId: "all-qcables"}
+    const table = genericTable<SearchedQCable>(qcables, "qcables",
+      ["Type", (x) => x.type],
+      ["Status", (x) => x.status],
+      ["Library Design", (x) => x.library_design],
+      ["Parent ID", (x) => x.parent_id],
+      ["OICR Alias", (x) => x.alias]);
+
+    const qcablesTable = elementFromTag("div", "container", table);
+    const caseCard: Card = {contents: qcablesTable.element, header: "QCables" , title: "QCables", tagId: "all-qcables"}
     cards.push(collapsibleCard("qcables", null, caseCard, false));
   }
 
-  //todo: likely genericTable function is broken
-  //todo: don't need to display all these columns??
   if (changelogs && changelogs.length) {
-    const headers = new Map([
-      ["id", "ID"],
-      ["change_date", "Date"],
-      ["project_id", "Project"],
-      ["case_id", "Case"],
-      ["qcable_id", "QCable"],
-      ["content", "Content"]
-    ]);
-    const table = genericTable<SearchedChangelog>(headers, changelogs, "changelogs");
-    const changelogCard: Card = {contents: table.element, header: "Changelogs", title: "Changelogs", tagId: "changelogs"}
+    const table = genericTable<SearchedChangelog>(changelogs, "changelogs",
+      ["Date", (x) => x.change_date],
+      ["Project", (x) => x.project_id],
+      ["Case", (x) => x.case_id],
+      ["QCable", (x) => x.qcable_id],
+      ["Content", (x) => x.content]);
+
+    const changelogsTable = elementFromTag("div", "container", table);
+    const changelogCard: Card = {contents: changelogsTable.element, header: "Changelogs", title: "Changelogs", tagId: "changelogs"}
     cards.push(collapsibleCard("changelogs", null, changelogCard, false));
   }
 
-  //todo: don't need to display id
   if (deliverables && deliverables.length) {
-    const headers = new Map([
-      ["id", "ID"],
-      ["project_id", "Project"],
-      ["location", "Location"],
-      ["notes", "Notes"],
-      ["expiry_date", "Expiry Date"]
-    ]);
-    const table = genericTable<DeliverableFile>(headers, deliverables, "deliverables");
-    const deliverableCard: Card = {contents: table.element, header: "Deliverable Information", title: "Deliverables", tagId: "deliverables"}
+    const table = genericTable<DeliverableFile>(deliverables, "deliverables",
+      ["Project", (x) => x.project_id],
+      ["Location", (x) => x.location],
+      ["Notes", (x) => x.notes],
+      ["Expiry Date", (x) => x.expiry_date]);
+
+    const deliverablesTable = elementFromTag("div", "container", table);
+    const deliverableCard: Card = {contents: deliverablesTable.element, header: "Deliverable Information", title: "Deliverables", tagId: "deliverables"}
     cards.push(collapsibleCard("deliverables", null, deliverableCard, false));
   }
 
-  //todo: can probably filter out some of these columns??
   if (notifications && notifications.length) {
-    const headers = new Map([
-      ["id", "ID"],
-      ["content", "Content"],
-      ["issue_date", "Issue Date"],
-      ["resolved_date", "Resolved Date"],
-      ["user_id", "User"]
-    ]);
-    const table = genericTable<Notification>(headers, notifications, "notifications");
-    const notificationsCard: Card = {contents: table.element, header: "Notifications", title: "Notifications", tagId: "notifications"}
+    const table = genericTable<Notification>(notifications, "notifications",
+      ["Content", (x) => x.content],
+      ["Issue Date", (x) => x.issue_date],
+      ["Resolved Date", (x) => x.resolved_date]);
+
+    const notificationsTable = elementFromTag("div", "container", table);
+    const notificationsCard: Card = {contents: notificationsTable.element, header: "Notifications", title: "Notifications", tagId: "notifications"}
     cards.push(collapsibleCard("notifications", null, notificationsCard, false));
   }
 
@@ -234,13 +224,13 @@ export function defaultSearch(searchString: string) {
       const deliverables = responses[4] as DeliverableFile[];
 
       document.body.appendChild(defaultSearchResults(searchString, projects, qcables, changelogs, notifications, deliverables));
+      return projects;
     })
-    .then(() => {
-      //todo: when should this callback happen??
-      //todo: can call this function with a map of table_ids and no search texts
-
-      const tableIds = ["project_donor_case", "donor_case_qcable", "qcables",
+    .then((projects) => {
+      const tableIds = ["donor_case_qcable", "qcables",
         "changelogs", "deliverables", "notifications"];
+
+      projects.map(project => tableIds.push(project.id + "-donor-cases"));
 
       tableIds.map(id => {
         $(function () {
