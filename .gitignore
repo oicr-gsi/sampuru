@@ -40,4 +40,4 @@ yarn.lock
 
 # Transpiled js files
 sampuru-server/src/main/resources/static/*.js
-dist/
+/dist
