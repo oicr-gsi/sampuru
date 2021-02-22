@@ -4,6 +4,8 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
+import io.undertow.util.PathTemplateMatch;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -89,4 +91,89 @@ public class ChangelogService extends Service<ChangelogEntry> {
 
         return jsonArray.toJSONString();
     }
+
+    public static void getFilteredChangelogs(HttpServerExchange hse) throws Exception {
+        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        ChangelogService cs = new ChangelogService();
+        PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+        String filterType = ptm.getParameters().get("filterType");
+        String filterId = ptm.getParameters().get("filterId");
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        switch(filterType) {
+            case "project":
+                hse.getResponseSender().send(cs.getChangelogsByProject(filterId, username).toJSONString());
+                break;
+            case "case":
+                hse.getResponseSender().send(cs.getChangelogsByCase(filterId, username).toJSONString());
+                break;
+            case "qcable":
+                hse.getResponseSender().send(cs.getChangelogsByQcable(filterId, username).toJSONString());
+                break;
+            default:
+                throw new UnsupportedOperationException("Bad filter type " + filterType +
+                        " , supported types are: project, case, qcable");
+        }
+    }
+
+    public JSONArray getChangelogsByProject(String projectId, String username) throws SQLException {
+        return buildChangelogsTable(new DBConnector().fetch(PostgresDSL
+                .select()
+                .from(CHANGELOG)
+                .where(CHANGELOG.PROJECT_ID.eq(projectId)
+                        .and(CHANGELOG.PROJECT_ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username)))
+                        .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username))))))));
+    }
+
+    public JSONArray getChangelogsByCase(String caseId, String username) throws SQLException {
+        return buildChangelogsTable(new DBConnector().fetch(PostgresDSL
+                .select()
+                .from(CHANGELOG)
+                .where(CHANGELOG.CASE_ID.eq(caseId)
+                        .and(CHANGELOG.PROJECT_ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username)))
+                                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
+    }
+
+    public JSONArray getChangelogsByQcable(String qcableId, String username) throws SQLException {
+        return buildChangelogsTable(new DBConnector().fetch(PostgresDSL
+                .select()
+                .from(CHANGELOG)
+                .where(CHANGELOG.QCABLE_ID.eq(qcableId)
+                        .and(CHANGELOG.PROJECT_ID.in(PostgresDSL
+                                .select(USER_ACCESS.PROJECT)
+                                .from(USER_ACCESS)
+                                .where(USER_ACCESS.USERNAME.eq(username)))
+                                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
+                                        .select(USER_ACCESS.PROJECT)
+                                        .from(USER_ACCESS)
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
+    }
+
+    private JSONArray buildChangelogsTable(Result<Record> result) {
+        JSONArray jsonArray = new JSONArray();
+        for(Record row: result) {
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put("project_id", row.get(CHANGELOG.PROJECT_ID));
+            jsonObject.put("case_id", row.get(CHANGELOG.CASE_ID));
+            jsonObject.put("qcable_id", row.get(CHANGELOG.QCABLE_ID) == null ? "null": row.get(CHANGELOG.QCABLE_ID));
+            jsonObject.put("change_date", row.get(CHANGELOG.CHANGE_DATE).toString());
+            jsonObject.put("content", row.get(CHANGELOG.CONTENT));
+
+            jsonArray.add(jsonObject);
+        }
+        return jsonArray;
+    }
 }
+

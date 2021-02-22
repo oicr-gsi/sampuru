@@ -11,6 +11,10 @@ body {
     float: right;
 }
 
+/**
+Most of these will have !important to override default bootstrap styling
+**/
+
 .cases .container {
     width: 100%;
 }
@@ -40,6 +44,35 @@ body {
     font-size: 10px;
     position: relative;
     text-align: center;
+}
+
+.changelog-card {
+    z-index: 1 !important;
+    margin: 5px;
+    float: right;
+    top: 90px;
+    right: 30px;
+    position: absolute !important;
+    padding: 15px !important;
+    font-size: 13px !important;
+}
+
+.changelog-card .row {
+    padding-bottom: 0 !important;
+}
+
+.changelog-card .row p {
+    padding-right: 8px !important;
+}
+
+.changelog.collapsing {
+    -webkit-transition: none;
+    transition: none;
+    display: none;
+}
+
+.changelog-table {
+    font-size: 13px !important;
 }
 
 .pending {

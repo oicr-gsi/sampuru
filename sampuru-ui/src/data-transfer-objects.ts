@@ -11,6 +11,10 @@ export interface ActiveProject {
   last_update: string
 }
 
+/**
+ * Data returned from api/project_overview
+ *
+ */
 export interface SankeyTransition {
   receipt: {total: number, pending: number, extraction: number, failed: number},
   extraction: {total: number, pending: number, library_preparation: number, failed: number},
@@ -107,10 +111,16 @@ export interface SearchedQCable {
   failure_reason: string
 }
 
-export interface Changelog {
+export interface BaseChangelog {
   id: number,
   change_date: string,
   content: string
+}
+
+export interface Changelog extends BaseChangelog {
+  project_id: string,
+  case_id: string,
+  qcable_id: string
 }
 
 export interface Step {
@@ -161,4 +171,3 @@ export interface DeliverableFile {
   notes: string,
   expiry_date: string //todo: check that it's string and add todo for better handling of dates
 }
-

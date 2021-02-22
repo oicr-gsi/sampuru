@@ -8,6 +8,7 @@ import {
 } from "./io.js";
 import {ActiveProject} from "./data-transfer-objects.js";
 
+
 export function activeProjects(projects: ActiveProject[]): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";

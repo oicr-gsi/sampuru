@@ -1,3 +1,7 @@
+/// <reference types="jquery" />
+/// <reference types="bootstrap" />
+/// <reference types="bootstrap-table" />
+
 import {
   busyDialog,
   Card,
@@ -5,12 +9,11 @@ import {
   staticCard,
   navbar,
   DOMElement, progressBar,
-  createLinkElement
+  createLinkElement, ComplexElement, tableRow, bootstrapTable, tableBodyFromRows
 } from "./html.js";
 import {fetchAsPromise, urlConstructor} from "./io.js";
-import { ProjectInfo } from "./data-transfer-objects.js";
+import {Case, BaseChangelog, ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
-
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
@@ -20,7 +23,52 @@ if(projectId) {
   initialiseProjectOverview(projectId);
 }
 
-export function project(projectInfo: ProjectInfo): HTMLElement {
+
+export function failedChangelog(changelogContent: string): string {
+  if(changelogContent.includes("fail")) {
+    return "table-danger";
+  } else {
+    return "";
+  }
+}
+
+export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElement> {
+  const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
+
+  changelogs
+    .forEach((changelog) => {
+      tableRows.push(tableRow(null,
+        {
+          contents: changelog.case_id,
+          className: failedChangelog(changelog.content)
+        },
+        {
+          contents: changelog.content,
+          className: failedChangelog(changelog.content)
+        },
+        {
+          contents: changelog.change_date,
+          className: failedChangelog(changelog.content)
+        }))
+    });
+
+  const tableHeaders = new Map([
+    ["donor_case_name", "Case"],
+    ["content", "Content"],
+    ["change_date", "Change Date"]
+  ]);
+
+  const table = bootstrapTable(tableHeaders, true, true, "project-changelog");
+  const tableBody = tableBodyFromRows(null, tableRows);
+
+  table.appendChild(tableBody);
+  table.className = "changelog-table";
+
+  return {type: "complex", element: table};
+}
+
+
+export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTMLElement {
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h2");
   pageHeader.innerText = projectInfo.name;
@@ -122,9 +170,9 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
   const qcablesCard: Card = {contents: sankeyContainer, header: "QCables",
     title: projectInfo.name + " QCables", tagId: projectInfo.name + "-qcables"};
 
-  const failures = elementFromTag("div", null, projectInfo.failures.join("\n"));
-  const failuresCard: Card = {contents: failures.element, header: "Failures",
-    title: projectInfo.name + " Failures", tagId: projectInfo.name + "-failures"};
+  const table = elementFromTag("div", null, changelogTable(changelogs));
+  const changelogsCard: Card = {contents: table.element, header: "Changelogs",
+    title: projectInfo.name + " Changelogs", tagId: projectInfo.name + "-changelogs"};
 
   const deliverables = elementFromTag("div", null, projectInfo.deliverables.join("\n"));
   const deliverablesCard: Card = {contents: deliverables.element, header: "Files",
@@ -132,7 +180,7 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 
   cards.push(projectSummary.element);
   cards.push(staticCard(qcablesCard));
-  cards.push(staticCard(failuresCard));
+  cards.push(staticCard(changelogsCard));
   cards.push(staticCard(deliverablesCard));
 
   cards
@@ -148,16 +196,31 @@ export function project(projectInfo: ProjectInfo): HTMLElement {
 }
 
 
-export function initialiseProjectOverview(project_id: string) {
+export function initialiseProjectOverview(projectId: string) {
   const closeBusy = busyDialog();
 
-  fetchAsPromise<ProjectInfo>("api/project_overview/" + project_id, {body: null})
-    .then((data) => {
-      document.body.appendChild(project(data));
-      return data;
+  Promise.all([
+    fetch("api/project_overview/" + projectId),
+    fetch("api/changelogs/project/" + projectId)
+  ])
+    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then((responses) => {
+      const projectInfo = responses[0] as ProjectInfo
+      const changelogs = responses[1] as Changelog[]
+
+      document.body.appendChild(project(projectInfo, changelogs));
+      return projectInfo;
     })
     .then((data) => {
       drawSankey(data.sankey_transitions);
+    })
+    .then(() => {
+      $(function () {
+        $('#project-changelog').bootstrapTable({});
+      });
+    })
+    .catch((error) => {
+      console.log(error); //todo: write to actual logs
     })
     .finally(closeBusy);
 }

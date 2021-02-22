@@ -212,7 +212,18 @@ export function tableBodyFromRows(
   className: string | null,
   rows: ComplexElement<HTMLTableRowElement>[]
 ): HTMLElement {
-  const tbody = elementFromTag("tbody", (typeof className == "string") ? className : null, ...rows);
+  let tbody;
+  if(!rows.length) {
+    const emptyCell = elementFromTag("td", null, "No elements.");
+    emptyCell.element.setAttribute("colspan", "100");
+    emptyCell.element.setAttribute("style", "text-align:center");
+
+    tbody = elementFromTag("tbody", (typeof className == "string") ? className : null,
+      elementFromTag("tr", null, emptyCell));
+  } else {
+    tbody = elementFromTag("tbody", (typeof className == "string") ? className : null, ...rows);
+  }
+
   return tbody.element;
 }
 
@@ -296,7 +307,36 @@ export function bootstrapTable(
   return table;
 }
 
-export function caseCard(caseContent: CaseCard): HTMLElement {
+export function caseCard(caseContent: Case): HTMLElement {
+  const formattedId = caseContent.id.replace(/[:]+/g, '');
+
+  const changelogs = createLinkElement(
+    null,
+    "Changelogs",
+    caseContent.name + "changelogs",
+    new Map([
+      ["data-toggle", "collapse"],
+      ["style", "float:right"]]),
+    "#" + formattedId + "-changelogs"
+  );
+
+  const changelogRows: DOMElement[] = [];
+  if(caseContent.changelog) {
+    //todo: eventually will want to display only the latest changelogs or implement scrolling
+    caseContent.changelog.forEach((changelog) => {
+      changelogRows.push(elementFromTag("div", "row",
+        elementFromTag("p", null, changelog.change_date),
+        elementFromTag("p", null, changelog.content)))
+    });
+  } else {
+    changelogRows.push(elementFromTag("div", null, "None."));
+  }
+
+  const changelogCard = elementFromTag("div", "changelog collapse",
+    elementFromTag("div", "card card-body changelog-card", changelogRows));
+
+  changelogCard.element.id = formattedId + "-changelogs";
+
   const caseProgess: DOMElement[] = [];
   // sort list so blank library designs are displayed first
   caseContent.bars.sort((a, b) => libDesignSort(a.library_design, b.library_design));
@@ -325,7 +365,8 @@ export function caseCard(caseContent: CaseCard): HTMLElement {
       { type: "complex", element: progressBarContainer }));
   });
 
-  const container = elementFromTag("div", "container", caseProgess);
+  const container = elementFromTag("div", "container",
+    {type: "complex", element: changelogs}, changelogCard, caseProgess);
   return container.element;
 }
 
@@ -525,7 +566,6 @@ export function progressBar(
 export function projectCard(
   project: ActiveProject
 ): HTMLElement {
-
   //todo: refactor so it's extensible to other pages
   const casesProgress = progressBar(project.cases_total, project.cases_completed);
   const qcablesProgress = progressBar(project.qcables_total, project.qcables_completed);
@@ -561,7 +601,13 @@ export function projectCard(
 
   const container = document.createElement("div");
   container.className = "card-container";
-  //todo: add last update time
+
+  if(project.last_update != "null") {
+    const lastUpdatedTime = elementFromTag("p", null, project.last_update);
+    lastUpdatedTime.element.setAttribute("style", "float:right");
+    container.appendChild(lastUpdatedTime.element);
+  }
+
   container.appendChild(cases);
   container.appendChild(qcables);
   return container;
