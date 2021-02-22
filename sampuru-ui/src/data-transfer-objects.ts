@@ -159,8 +159,8 @@ export interface SearchedCase extends BaseCase<string> {
 export interface Notification {
   id: number,
   user_id: string,
-  issue_date: string, //todo: make sure this is a string not date
-  resolved_date: string, //todo: make sure this is a string not date
+  issue_date: string,
+  resolved_date: string,
   content: string
 }
 
@@ -169,5 +169,5 @@ export interface DeliverableFile {
   project_id: string,
   location: string,
   notes: string,
-  expiry_date: string //todo: check that it's string and add todo for better handling of dates
+  expiry_date: string
 }
