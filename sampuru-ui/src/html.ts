@@ -425,6 +425,11 @@ export function navbar(): HTMLElement {
   submitButton.addEventListener("click", () => {
     window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
   });
+  submitButton.addEventListener("keyup", (event) => {
+    if (event.code === 'Enter') {
+      window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
+    }
+  });
 
   const search = elementFromTag("div", "input-group",
     {type: "complex", element: textBox},
