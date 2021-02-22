@@ -11,8 +11,8 @@ import {
   DOMElement, progressBar,
   createLinkElement, ComplexElement, tableRow, bootstrapTable, tableBodyFromRows
 } from "./html.js";
-import {fetchAsPromise, urlConstructor} from "./io.js";
-import {Case, BaseChangelog, ProjectInfo, Changelog} from "./data-transfer-objects.js";
+import {urlConstructor} from "./io.js";
+import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 
 const urlParams = new URLSearchParams(window.location.search);

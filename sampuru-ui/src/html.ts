@@ -1,7 +1,6 @@
 import {CaseCard, ActiveProject} from "./data-transfer-objects.js";
 import {formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
 import {urlConstructor} from "./io.js";
-import {defaultSearch} from "./index.js";
 
 
 /**
@@ -307,7 +306,7 @@ export function bootstrapTable(
   return table;
 }
 
-export function caseCard(caseContent: Case): HTMLElement {
+export function caseCard(caseContent: CaseCard): HTMLElement {
   const formattedId = caseContent.id.replace(/[:]+/g, '');
 
   const changelogs = createLinkElement(
