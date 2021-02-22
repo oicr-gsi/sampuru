@@ -269,7 +269,7 @@ export function tableRow(
  * @param headers -> map of data-field to header innerText
  * @param pagination -> boolean for paginating table
  * @param search -> boolean for adding a search to table
- * @param tableId -> id to associate with table for jQuery to do its thing
+ * @param tableId -> id to associate with table for jQuery to apply bootstrapTable styling and js to the right objects
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
@@ -424,7 +424,6 @@ export function navbar(): HTMLElement {
   submitButton.innerText = "Search";
   submitButton.addEventListener("click", () => {
     window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
-    //defaultSearch(textBox.value);
   });
 
   const search = elementFromTag("div", "input-group",
