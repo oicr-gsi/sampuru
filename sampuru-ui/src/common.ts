@@ -26,20 +26,39 @@ export function formatQualityGateNames(name: string) {
   }
 }
 
+/**
+ * Library design codes in MISO
+ * */
 export function formatLibraryDesigns(libraryDesign: string) {
   switch(libraryDesign) {
+    case "AS":
+      return "ATAC-Seq";
+    case "BS":
+      return "Bisulphite Sequencing";
+    case "CH":
+      return "ChIP-Seq";
+    case "CM":
+      return "cfMeDIP";
+    case "CT":
+      return "ctDNA";
+    case "EX":
+      return "Exome";
+    case "NN":
+      return "Unknown";
+    case "MR":
+      return "mRNA";
+    case "SC":
+      return "Single Cell";
+    case "SM":
+      return "smRNA";
+    case "TR":
+      return "Total RNA";
     case "TS":
       return "Targeted Sequencing";
     case "WG":
       return "Whole Genome";
-    case "CM":
-      return "cfMeDIP";
-    case "EX":
-      return "Exome";
     case "WT":
       return "Whole Transcriptome";
-    case "MR":
-      return "mRNA";
     default:
       return "";
   }
