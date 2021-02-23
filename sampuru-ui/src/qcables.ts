@@ -94,7 +94,7 @@ export function qcablesTable(
     });
 
   const tableHeaders = new Map([
-    ["case_external_name", "Case"],
+    ["case_external_name", "Project:Case"],
     ["tissue_qcable_alias", "Receipt/Inspection"],
     ["extraction_qcable_alias", "Extraction"],
     ["library_preparation_qcable_alias", "Library Preparation"],
