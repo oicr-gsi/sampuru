@@ -6,7 +6,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("cases-project-id");
 
 if (projectId) {
-  document.body.appendChild(navbar());
+  document.body.appendChild(navbar("hello"));
   initialiseCases(projectId);
 }
 

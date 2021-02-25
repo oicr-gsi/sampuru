@@ -17,7 +17,7 @@ const filterType = urlParams.get("qcables-filter-type");
 const filterId = urlParams.get("qcables-filter-id");
 
 if (filterType && filterId) {
-  document.body.appendChild(navbar());
+  document.body.appendChild(navbar("hello"));
   initialiseQCables(filterType, filterId);
 }
 

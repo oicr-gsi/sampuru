@@ -12,6 +12,7 @@ import io.undertow.server.handlers.ExceptionHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
 import io.undertow.util.PathTemplateMatch;
 
 import java.io.*;
@@ -79,6 +80,7 @@ public class Server {
         }
         list = service.search(term, username);
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), hse.getRequestHeaders().get("X-Common-Name").element());
         hse.getResponseSender().send(service.toJson(list, username));
     }
 

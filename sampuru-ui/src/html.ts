@@ -401,7 +401,10 @@ export interface Card {
 /***
  * Horizontal navbar that becomes vertical on small screens
  */
-export function navbar(): HTMLElement {
+export function navbar(name: string | null): HTMLElement {
+  if (name === null) {
+    name = "LOGIN ERROR";
+  }
 
   const nav = document.createElement("nav");
   nav.className = "navbar navbar-expand-sm bg-light navbar-light";
@@ -436,8 +439,11 @@ export function navbar(): HTMLElement {
     elementFromTag("div", "input-group-append",
       {type: "complex", element: submitButton}))
 
+  const commonName = createLinkElement("navbar-brand", "hello", null, null, null);
+
   nav.appendChild(sampuru);
   nav.appendChild(search.element);
+  nav.appendChild(commonName);
 
   return nav;
 }

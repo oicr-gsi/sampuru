@@ -19,7 +19,6 @@ const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
 
 if(projectId) {
-  document.body.appendChild(navbar());
   initialiseProjectOverview(projectId);
 }
 
@@ -203,11 +202,17 @@ export function initialiseProjectOverview(projectId: string) {
     fetch("api/project_overview/" + projectId),
     fetch("api/changelogs/project/" + projectId)
   ])
-    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then(responses => {
+      const commonName = responses[0].headers.get("X-Common-Name");
+      console.log(commonName);
+      document.body.appendChild(navbar(commonName));
+      return Promise.all(responses.map(response => response.json()));
+    })
     .then((responses) => {
       const projectInfo = responses[0] as ProjectInfo
       const changelogs = responses[1] as Changelog[]
 
+      
       document.body.appendChild(project(projectInfo, changelogs));
       return projectInfo;
     })
