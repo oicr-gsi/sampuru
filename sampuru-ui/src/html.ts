@@ -559,6 +559,7 @@ export function progressBar(
   const progressText = document.createElement("div");
   progressText.className = "progress-text"
   progressText.innerText = completed.toString() + "/" + total.toString() + " Completed";
+  progressText.title = progressText.innerText
   progressText.setAttribute("style", "position: absolute; line-height: 1rem; text-align: center; right: 0; left: 0;");
 
   progress.appendChild(progressBar);
