@@ -59,35 +59,43 @@ export function qcablesTable(
       tableRows.push(tableRow(null,
         {
           contents: qcable.case_external_name,
-          className: "qcable-table-donor-case"
+          className: "qcable-table-donor-case",
+          title: "hi there"
         },
         {
           contents: qcable.tissue_qcable_alias ? qcable.tissue_qcable_alias: "",
-          className: statusToClassName(qcable.tissue_qcable_status)
+          className: statusToClassName(qcable.tissue_qcable_status),
+          title: "hi there"
         },
         {
           contents: qcable.extraction_qcable_alias ? qcable.extraction_qcable_alias: "",
-          className: statusToClassName(qcable.extraction_qcable_status)
+          className: statusToClassName(qcable.extraction_qcable_status),
+          title: "hi there"
         },
         {
           contents: qcable.library_preparation_qcable_alias ? qcable.library_preparation_qcable_alias: "",
-          className: statusToClassName(qcable.library_preparation_qcable_status)
+          className: statusToClassName(qcable.library_preparation_qcable_status),
+          title: "hi there"
         },
         {
           contents: qcable.low_pass_sequencing_qcable_alias ? qcable.low_pass_sequencing_qcable_alias: "",
-          className: statusToClassName(qcable.low_pass_sequencing_qcable_status)
+          className: statusToClassName(qcable.low_pass_sequencing_qcable_status),
+          title: "hi there"
         },
         {
           contents: qcable.full_depth_sequencing_qcable_alias ? qcable.full_depth_sequencing_qcable_alias: "",
-          className: statusToClassName(qcable.full_depth_sequencing_qcable_status)
+          className: statusToClassName(qcable.full_depth_sequencing_qcable_status),
+          title: "hi there"
         },
         {
           contents: qcable.informatics_interpretation_qcable_alias ? qcable.informatics_interpretation_qcable_alias: "",
-          className: statusToClassName(qcable.informatics_interpretation_qcable_status)
+          className: statusToClassName(qcable.informatics_interpretation_qcable_status),
+          title: "hi there"
         },
         {
           contents: qcable.final_report_qcable_alias ? qcable.final_report_qcable_alias: "",
-          className: statusToClassName(qcable.final_report_qcable_status)
+          className: statusToClassName(qcable.final_report_qcable_status),
+          title: "hi there"
         }
       ));
 
