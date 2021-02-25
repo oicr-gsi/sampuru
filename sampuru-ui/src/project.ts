@@ -204,7 +204,6 @@ export function initialiseProjectOverview(projectId: string) {
   ])
     .then(responses => {
       const commonName = responses[0].headers.get("X-Common-Name");
-      console.log(commonName);
       document.body.appendChild(navbar(commonName));
       return Promise.all(responses.map(response => response.json()));
     })
