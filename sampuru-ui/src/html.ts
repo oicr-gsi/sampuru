@@ -348,6 +348,7 @@ export function caseCard(caseContent: CaseCard): HTMLElement {
       const qualityGate = document.createElement("div");
       qualityGate.className = "cases quality-gate " + step.status;
       qualityGate.innerText = step.completed.toString() + "/" + step.total.toString();
+      qualityGate.title = toSentenceCase(step.status);
 
       const qualityGateName = document.createElement("p");
       qualityGateName.className = "quality-gate-name";
