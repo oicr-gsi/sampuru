@@ -348,6 +348,7 @@ export function caseCard(caseContent: CaseCard): HTMLElement {
       const qualityGate = document.createElement("div");
       qualityGate.className = "cases quality-gate " + step.status;
       qualityGate.innerText = step.completed.toString() + "/" + step.total.toString();
+      qualityGate.title = toSentenceCase(step.status);
 
       const qualityGateName = document.createElement("p");
       qualityGateName.className = "quality-gate-name";
@@ -558,6 +559,7 @@ export function progressBar(
   const progressText = document.createElement("div");
   progressText.className = "progress-text"
   progressText.innerText = completed.toString() + "/" + total.toString() + " Completed";
+  progressText.title = progressText.innerText
   progressText.setAttribute("style", "position: absolute; line-height: 1rem; text-align: center; right: 0; left: 0;");
 
   progress.appendChild(progressBar);
@@ -651,6 +653,10 @@ export function busyDialog(): () => void {
   return () => {
     document.body.removeChild(spinner);
   }
+}
+
+export function toSentenceCase(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 

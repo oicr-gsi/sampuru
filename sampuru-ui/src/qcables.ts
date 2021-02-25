@@ -8,7 +8,8 @@ import {
   ComplexElement, DOMElement, elementFromTag,
   navbar,
   tableBodyFromRows,
-  tableRow
+  tableRow,
+  toSentenceCase
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 
@@ -46,6 +47,7 @@ export function qcablesTable(
   filterId: string): void {
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h3");
+  const titleUnknown = "Hasn't started yet";
   if(filterType === "case") {
     const caseExtName = qcables[0].case_external_name;
     pageHeader.innerText = "QCables (" + caseExtName + ")";
@@ -63,31 +65,38 @@ export function qcablesTable(
         },
         {
           contents: qcable.tissue_qcable_alias ? qcable.tissue_qcable_alias: "",
-          className: statusToClassName(qcable.tissue_qcable_status)
+          className: statusToClassName(qcable.tissue_qcable_status),
+          title: qcable.tissue_qcable_status? toSentenceCase(qcable.tissue_qcable_status) : titleUnknown
         },
         {
           contents: qcable.extraction_qcable_alias ? qcable.extraction_qcable_alias: "",
-          className: statusToClassName(qcable.extraction_qcable_status)
+          className: statusToClassName(qcable.extraction_qcable_status),
+          title: qcable.extraction_qcable_status? toSentenceCase(qcable.extraction_qcable_status) : titleUnknown
         },
         {
           contents: qcable.library_preparation_qcable_alias ? qcable.library_preparation_qcable_alias: "",
-          className: statusToClassName(qcable.library_preparation_qcable_status)
+          className: statusToClassName(qcable.library_preparation_qcable_status),
+          title: qcable.library_preparation_qcable_status? toSentenceCase(qcable.library_preparation_qcable_status) : titleUnknown
         },
         {
           contents: qcable.low_pass_sequencing_qcable_alias ? qcable.low_pass_sequencing_qcable_alias: "",
-          className: statusToClassName(qcable.low_pass_sequencing_qcable_status)
+          className: statusToClassName(qcable.low_pass_sequencing_qcable_status),
+          title: qcable.low_pass_sequencing_qcable_status? toSentenceCase(qcable.low_pass_sequencing_qcable_status) : titleUnknown
         },
         {
           contents: qcable.full_depth_sequencing_qcable_alias ? qcable.full_depth_sequencing_qcable_alias: "",
-          className: statusToClassName(qcable.full_depth_sequencing_qcable_status)
+          className: statusToClassName(qcable.full_depth_sequencing_qcable_status),
+          title: qcable.full_depth_sequencing_qcable_status? toSentenceCase(qcable.full_depth_sequencing_qcable_status) : titleUnknown
         },
         {
           contents: qcable.informatics_interpretation_qcable_alias ? qcable.informatics_interpretation_qcable_alias: "",
-          className: statusToClassName(qcable.informatics_interpretation_qcable_status)
+          className: statusToClassName(qcable.informatics_interpretation_qcable_status),
+          title: qcable.informatics_interpretation_qcable_status? toSentenceCase(qcable.informatics_interpretation_qcable_status) : titleUnknown
         },
         {
           contents: qcable.final_report_qcable_alias ? qcable.final_report_qcable_alias: "",
-          className: statusToClassName(qcable.final_report_qcable_status)
+          className: statusToClassName(qcable.final_report_qcable_status),
+          title: qcable.final_report_qcable_status? toSentenceCase(qcable.final_report_qcable_status) : titleUnknown
         }
       ));
 
