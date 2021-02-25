@@ -49,7 +49,7 @@ public class Server {
 
     // see https://stackoverflow.com/questions/39742014/routing-template-format-for-undertow
     private static void doSearch(HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = getUsername(hse);
         Service service = null;
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String type = ptm.getParameters().get("type");
@@ -79,9 +79,7 @@ public class Server {
                 throw new Exception("Invalid search type " + type);
         }
         list = service.search(term, username);
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), hse.getRequestHeaders().get("X-Common-Name").element());
-        hse.getResponseSender().send(service.toJson(list, username));
+        sendHTTPResponse(hse, service.toJson(list, username));
     }
 
     //TODO: No error handling for, eg, /qcable/10000000
@@ -95,7 +93,7 @@ public class Server {
     }
 
     private static void helloWorld(HttpServerExchange hse){
-        String name = hse.getRequestHeaders().get("X-Remote-User").element();
+        String name = getUsername(hse);
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         hse.getResponseSender().send("You found Sampuru! Good job, " + name);
     }
@@ -119,5 +117,15 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void sendHTTPResponse(HttpServerExchange hse, String body){
+        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), hse.getRequestHeaders().get("X-Common-Name").element());
+        hse.getResponseSender().send(body);
+    }
+
+    public static String getUsername(HttpServerExchange hse){
+        return hse.getRequestHeaders().get("X-Remote-User").element();
     }
 }

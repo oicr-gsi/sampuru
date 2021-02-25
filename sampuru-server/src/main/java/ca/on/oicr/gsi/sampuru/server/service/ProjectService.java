@@ -1,6 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
@@ -78,10 +79,9 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getCompletedProjectsParams(HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         ProjectService ps = new ProjectService();
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ps.getCompletedProjectsJson(username));
+        Server.sendHTTPResponse(hse, ps.getCompletedProjectsJson(username));
     }
 
     private String getCompletedProjectsJson(String username) throws Exception {
@@ -171,10 +171,9 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getActiveProjectsParams(HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         ProjectService ps = new ProjectService();
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ps.getActiveProjectsJson(ps.getActiveProjects(username)));
+        Server.sendHTTPResponse(hse, ps.getActiveProjectsJson(ps.getActiveProjects(username)));
     }
 
     private String getActiveProjectsJson(List<Project> activeProjects) throws Exception {
@@ -402,13 +401,11 @@ public class ProjectService extends Service<Project> {
     }
 
     public static void getProjectOverviewParams(HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String idparam = ptm.getParameters().get("id");
         ProjectService ps = new ProjectService();
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), hse.getRequestHeaders().get("X-Common-Name").element());
         // TODO: please refactor, i think this is the last holdout using get()
-        hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(idparam, username), username));
+        Server.sendHTTPResponse(hse, ps.getProjectOverviewJson(ps.get(idparam, username), username));
     }
 }

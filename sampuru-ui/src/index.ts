@@ -20,7 +20,11 @@ import {
   SearchedProject,
   SearchedQCable
 } from "./data-transfer-objects.js";
-import {formatLibraryDesigns, formatQualityGateNames} from "./common.js";
+import {
+  commonName, 
+  formatLibraryDesigns, 
+  formatQualityGateNames
+} from "./common.js";
 
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -238,7 +242,10 @@ export function defaultSearch(searchString: string) {
     fetch("api/search/notification/" + searchString),
     fetch("api/search/deliverable/" + searchString)
   ])
-    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then(responses => {
+      document.body.appendChild(navbar(commonName(responses[0])));
+      return Promise.all(responses.map(response => response.json()))
+    })
     .then((responses) => {
       const projects = responses[0] as SearchedProject[];
       const cases = responses[1] as SearchedCase[];

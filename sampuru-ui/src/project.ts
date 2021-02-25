@@ -14,6 +14,7 @@ import {
 import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
+import {commonName} from "./common.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
@@ -203,8 +204,7 @@ export function initialiseProjectOverview(projectId: string) {
     fetch("api/changelogs/project/" + projectId)
   ])
     .then(responses => {
-      const commonName = responses[0].headers.get("X-Common-Name");
-      document.body.appendChild(navbar(commonName));
+      document.body.appendChild(navbar(commonName(responses[0])));
       return Promise.all(responses.map(response => response.json()));
     })
     .then((responses) => {

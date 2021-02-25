@@ -11,13 +11,13 @@ import {
   tableRow
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
+import {commonName} from "./common.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const filterType = urlParams.get("qcables-filter-type");
 const filterId = urlParams.get("qcables-filter-id");
 
 if (filterType && filterId) {
-  document.body.appendChild(navbar("hello"));
   initialiseQCables(filterType, filterId);
 }
 
@@ -170,8 +170,10 @@ export function initialiseQCables(filterType: string, filterId: string) {
     fetch("api/qcables_table/" + filterType + "/" + filterId),
     fetch("api/changelogs/" + filterType + "/" + filterId)
   ])
-    .then(responses => Promise.all(responses.map(response => response.json())))
-    .then((responses) => {
+    .then(responses => {
+      document.body.appendChild(navbar(commonName(responses[0])));
+      return Promise.all(responses.map(response => response.json()));
+    }).then((responses) => {
       const qcables = responses[0] as QCable[]
       const changelogs = responses[1] as Changelog[]
 

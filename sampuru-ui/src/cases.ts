@@ -1,6 +1,7 @@
 import {busyDialog, Card, caseCard, collapsibleCard, navbar} from "./html.js";
 import {fetchAsPromise} from "./io.js";
 import {CaseCard} from "./data-transfer-objects.js";
+import {commonName} from "./common.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("cases-project-id");
@@ -41,6 +42,7 @@ export function initialiseCases(projectId: string) {
 
   fetchAsPromise<CaseCard[]>("api/cases_cards/" + projectId, {body: null})
     .then((data) => {
+      document.body.appendChild(navbar(commonName(data[0])));
       document.body.appendChild(casesPage(data));
     })
     .finally(closeBusy);

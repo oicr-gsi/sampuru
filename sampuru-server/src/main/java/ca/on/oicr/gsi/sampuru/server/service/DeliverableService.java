@@ -1,6 +1,7 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
@@ -38,7 +39,7 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     public static void endpointDisplayParams(HttpServerExchange hse) throws SQLException {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         DeliverableService ds = new DeliverableService();
 
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
@@ -161,7 +162,7 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     public static void postDeliverableParams(HttpServerExchange hse) {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         DeliverableService ds = new DeliverableService();
         hse.getRequestReceiver().receiveFullBytes((httpServerExchange, bytes) -> {
             String fullJson = new String(bytes);
@@ -179,7 +180,7 @@ public class DeliverableService extends Service<Deliverable> {
                 hse.getResponseSender().send("Sampuru Server was unable to write deliverables to database: " + e.getMessage());
             }
             try {
-                hse.getResponseSender().send(ds.getPortalJson(username));
+                Server.sendHTTPResponse(hse, ds.getPortalJson(username));
             } catch (SQLException sqle) {
                 hse.setStatusCode(503);
                 hse.getResponseSender().send("Sampuru Server was unable to get the full portal JSON after writing deliverables: " + sqle.getMessage());
