@@ -30,7 +30,7 @@ if (search) {
   document.body.appendChild(navbar("hello"));
   defaultSearch(search);
 } else {
-  document.body.appendChild(navbar("hello"));
+  document.body.appendChild(navbar("boo"));
   initialiseActiveProjects();
 }
 

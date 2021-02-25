@@ -439,11 +439,11 @@ export function navbar(name: string | null): HTMLElement {
     elementFromTag("div", "input-group-append",
       {type: "complex", element: submitButton}))
 
-  const commonName = createLinkElement("navbar-brand", "hello", null, null, null);
+  const commonName = elementFromTag("div", "navbar-brand", name);
 
   nav.appendChild(sampuru);
   nav.appendChild(search.element);
-  nav.appendChild(commonName);
+  nav.appendChild(commonName.element);
 
   return nav;
 }

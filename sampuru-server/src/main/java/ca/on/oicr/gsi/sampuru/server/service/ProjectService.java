@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
+import io.undertow.util.HttpString;
+
 
 public class ProjectService extends Service<Project> {
 
@@ -405,6 +407,7 @@ public class ProjectService extends Service<Project> {
         String idparam = ptm.getParameters().get("id");
         ProjectService ps = new ProjectService();
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), hse.getRequestHeaders().get("X-Common-Name").element());
         // TODO: please refactor, i think this is the last holdout using get()
         hse.getResponseSender().send(ps.getProjectOverviewJson(ps.get(idparam, username), username));
     }
