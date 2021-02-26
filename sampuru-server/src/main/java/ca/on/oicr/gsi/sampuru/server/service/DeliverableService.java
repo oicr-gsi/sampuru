@@ -170,20 +170,17 @@ public class DeliverableService extends Service<Deliverable> {
             try {
                 jsonArray = (JSONArray) new JSONParser().parse(fullJson);
             } catch (ParseException e) {
-                hse.setStatusCode(400);
-                hse.getResponseSender().send("Sampuru Server received a JSONArray it couldn't parse: " + jsonArray + "\n" + e.getMessage());
+                Server.sendHTTPResponse(hse, 400, "Sampuru Server received a JSONArray it couldn't parse: " + jsonArray + "\n" + e.getMessage());
             }
             try {
                 new DBConnector().writeDeliverables(jsonArray, username);
             } catch (Exception e) {
-                hse.setStatusCode(503);
-                hse.getResponseSender().send("Sampuru Server was unable to write deliverables to database: " + e.getMessage());
+                Server.sendHTTPResponse(hse, 503, "Sampuru Server was unable to write deliverables to database: " + e.getMessage());
             }
             try {
                 Server.sendHTTPResponse(hse, ds.getPortalJson(username));
             } catch (SQLException sqle) {
-                hse.setStatusCode(503);
-                hse.getResponseSender().send("Sampuru Server was unable to get the full portal JSON after writing deliverables: " + sqle.getMessage());
+                Server.sendHTTPResponse(hse, 503, "Sampuru Server was unable to get the full portal JSON after writing deliverables: " + sqle.getMessage());
             }
         });
 

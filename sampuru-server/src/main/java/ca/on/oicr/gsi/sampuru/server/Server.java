@@ -120,8 +120,13 @@ public class Server {
     }
 
     public static void sendHTTPResponse(HttpServerExchange hse, String body){
+        sendHTTPResponse(hse, 200, body);
+    }
+
+    public static void sendHTTPResponse(HttpServerExchange hse, int status, String body){
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), hse.getRequestHeaders().get("X-Common-Name").element());
+        hse.setStatusCode(status);
         hse.getResponseSender().send(body);
     }
 
