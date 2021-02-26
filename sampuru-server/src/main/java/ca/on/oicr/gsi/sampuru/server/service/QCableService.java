@@ -1,9 +1,11 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
-import ca.on.oicr.gsi.sampuru.server.type.*;
+import ca.on.oicr.gsi.sampuru.server.Server;
+import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
+import ca.on.oicr.gsi.sampuru.server.type.QCable;
+import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -122,32 +124,25 @@ public class QCableService extends Service<QCable> {
         return jsonArray.toJSONString();
     }
 
-//    public static void getAllQcablesTableParams(HttpServerExchange hse) throws Exception {
-//        String username = hse.getRequestHeaders().get("X-Remote-User").element();
-//        CaseService cs = new CaseService();
-//        QCableService qs = new QCableService();
-//        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-//        hse.getResponseSender().send(qs.getTableJsonFromCases(cs.getAll(username), username));
-//    }
-
     public static void getFilteredQcablesTableParams(HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         QCableService qs = new QCableService();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String filterType = ptm.getParameters().get("filterType");
         String filterId = ptm.getParameters().get("filterId");
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        String responseBody;
         switch(filterType){
             case "project":
-                hse.getResponseSender().send(qs.getQcableTableFromProject(filterId, username).toJSONString());
+                responseBody = qs.getQcableTableFromProject(filterId, username).toJSONString();
                 break;
             case "case":
-                hse.getResponseSender().send(qs.getQcableTableFromCase(filterId, username).toJSONString());
+                responseBody = qs.getQcableTableFromCase(filterId, username).toJSONString();
                 break;
             default:
                 throw new UnsupportedOperationException("Bad filter type "
                         + filterType +" , supported types are: project, case");
         }
+        Server.sendHTTPResponse(hse, responseBody);
     }
 
     private JSONArray getQcableTableFromCase(String caseId, String username) throws SQLException {

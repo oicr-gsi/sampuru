@@ -1,10 +1,10 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -93,26 +93,27 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     public static void getFilteredChangelogs(HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         ChangelogService cs = new ChangelogService();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String filterType = ptm.getParameters().get("filterType");
         String filterId = ptm.getParameters().get("filterId");
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+        String responseBody;
         switch(filterType) {
             case "project":
-                hse.getResponseSender().send(cs.getChangelogsByProject(filterId, username).toJSONString());
+                responseBody = cs.getChangelogsByProject(filterId, username).toJSONString();
                 break;
             case "case":
-                hse.getResponseSender().send(cs.getChangelogsByCase(filterId, username).toJSONString());
+                responseBody = cs.getChangelogsByCase(filterId, username).toJSONString();
                 break;
             case "qcable":
-                hse.getResponseSender().send(cs.getChangelogsByQcable(filterId, username).toJSONString());
+                responseBody = cs.getChangelogsByQcable(filterId, username).toJSONString();
                 break;
             default:
                 throw new UnsupportedOperationException("Bad filter type " + filterType +
                         " , supported types are: project, case, qcable");
         }
+        Server.sendHTTPResponse(hse, responseBody);
     }
 
     public JSONArray getChangelogsByProject(String projectId, String username) throws SQLException {

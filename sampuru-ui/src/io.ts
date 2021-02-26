@@ -64,7 +64,7 @@ export function fetchOperation<T>(
       }
     })
   )
-    .catch((error) => alert(error.nessage)); //TODO: better error handling
+    .catch((error) => alert(error.message)); //TODO: better error handling
 }
 
 

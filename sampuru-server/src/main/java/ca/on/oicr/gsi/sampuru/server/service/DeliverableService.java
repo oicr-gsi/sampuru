@@ -1,10 +1,10 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
+import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -38,11 +38,10 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     public static void endpointDisplayParams(HttpServerExchange hse) throws SQLException {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         DeliverableService ds = new DeliverableService();
 
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ds.getPortalJson(username));
+        Server.sendHTTPResponse(hse, ds.getPortalJson(username));
     }
 
     private String getPortalJson(String username) throws SQLException {
@@ -161,7 +160,7 @@ public class DeliverableService extends Service<Deliverable> {
     }
 
     public static void postDeliverableParams(HttpServerExchange hse) {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         DeliverableService ds = new DeliverableService();
         hse.getRequestReceiver().receiveFullBytes((httpServerExchange, bytes) -> {
             String fullJson = new String(bytes);
@@ -169,20 +168,17 @@ public class DeliverableService extends Service<Deliverable> {
             try {
                 jsonArray = (JSONArray) new JSONParser().parse(fullJson);
             } catch (ParseException e) {
-                hse.setStatusCode(400);
-                hse.getResponseSender().send("Sampuru Server received a JSONArray it couldn't parse: " + jsonArray + "\n" + e.getMessage());
+                Server.sendHTTPResponse(hse, 400, "Sampuru Server received a JSONArray it couldn't parse: " + jsonArray + "\n" + e.getMessage());
             }
             try {
                 new DBConnector().writeDeliverables(jsonArray, username);
             } catch (Exception e) {
-                hse.setStatusCode(503);
-                hse.getResponseSender().send("Sampuru Server was unable to write deliverables to database: " + e.getMessage());
+                Server.sendHTTPResponse(hse, 503, "Sampuru Server was unable to write deliverables to database: " + e.getMessage());
             }
             try {
-                hse.getResponseSender().send(ds.getPortalJson(username));
+                Server.sendHTTPResponse(hse, ds.getPortalJson(username));
             } catch (SQLException sqle) {
-                hse.setStatusCode(503);
-                hse.getResponseSender().send("Sampuru Server was unable to get the full portal JSON after writing deliverables: " + sqle.getMessage());
+                Server.sendHTTPResponse(hse, 503, "Sampuru Server was unable to get the full portal JSON after writing deliverables: " + sqle.getMessage());
             }
         });
 

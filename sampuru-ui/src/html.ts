@@ -402,7 +402,10 @@ export interface Card {
 /***
  * Horizontal navbar that becomes vertical on small screens
  */
-export function navbar(): HTMLElement {
+export function navbar(name: string | null): HTMLElement {
+  if (name === null) {
+    name = "LOGIN ERROR";
+  }
 
   const nav = document.createElement("nav");
   nav.className = "navbar navbar-expand-sm bg-light navbar-light";
@@ -437,8 +440,11 @@ export function navbar(): HTMLElement {
     elementFromTag("div", "input-group-append",
       {type: "complex", element: submitButton}))
 
+  const commonName = elementFromTag("div", "navbar-brand", name);
+
   nav.appendChild(sampuru);
   nav.appendChild(search.element);
+  nav.appendChild(commonName.element);
 
   return nav;
 }
@@ -642,16 +648,19 @@ export function busyDialog(): () => void {
   const spinner = document.createElement("div");
   spinner.className = "spinner-border";
   spinner.setAttribute("role", "status");
+  spinner.setAttribute(
+    "style",
+    "top: 100px; position: absolute !important; width: 3rem; height: 3rem;");
 
-  const loading = document.createElement("span");
-  loading.className = "sr-only";
-  loading.innerText = "Loading...";
+  const container = elementFromTag("div", "d-flex justify-content-center",
+    {type: "complex", element: spinner},
+    elementFromTag("span", "sr-only", "Loading...")
+  );
 
-  spinner.appendChild(loading);
-  document.body.appendChild(spinner);
+  document.body.appendChild(container.element);
 
   return () => {
-    document.body.removeChild(spinner);
+    document.body.removeChild(container.element);
   }
 }
 

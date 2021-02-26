@@ -1,3 +1,7 @@
+export function commonName(response: Response){
+  return response.headers.get("X-Common-Name");
+}
+
 export function formatQualityGateNames(name: string) {
   switch(name){
     case "receipt":
@@ -87,4 +91,3 @@ export function libDesignSort(a: string | null, b: string | null) {
     return a < b ? -1 : 1;
   }
 }
-

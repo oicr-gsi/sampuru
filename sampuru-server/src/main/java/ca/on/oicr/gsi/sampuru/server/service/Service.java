@@ -1,8 +1,8 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
+import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -25,22 +25,20 @@ public abstract class Service<T extends SampuruType> {
 
     //TODO: do these have a purpose beyond The Old Endpoints?
     public static void getIdParams(Service targetService, HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         Deque<String> idparams = hse.getQueryParameters().get("id");
         Set<SampuruType> items = new HashSet<>();
         for(String id: idparams){
             items.add(targetService.get(id, username));
         }
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(targetService.toJson(items, username));
+        Server.sendHTTPResponse(hse, targetService.toJson(items, username));
     }
 
     public abstract List<T> getAll(String username) throws Exception;
 
     public static void getAllParams(Service targetService, HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(targetService.toJson(targetService.getAll(username), username));
+        String username = Server.getUsername(hse);
+        Server.sendHTTPResponse(hse, targetService.toJson(targetService.getAll(username), username));
     }
 
     public abstract List<T> search(String term, String username) throws SQLException;

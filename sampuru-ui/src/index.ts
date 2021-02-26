@@ -20,17 +20,19 @@ import {
   SearchedProject,
   SearchedQCable
 } from "./data-transfer-objects.js";
-import {formatLibraryDesigns, formatQualityGateNames} from "./common.js";
+import {
+  commonName, 
+  formatLibraryDesigns, 
+  formatQualityGateNames
+} from "./common.js";
 
 
 const urlParams = new URLSearchParams(window.location.search);
 const search = urlParams.get("search");
 
 if (search) {
-  document.body.appendChild(navbar());
   defaultSearch(search);
 } else {
-  document.body.appendChild(navbar());
   initialiseActiveProjects();
 }
 
@@ -238,7 +240,10 @@ export function defaultSearch(searchString: string) {
     fetch("api/search/notification/" + searchString),
     fetch("api/search/deliverable/" + searchString)
   ])
-    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then(responses => {
+      document.body.appendChild(navbar(commonName(responses[0])));
+      return Promise.all(responses.map(response => response.json()))
+    })
     .then((responses) => {
       const projects = responses[0] as SearchedProject[];
       const cases = responses[1] as SearchedCase[];

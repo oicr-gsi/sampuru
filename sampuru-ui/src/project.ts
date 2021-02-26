@@ -14,12 +14,12 @@ import {
 import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
+import {commonName} from "./common.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
 
 if(projectId) {
-  document.body.appendChild(navbar());
   initialiseProjectOverview(projectId);
 }
 
@@ -203,11 +203,15 @@ export function initialiseProjectOverview(projectId: string) {
     fetch("api/project_overview/" + projectId),
     fetch("api/changelogs/project/" + projectId)
   ])
-    .then(responses => Promise.all(responses.map(response => response.json())))
+    .then(responses => {
+      document.body.appendChild(navbar(commonName(responses[0])));
+      return Promise.all(responses.map(response => response.json()));
+    })
     .then((responses) => {
       const projectInfo = responses[0] as ProjectInfo
       const changelogs = responses[1] as Changelog[]
 
+      
       document.body.appendChild(project(projectInfo, changelogs));
       return projectInfo;
     })

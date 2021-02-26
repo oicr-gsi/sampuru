@@ -1,9 +1,10 @@
 package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
-import ca.on.oicr.gsi.sampuru.server.type.*;
+import ca.on.oicr.gsi.sampuru.server.Server;
+import ca.on.oicr.gsi.sampuru.server.type.Case;
+import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -38,13 +39,12 @@ public class CaseService extends Service<Case> {
     }
 
     public static void getCardsParams(HttpServerExchange hse) throws Exception {
-        String username = hse.getRequestHeaders().get("X-Remote-User").element();
+        String username = Server.getUsername(hse);
         CaseService cs = new CaseService();
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         //TODO: maybe in the future we'll want the opportunity for this to be blank
         String projectId = ptm.getParameters().get("projectId");
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(cs.getCardJsonForProject(projectId, username));
+        Server.sendHTTPResponse(hse, cs.getCardJsonForProject(projectId, username));
     }
 
     // Front end will need to group by case_id
