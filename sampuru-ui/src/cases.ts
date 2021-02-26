@@ -37,7 +37,7 @@ export function casesPage(cases: CaseCard[]): HTMLElement {
 
 export function initialiseCases(projectId: string) {
   const closeBusy = busyDialog();
-  fetch("api/cases_cards/" + projectId)
+  fetch("api/cases_cards/" + projectId, {body: null})
     .then(response => {
       document.body.appendChild(navbar(commonName(response)));
       if (response.ok) {
@@ -51,5 +51,7 @@ export function initialiseCases(projectId: string) {
       }
     })
     .then((response) => response as CaseCard[])
-    .finally(closeBusy);
+    .then((data) => {
+      document.body.appendChild(casesPage(data));
+    }).finally(closeBusy);
 }
