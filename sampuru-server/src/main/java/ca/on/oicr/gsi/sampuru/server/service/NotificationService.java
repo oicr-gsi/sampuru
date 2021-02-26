@@ -5,7 +5,6 @@ import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.Notification;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -17,7 +16,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import static tables_generated.Tables.*;
+import static tables_generated.Tables.NOTIFICATION;
 
 
 public class NotificationService extends Service<Notification> {

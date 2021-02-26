@@ -4,10 +4,9 @@ import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.*;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
-import org.jooq.Result;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -20,8 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
-
-import io.undertow.util.HttpString;
 
 
 public class ProjectService extends Service<Project> {

@@ -2,9 +2,10 @@ package ca.on.oicr.gsi.sampuru.server.service;
 
 import ca.on.oicr.gsi.sampuru.server.DBConnector;
 import ca.on.oicr.gsi.sampuru.server.Server;
-import ca.on.oicr.gsi.sampuru.server.type.*;
+import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
+import ca.on.oicr.gsi.sampuru.server.type.QCable;
+import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
 import org.jooq.Record;
 import org.jooq.Result;

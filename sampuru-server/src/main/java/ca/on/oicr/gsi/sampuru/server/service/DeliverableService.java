@@ -5,7 +5,6 @@ import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.Deliverable;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.util.postgres.PostgresDSL;
@@ -42,8 +41,7 @@ public class DeliverableService extends Service<Deliverable> {
         String username = Server.getUsername(hse);
         DeliverableService ds = new DeliverableService();
 
-        hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseSender().send(ds.getPortalJson(username));
+        Server.sendHTTPResponse(hse, ds.getPortalJson(username));
     }
 
     private String getPortalJson(String username) throws SQLException {

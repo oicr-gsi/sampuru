@@ -5,7 +5,6 @@ import ca.on.oicr.gsi.sampuru.server.Server;
 import ca.on.oicr.gsi.sampuru.server.type.ChangelogEntry;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
 import org.jooq.Record;
 import org.jooq.Result;
