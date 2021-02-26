@@ -646,16 +646,19 @@ export function busyDialog(): () => void {
   const spinner = document.createElement("div");
   spinner.className = "spinner-border";
   spinner.setAttribute("role", "status");
+  spinner.setAttribute(
+    "style",
+    "top: 100px; position: absolute !important; width: 3rem; height: 3rem;");
 
-  const loading = document.createElement("span");
-  loading.className = "sr-only";
-  loading.innerText = "Loading...";
+  const container = elementFromTag("div", "d-flex justify-content-center",
+    {type: "complex", element: spinner},
+    elementFromTag("span", "sr-only", "Loading...")
+  );
 
-  spinner.appendChild(loading);
-  document.body.appendChild(spinner);
+  document.body.appendChild(container.element);
 
   return () => {
-    document.body.removeChild(spinner);
+    document.body.removeChild(container.element);
   }
 }
 
