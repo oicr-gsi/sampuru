@@ -202,5 +202,4 @@ export function drawSankey(sankey: SankeyTransition) {
     .attr("dy", "0.35em")
     .attr("text-anchor", d => (typeof d.x0 === "number") ? (d.x0 < width / 2 ? "start" : "end") : null)
     .text(d => `${formatNodeLabel(d.name)}`);
-
 }
