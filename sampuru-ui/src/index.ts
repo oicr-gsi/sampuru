@@ -31,7 +31,6 @@ const urlParams = new URLSearchParams(window.location.search);
 const search = urlParams.get("search");
 
 if (search) {
-  document.body.appendChild(navbar("hello"));
   defaultSearch(search);
 } else {
   document.body.appendChild(navbar("boo"));
