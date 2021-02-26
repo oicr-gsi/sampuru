@@ -33,7 +33,6 @@ const search = urlParams.get("search");
 if (search) {
   defaultSearch(search);
 } else {
-  document.body.appendChild(navbar("boo"));
   initialiseActiveProjects();
 }
 

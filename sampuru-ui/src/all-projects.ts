@@ -1,7 +1,8 @@
 import {
   Card,
-  projectCard, collapsibleCard, busyDialog,
+  projectCard, collapsibleCard, busyDialog, navbar
 } from "./html.js";
+import {commonName} from "./common.js";
 
 import {
   fetchAsPromise,
@@ -39,9 +40,21 @@ export function activeProjects(projects: ActiveProject[]): HTMLElement {
 export function initialiseActiveProjects() {
   const closeBusy = busyDialog();
 
-  fetchAsPromise<ActiveProject[]>("api/active_projects", {body: null})
-    .then((projects) => {
-      document.body.appendChild(activeProjects(projects));
-    })//todo: catch errors
-    .finally(closeBusy);
+  fetch("api/active_projects", {body: null})
+  .then(response => {
+    document.body.appendChild(navbar(commonName(response)));
+    if (response.ok) {
+      return Promise.resolve(response.json());
+    } else if (response.status == 503) {
+      return Promise.reject(new Error("Sampuru is currently overloaded."));
+    } else {
+      return Promise.reject(
+        new Error(`Failed to load: ${response.status} ${response.statusText}`)
+      );
+    }
+  })
+  .then((response) => response as ActiveProject[])
+  .then((data) => {
+    document.body.appendChild(activeProjects(data));
+  }).finally(closeBusy);
 }
