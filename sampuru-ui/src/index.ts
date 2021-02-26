@@ -257,7 +257,7 @@ export function defaultSearch(searchString: string) {
       projects.map(project => tableIds.push(project.id + "-donor-cases"));
 
       tableIds.map(id => {
-        $(function () {
+        $.when().then(() => {
           $(`#${id}`).bootstrapTable({});
         });
       });
