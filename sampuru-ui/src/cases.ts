@@ -1,8 +1,6 @@
 import {busyDialog, Card, caseCard, collapsibleCard, navbar} from "./html.js";
-import {fetchAsPromise} from "./io.js";
 import {CaseCard} from "./data-transfer-objects.js";
 import {commonName} from "./common.js";
-import { response } from "express";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("cases-project-id");
@@ -39,11 +37,11 @@ export function casesPage(cases: CaseCard[]): HTMLElement {
 
 export function initialiseCases(projectId: string) {
   const closeBusy = busyDialog();
-  fetch("api/cases_cards/" + projectId, {body: null})
+  fetch("api/cases_cards/" + projectId)
     .then(response => {
       document.body.appendChild(navbar(commonName(response)));
       if (response.ok) {
-        return Promise.resolve(response);
+        return Promise.resolve(response.json());
       } else if (response.status == 503) {
         return Promise.reject(new Error("Sampuru is currently overloaded."));
       } else {
@@ -52,7 +50,6 @@ export function initialiseCases(projectId: string) {
         );
       }
     })
-    .then((response) => response.json())
     .then((response) => response as CaseCard[])
     .finally(closeBusy);
 }
