@@ -39,7 +39,7 @@ export function initialiseCases(projectId: string) {
   const closeBusy = busyDialog();
   fetch("api/cases_cards/" + projectId, {body: null})
     .then(response => {
-      document.body.appendChild(navbar(commonName(response)));
+      document.body.appendChild(navbar(commonName(response), "cases"));
       if (response.ok) {
         return Promise.resolve(response.json());
       } else if (response.status == 503) {

@@ -180,7 +180,7 @@ export function initialiseQCables(filterType: string, filterId: string) {
     fetch("api/changelogs/" + filterType + "/" + filterId)
   ])
     .then(responses => {
-      document.body.appendChild(navbar(commonName(responses[0])));
+      document.body.appendChild(navbar(commonName(responses[0]), "qcables"));
       return Promise.all(responses.map(response => response.json()));
     }).then((responses) => {
       const qcables = responses[0] as QCable[]

@@ -204,7 +204,7 @@ export function initialiseProjectOverview(projectId: string) {
     fetch("api/changelogs/project/" + projectId)
   ])
     .then(responses => {
-      document.body.appendChild(navbar(commonName(responses[0])));
+      document.body.appendChild(navbar(commonName(responses[0]), "project-overview"));
       return Promise.all(responses.map(response => response.json()));
     })
     .then((responses) => {

@@ -402,7 +402,10 @@ export interface Card {
 /***
  * Horizontal navbar that becomes vertical on small screens
  */
-export function navbar(name: string | null): HTMLElement {
+export function navbar(
+  name: string | null,
+  helpAnchor: string
+): HTMLElement {
   if (name === null) {
     name = "LOGIN ERROR";
   }
@@ -440,10 +443,14 @@ export function navbar(name: string | null): HTMLElement {
     elementFromTag("div", "input-group-append",
       {type: "complex", element: submitButton}))
 
+  // TODO: How do I replace the 'Help' text with an svg icon?
+  const helpLink = createLinkElement("navbar-brand", "Help", "Read manual for this page", null, "user-manual-en.html#"+helpAnchor);
+
   const commonName = elementFromTag("div", "navbar-brand", name);
 
   nav.appendChild(sampuru);
   nav.appendChild(search.element);
+  nav.appendChild(helpLink);
   nav.appendChild(commonName.element);
 
   return nav;

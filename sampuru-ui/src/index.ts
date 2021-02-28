@@ -241,7 +241,7 @@ export function defaultSearch(searchString: string) {
     fetch("api/search/deliverable/" + searchString)
   ])
     .then(responses => {
-      document.body.appendChild(navbar(commonName(responses[0])));
+      document.body.appendChild(navbar(commonName(responses[0]), "search-results"));
       return Promise.all(responses.map(response => response.json()))
     })
     .then((responses) => {
