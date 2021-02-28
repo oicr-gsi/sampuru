@@ -7,6 +7,10 @@ p {
     text-indent: 1em;
 }
 
+a.definition {
+    text-decoration-style: dashed;
+}
+
 .help {
     color: red;
 }
