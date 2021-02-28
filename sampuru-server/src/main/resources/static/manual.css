@@ -1,0 +1,12 @@
+body {
+    font-family: serif;
+    line-height: 2;
+}
+
+p {
+    text-indent: 1em;
+}
+
+.help {
+    color: red;
+}
