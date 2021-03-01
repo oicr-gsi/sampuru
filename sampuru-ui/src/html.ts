@@ -426,11 +426,12 @@ export function navbar(name: string | null): HTMLElement {
   submitButton.type = "button";
   submitButton.className = "btn btn-secondary";
   submitButton.innerText = "Search";
+
   submitButton.addEventListener("click", () => {
     window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
   });
-  submitButton.addEventListener("keyup", (event) => {
-    if (event.code === 'Enter') {
+  textBox.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") {
       window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
     }
   });
