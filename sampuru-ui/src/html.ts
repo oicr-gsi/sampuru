@@ -395,6 +395,7 @@ export interface Card {
 
   /**
    * Used by Bootstrap to know what card to collapse/expand
+   * Also the id that is passed to construct URLs
    * */
   cardId: string;
 }
