@@ -134,7 +134,7 @@ export function defaultSearchResults(
           innerText: "All", className: "", title: "All Cases for " + project.name}))
 
         const info = elementFromTag("div", "container project-overview", infoItems);
-        const infoCard: Card = {contents: info.element, header: "Project Overview: " + project.name, title: project.name, tagId: project.id}
+        const infoCard: Card = {contents: info.element, header: "Project Overview: " + project.name, title: project.name, cardId: project.id}
         cards.push(collapsibleCard("projects", null, infoCard, false));
       });
   }
@@ -160,7 +160,7 @@ export function defaultSearchResults(
     );
 
     const casesTable = elementFromTag("div", "container generic-tables", table);
-    const casesCard: Card = {contents: casesTable.element, header: "Cases", title: "Donor Cases", tagId: "donor_cases"}
+    const casesCard: Card = {contents: casesTable.element, header: "Cases", title: "Donor Cases", cardId: "donor_cases"}
     cards.push(collapsibleCard("donor_cases", null, casesCard, false));
   }
 
@@ -174,7 +174,7 @@ export function defaultSearchResults(
       ["Parent ID", (x) => x.parent_id == "null" ? "None" : x.parent_id]);
 
     const qcablesTable = elementFromTag("div", "container generic-tables", table);
-    const caseCard: Card = {contents: qcablesTable.element, header: "QCables" , title: "QCables", tagId: "all-qcables"}
+    const caseCard: Card = {contents: qcablesTable.element, header: "QCables" , title: "QCables", cardId: "all-qcables"}
     cards.push(collapsibleCard("qcables", null, caseCard, false));
   }
 
@@ -184,7 +184,7 @@ export function defaultSearchResults(
       ["Content", (x) => x.content]);
 
     const changelogsTable = elementFromTag("div", "container generic-tables", table);
-    const changelogCard: Card = {contents: changelogsTable.element, header: "Changelogs", title: "Changelogs", tagId: "changelogs"}
+    const changelogCard: Card = {contents: changelogsTable.element, header: "Changelogs", title: "Changelogs", cardId: "changelogs"}
     cards.push(collapsibleCard("changelogs", null, changelogCard, false));
   }
 
@@ -196,7 +196,7 @@ export function defaultSearchResults(
       ["Expiry Date", (x) => x.expiry_date]);
 
     const deliverablesTable = elementFromTag("div", "container generic-tables", table);
-    const deliverableCard: Card = {contents: deliverablesTable.element, header: "Deliverable Information", title: "Deliverables", tagId: "deliverables"}
+    const deliverableCard: Card = {contents: deliverablesTable.element, header: "Deliverable Information", title: "Deliverables", cardId: "deliverables"}
     cards.push(collapsibleCard("deliverables", null, deliverableCard, false));
   }
 
@@ -207,7 +207,7 @@ export function defaultSearchResults(
       ["Resolved Date", (x) => x.resolved_date]);
 
     const notificationsTable = elementFromTag("div", "container generic-tables", table);
-    const notificationsCard: Card = {contents: notificationsTable.element, header: "Notifications", title: "Notifications", tagId: "notifications"}
+    const notificationsCard: Card = {contents: notificationsTable.element, header: "Notifications", title: "Notifications", cardId: "notifications"}
     cards.push(collapsibleCard("notifications", null, notificationsCard, false));
   }
 

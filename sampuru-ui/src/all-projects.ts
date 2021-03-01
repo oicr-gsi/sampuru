@@ -14,13 +14,13 @@ export function activeProjects(projects: ActiveProject[]): HTMLElement {
 
   const cards: HTMLElement[] = [];
   const welcomeText = elementFromTag("div", null, "contents");
-  const welcomeCard: Card = {contents: welcomeText.element, header: "Header!", title: "title!", tagId: "welcome-text"};
+  const welcomeCard: Card = {contents: welcomeText.element, header: "Header!", title: "title!", cardId: "welcome-text"};
   cards.push(collapsibleCard("welcome-text", null, welcomeCard, true));
 
   projects
     .forEach((project) => {
       const cardContent = projectCard(project);
-      const card: Card = {contents: cardContent, header: project.name, title: project.name, tagId: project.id};
+      const card: Card = {contents: cardContent, header: project.name, title: project.name, cardId: project.id};
       cards.push(collapsibleCard("projects", null, card, true));
     })
 

@@ -394,9 +394,9 @@ export interface Card {
   title?: string;
 
   /**
-   * ID for children elements of this card
+   * Used by Bootstrap to know what card to collapse/expand
    * */
-  tagId: string;
+  cardId: string;
 }
 
 /***
@@ -485,7 +485,7 @@ export function collapsibleCard(
         null,
         null,
         urlConstructor(
-              "project.html", ["project-overview-id"], [content.tagId])
+              "project.html", ["project-overview-id"], [content.cardId])
     );
   } else if (referer == "cases") {
     cardLink = createLinkElement(
@@ -494,7 +494,7 @@ export function collapsibleCard(
         null,
         null,
         urlConstructor(
-              "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["case", content.tagId])
+              "qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["case", content.cardId])
     );
   }
   else {
@@ -506,7 +506,7 @@ export function collapsibleCard(
   cardHeader.type = "button";
   cardHeader.className = "card-header";
   cardHeader.setAttribute("data-toggle", "collapse");
-  cardHeader.setAttribute("data-target", `#${content.tagId.replace(/[:]+/g, '')}`);
+  cardHeader.setAttribute("data-target", `#${content.cardId.replace(/[:]+/g, '')}`);
 
   const headerIcon = document.createElement("i");
   headerIcon.className = "fa fa-chevron-down pull-right";
@@ -519,7 +519,7 @@ export function collapsibleCard(
   cardBodyInner.appendChild(content.contents);
 
   const cardBody = document.createElement("div");
-  cardBody.id = `${content.tagId.replace(/[:]+/g, '')}`;
+  cardBody.id = `${content.cardId.replace(/[:]+/g, '')}`;
   cardBody.className = show ? "collapse show" : "collapse";
   cardBody.appendChild(cardBodyInner);
 

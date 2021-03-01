@@ -117,7 +117,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
   const info = elementFromTag("div", "container project-overview", infoItems);
   const infoCard: Card = {contents: info.element, header: "Project Information",
-    title: projectInfo.name + " Overview", tagId: projectInfo.name + "-overview"};
+    title: projectInfo.name + " Overview", cardId: projectInfo.name + "-overview"};
 
 
   const contact = elementFromTag("div", "contact row",
@@ -130,7 +130,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
 
   const contactCard: Card = {contents: contact.element, header: "Contact Information",
-    title: projectInfo.name + " Contact Information", tagId: projectInfo.name + "-contact"};
+    title: projectInfo.name + " Contact Information", cardId: projectInfo.name + "-contact"};
 
   const qcablesLink = createLinkElement(
     null,
@@ -168,15 +168,15 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const sankeyContainer = document.createElement("div");
   sankeyContainer.id = "sankey";
   const qcablesCard: Card = {contents: sankeyContainer, header: "QCables",
-    title: projectInfo.name + " QCables", tagId: projectInfo.name + "-qcables"};
+    title: projectInfo.name + " QCables", cardId: projectInfo.name + "-qcables"};
 
   const table = elementFromTag("div", null, changelogTable(changelogs));
   const changelogsCard: Card = {contents: table.element, header: "Changelogs",
-    title: projectInfo.name + " Changelogs", tagId: projectInfo.name + "-changelogs"};
+    title: projectInfo.name + " Changelogs", cardId: projectInfo.name + "-changelogs"};
 
   const deliverables = elementFromTag("div", null, projectInfo.deliverables.join("\n"));
   const deliverablesCard: Card = {contents: deliverables.element, header: "Files",
-    title: projectInfo.name + " Files", tagId: projectInfo.name + "-files"};
+    title: projectInfo.name + " Files", cardId: projectInfo.name + "-files"};
 
   cards.push(projectSummary.element);
   cards.push(staticCard(qcablesCard));
