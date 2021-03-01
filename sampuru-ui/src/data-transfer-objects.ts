@@ -74,6 +74,7 @@ export interface QCable {
   project_id: string,
   case_id: string,
   case_external_name: string,
+  library_design: string,
   tissue_qcable_alias: string | null,
   tissue_qcable_external_name: string | null,
   tissue_qcable_status: string | null,

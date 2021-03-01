@@ -12,7 +12,7 @@ import {
   toSentenceCase
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
-import {commonName} from "./common.js";
+import {commonName, formatLibraryDesigns} from "./common.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const filterType = urlParams.get("qcables-filter-type");
@@ -64,6 +64,10 @@ export function qcablesTable(
           className: "qcable-table-donor-case"
         },
         {
+          contents: formatLibraryDesigns(qcable.library_design),
+          className: "qcable-table-donor-case"
+        },
+        {
           contents: qcable.tissue_qcable_alias ? qcable.tissue_qcable_alias: "",
           className: statusToClassName(qcable.tissue_qcable_status),
           title: qcable.tissue_qcable_status? toSentenceCase(qcable.tissue_qcable_status) : titleUnknown
@@ -104,6 +108,7 @@ export function qcablesTable(
 
   const tableHeaders = new Map([
     ["case_external_name", "Project:Case"],
+    ["library_design", "Library Design"],
     ["tissue_qcable_alias", "Receipt/Inspection"],
     ["extraction_qcable_alias", "Extraction"],
     ["library_preparation_qcable_alias", "Library Preparation"],
