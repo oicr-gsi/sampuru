@@ -11,10 +11,9 @@ import {ActiveProject} from "./data-transfer-objects.js";
 export function activeProjects(projects: ActiveProject[]): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
-  const welcomeText = document.createElement("div");
-  welcomeText.appendChild(elementFromTag("div", null, "contents!")); // This doesn't work, and i can't put an elementFromTag directly into collapsibleCard either, help
-  const welcomeCard: Card = {contents: welcomeText, header: "Header!", title: "title!", tagId: ""};
-  cardContainer.appendChild(collapsibleCard("projects", null, welcomeCard, false));
+  const welcomeText = elementFromTag("div", null, "contents");
+  const welcomeCard: Card = {contents: welcomeText.element, header: "Header!", title: "title!", tagId: ""};
+  cardContainer.appendChild(collapsibleCard("projects", null, welcomeCard, true));
 
   const cards: HTMLElement[] = [];
   projects
