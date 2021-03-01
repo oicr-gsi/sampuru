@@ -253,14 +253,13 @@ export function defaultSearch(searchString: string) {
       const deliverables = responses[5] as DeliverableFile[];
 
       document.body.appendChild(defaultSearchResults(searchString, projects, cases, qcables, changelogs, notifications, deliverables));
-      const tableIds = ["qcables", "searched-changelogs", "deliverables", "notifications", "donor-case-qcables"];
-      projects.map(project => tableIds.push(project.id + "-donor-cases"));
-
-      tableIds.map(id => {
+      const tableIds = ["donor-case-qcables", "qcables", "searched-changelogs", "deliverables", "notifications"];
+      tableIds.forEach((tid) => {
         $(function () {
-          $(`#${id}`).bootstrapTable({});
+          $(`#${tid}`).bootstrapTable({});
         });
       });
+
     })
     .catch((error) => {
       console.log(error); // todo: log this somewhere permanent
