@@ -443,8 +443,10 @@ export function navbar(
     elementFromTag("div", "input-group-append",
       {type: "complex", element: submitButton}))
 
-  // TODO: How do I replace the 'Help' text with an svg icon?
-  const helpLink = createLinkElement("navbar-brand", "Help", "Read manual for this page", null, "user-manual-en.html#"+helpAnchor);
+  const helpSvg = elementFromTag("i", "fa fa-question-circle");
+
+  const helpLink = createLinkElement("navbar-brand", "", "Read manual for this page", null, "user-manual-en.html#"+helpAnchor);
+  helpLink.appendChild(helpSvg.element);
 
   const commonName = elementFromTag("div", "navbar-brand", name);
 
