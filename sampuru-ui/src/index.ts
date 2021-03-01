@@ -48,7 +48,7 @@ export function genericTable<T>(
   if (rows.length == 0) return [];
   const table =  elementFromTag(
     "table",
-    null,
+    "table",
     elementFromTag(
       "thead",
       null,
