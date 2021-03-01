@@ -8,7 +8,7 @@ import {
   collapsibleCard, createLinkElement,
   DOMElement,
   elementFromTag,
-  navbar
+  navbar, table
 } from "./html.js";
 import {initialiseActiveProjects} from "./all-projects.js";
 import {urlConstructor} from "./io.js";
@@ -48,7 +48,7 @@ export function genericTable<T>(
   if (rows.length == 0) return [];
   const table =  elementFromTag(
     "table",
-    "table",
+    null,
     elementFromTag(
       "thead",
       null,
@@ -159,7 +159,7 @@ export function defaultSearchResults(
       }]
     );
 
-    const casesTable = elementFromTag("div", "container generic-tables", table);
+    const casesTable = elementFromTag("div", "generic-tables", table);
     const casesCard: Card = {contents: casesTable.element, header: "Cases", title: "Donor Cases", tagId: "donor_cases"}
     cards.push(collapsibleCard("donor_cases", null, casesCard, false));
   }
@@ -254,7 +254,11 @@ export function defaultSearch(searchString: string) {
 
       document.body.appendChild(defaultSearchResults(searchString, projects, cases, qcables, changelogs, notifications, deliverables));
       const tableIds = ["donor-case-qcables", "qcables", "searched-changelogs", "deliverables", "notifications"];
-      tableIds.map(id => $(`#${id}`).bootstrapTable({}));
+      tableIds.forEach((id) => {
+        $(function () {
+          $(`#${id}`).bootstrapTable({});
+        });
+      });
 
     })
     .catch((error) => {
