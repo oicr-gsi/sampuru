@@ -254,9 +254,9 @@ export function defaultSearch(searchString: string) {
 
       document.body.appendChild(defaultSearchResults(searchString, projects, cases, qcables, changelogs, notifications, deliverables));
       const tableIds = ["donor-case-qcables", "qcables", "searched-changelogs", "deliverables", "notifications"];
-      tableIds.forEach((id) => {
+      tableIds.forEach((tid) => {
         $(function () {
-          $(`#${id}`).bootstrapTable({});
+          $(`#${tid}`).bootstrapTable({});
         });
       });
 
