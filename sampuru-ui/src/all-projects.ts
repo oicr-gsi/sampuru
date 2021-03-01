@@ -1,18 +1,20 @@
 import {
   Card,
+  elementFromTag,
   projectCard, collapsibleCard, busyDialog, navbar
 } from "./html.js";
 import {commonName} from "./common.js";
 
-import {
-  fetchAsPromise,
-} from "./io.js";
 import {ActiveProject} from "./data-transfer-objects.js";
 
 
 export function activeProjects(projects: ActiveProject[]): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
+  const welcomeText = document.createElement("div");
+  welcomeText.appendChild(elementFromTag("div", null, "contents!")); // This doesn't work, and i can't put an elementFromTag directly into collapsibleCard either, help
+  const welcomeCard: Card = {contents: welcomeText, header: "Header!", title: "title!", tagId: ""};
+  cardContainer.appendChild(collapsibleCard("projects", null, welcomeCard, false));
 
   const cards: HTMLElement[] = [];
   projects
