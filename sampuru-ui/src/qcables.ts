@@ -162,9 +162,9 @@ export function qcablesTable(
       if (childNodes.length) {
         childNodes.remove();
       } else {
-        if(value != "" && field != "case_external_name") {
+        if(value != "" && field != "case_external_name" && field != "library_design") {
           $element.attr('id', value).append(cellValue.element);
-        } else if (field != "case_external_name") {
+        } else if (field != "case_external_name" && field != "library_design") {
           // Let user know QCable hasn't been created yet
           const emptyNotifier = elementFromTag("div", "card",
             elementFromTag("div", "card-body", "Hasn't yet started"));
