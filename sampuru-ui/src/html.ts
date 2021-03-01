@@ -423,16 +423,18 @@ export function navbar(name: string | null): HTMLElement {
   textBox.placeholder = "Search Sampuru";
 
   const submitButton = document.createElement("button");
-  submitButton.type = "submit";
+  submitButton.type = "button";
   submitButton.className = "btn btn-secondary";
   submitButton.innerText = "Search";
+
   submitButton.addEventListener("click", () => {
     window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
   });
-
-
-  submitButton.onkeypress
-
+  textBox.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") {
+      window.location.href = urlConstructor("index.html", ["search"], [textBox.value]);
+    }
+  });
 
   const search = elementFromTag("div", "input-group",
     {type: "complex", element: textBox},
