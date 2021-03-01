@@ -26,13 +26,14 @@ export function activeProjects(projects: ActiveProject[]): HTMLElement {
     elementFromTag("li", null, "Failed QC: Red")
    )
    );
-  const welcomeCard: Card = {contents: welcomeText.element, header: "Welcome to Sampuru! Click here for help", title: "Help banner", tagId: "welcome-text"};
+  const welcomeCard: Card = {contents: welcomeText.element, header: "Welcome to Sampuru! Click here for help", title: "Help banner", cardId: "welcome-text"};
   cards.push(collapsibleCard("welcome-text", null, welcomeCard, false));
+
 
   projects
     .forEach((project) => {
       const cardContent = projectCard(project);
-      const card: Card = {contents: cardContent, header: project.name, title: project.name, tagId: project.id};
+      const card: Card = {contents: cardContent, header: project.name, title: project.name, cardId: project.id};
       cards.push(collapsibleCard("projects", null, card, true));
     })
 
