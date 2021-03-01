@@ -16,6 +16,10 @@ export function activeProjects(projects: ActiveProject[]): HTMLElement {
   cardContainer.appendChild(collapsibleCard("projects", null, welcomeCard, true));
 
   const cards: HTMLElement[] = [];
+  const welcomeText = elementFromTag("div", null, "contents");
+  const welcomeCard: Card = {contents: welcomeText.element, header: "Header!", title: "title!", tagId: "welcome-text"};
+  cards.push(collapsibleCard("welcome-text", null, welcomeCard, true));
+
   projects
     .forEach((project) => {
       const cardContent = projectCard(project);
