@@ -42,7 +42,7 @@ export function initialiseActiveProjects() {
 
   fetch("api/active_projects", {body: null})
   .then(response => {
-    document.body.appendChild(navbar(commonName(response)));
+    document.body.appendChild(navbar(commonName(response), "all-active-projects"));
     if (response.ok) {
       return Promise.resolve(response.json());
     } else if (response.status == 503) {

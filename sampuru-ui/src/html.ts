@@ -402,7 +402,10 @@ export interface Card {
 /***
  * Horizontal navbar that becomes vertical on small screens
  */
-export function navbar(name: string | null): HTMLElement {
+export function navbar(
+  name: string | null,
+  helpAnchor: string
+): HTMLElement {
   if (name === null) {
     name = "LOGIN ERROR";
   }
@@ -441,10 +444,16 @@ export function navbar(name: string | null): HTMLElement {
     elementFromTag("div", "input-group-append",
       {type: "complex", element: submitButton}))
 
+  const helpSvg = elementFromTag("i", "fa fa-question-circle");
+
+  const helpLink = createLinkElement("navbar-brand", "", "Read manual for this page", null, "user-manual-en.html#"+helpAnchor);
+  helpLink.appendChild(helpSvg.element);
+
   const commonName = elementFromTag("div", "navbar-brand", name);
 
   nav.appendChild(sampuru);
   nav.appendChild(search.element);
+  nav.appendChild(helpLink);
   nav.appendChild(commonName.element);
 
   return nav;
