@@ -4,7 +4,7 @@
   <parent>
     <groupId>ca.on.oicr.gsi.sampuru</groupId>
     <artifactId>sampuru</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
   <artifactId>sampuru-server</artifactId>
   <packaging>jar</packaging>
@@ -48,7 +48,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.1-SNAPSHOT.0</version>
         <executions>
           <execution>
             <phase>validate</phase>
@@ -137,7 +137,7 @@
     <dependency>
       <groupId>io.undertow</groupId>
       <artifactId>undertow-core</artifactId>
-      <version>2.1.0.Final</version>
+      <version>2.1.1-SNAPSHOT.Final</version>
     </dependency>
     <dependency>
       <groupId>org.jooq</groupId>
