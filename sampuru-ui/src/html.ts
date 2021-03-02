@@ -269,12 +269,14 @@ export function tableRow(
  * @param headers -> map of data-field to header innerText
  * @param pagination -> boolean for paginating table
  * @param search -> boolean for adding a search to table
+ * @param sort -> map of column name to sort function that needs to be applied to it
  * @param tableId -> id to associate with table for jQuery to apply bootstrapTable styling and js to the right objects
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
   pagination: boolean,
   search: boolean,
+  sort: Map<string, string> | null,
   tableId: string
 ): HTMLElement {
   
@@ -297,6 +299,12 @@ export function bootstrapTable(
     .forEach((header, data, map) => {
       const cell = document.createElement("th");
       cell.setAttribute("data-field", data);
+
+      if (sort && sort.has(data)) {
+        cell.setAttribute("data-sortable", "true");
+        cell.setAttribute("data-sorter", <string>sort.get(data));
+      }
+
       cell.innerText = header;
       tr.appendChild(cell);
     });

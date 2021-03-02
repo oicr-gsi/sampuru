@@ -40,6 +40,16 @@ function statusToClassName(status: string | null) {
   }
 }
 
+
+function alphaNumSort(a: string, b: string) {
+  // Remove non-alphanumeric characters
+  a = a.replace(/[\W_]+/g,"");
+  b = b.replace(/[\W_]+/g,"");
+  if (a > b) return 1;
+  if (a < b) return -1;
+  return 0;
+}
+
 export function qcablesTable(
   qcables: QCable[],
   changelogs: Changelog[],
@@ -117,9 +127,12 @@ export function qcablesTable(
     ["informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
     ["final_report_qcable_alias", "Final Report"]])
 
-  const table = bootstrapTable(tableHeaders, true, true, "table");
+  const sort = new Map();
+  sort.set("case_external_name", "alphaNumSort");
+  const table = bootstrapTable(tableHeaders, true, true, sort, "table");
   const tableBody = tableBodyFromRows(null, tableRows);
 
+  table.setAttribute("data-sort-name", "case_external_name");
   table.appendChild(tableBody);
 
   pageContainer.appendChild(pageHeader);

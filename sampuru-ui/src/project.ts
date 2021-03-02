@@ -58,7 +58,7 @@ export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElem
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, "project-changelog");
+  const table = bootstrapTable(tableHeaders, true, true, null, "project-changelog");
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
