@@ -53,7 +53,7 @@ public class Server {
         Service service = null;
         PathTemplateMatch ptm = hse.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
         String type = ptm.getParameters().get("type");
-        String term = ptm.getParameters().get("term");
+        String term = ptm.getParameters().get("term").toUpperCase(Locale.ROOT);
         List<? extends SampuruType> list;
 
         switch(type){
