@@ -13,9 +13,9 @@ export function formatQualityGateNames(name: string) {
     case "library_preparation":
       return "Library Preparation";
     case "low_pass":
-      return "Low-Pass";
+      return "Library Qualification";
     case "low_pass_sequencing":
-      return "Low-Pass Sequencing";
+      return "Library Qualification";
     case "full_depth":
       return "Full-Depth";
     case "full_depth_sequencing":

@@ -122,7 +122,7 @@ export function qcablesTable(
     ["tissue_qcable_alias", "Receipt/Inspection"],
     ["extraction_qcable_alias", "Extraction"],
     ["library_preparation_qcable_alias", "Library Preparation"],
-    ["low_pass_sequencing_qcable_alias", "Low-Pass Sequencing"],
+    ["low_pass_sequencing_qcable_alias", "Library Qualification"],
     ["full_depth_sequencing_qcable_alias", "Full-Depth Sequencing"],
     ["informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
     ["final_report_qcable_alias", "Final Report"]])
