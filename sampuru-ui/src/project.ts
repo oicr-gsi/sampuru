@@ -174,14 +174,16 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const changelogsCard: Card = {contents: table.element, header: "Changelogs",
     title: projectInfo.name + " Changelogs", cardId: projectInfo.name + "-changelogs"};
 
+  /* TODO: Uncomment once deliverable portal is developed and there is data to display. GR-1334
   const deliverables = elementFromTag("div", null, projectInfo.deliverables.join("\n"));
   const deliverablesCard: Card = {contents: deliverables.element, header: "Files",
     title: projectInfo.name + " Files", cardId: projectInfo.name + "-files"};
+  */
 
   cards.push(projectSummary.element);
   cards.push(staticCard(qcablesCard));
   cards.push(staticCard(changelogsCard));
-  cards.push(staticCard(deliverablesCard));
+  //cards.push(staticCard(deliverablesCard)); END TODO
 
   cards
     .forEach((card) => {
