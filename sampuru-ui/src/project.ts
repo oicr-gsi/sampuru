@@ -178,7 +178,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const deliverables = elementFromTag("div", null, projectInfo.deliverables.join("\n"));
   const deliverablesCard: Card = {contents: deliverables.element, header: "Files",
     title: projectInfo.name + " Files", cardId: projectInfo.name + "-files"};
-   */
+  */
 
   cards.push(projectSummary.element);
   cards.push(staticCard(qcablesCard));
