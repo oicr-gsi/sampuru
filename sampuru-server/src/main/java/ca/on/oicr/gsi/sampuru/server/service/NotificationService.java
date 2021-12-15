@@ -12,6 +12,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,8 @@ public class NotificationService extends Service<Notification> {
     public NotificationService(){
         super(Notification.class);
     }
+
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static void getIdParams(HttpServerExchange hse) throws Exception {
         getIdParams(new NotificationService(), hse);
@@ -72,8 +75,8 @@ public class NotificationService extends Service<Notification> {
             Notification notificationItem = (Notification)item;
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("id", notificationItem.id);
-            jsonObject.put("issue_date", JSONObject.escape(notificationItem.issueDate.toString()));
-            jsonObject.put("resolved_date", notificationItem.resolvedDate == null? "null": JSONObject.escape(notificationItem.resolvedDate.toString()));
+            jsonObject.put("issue_date", JSONObject.escape(notificationItem.issueDate.format(DATE_TIME_FORMATTER)));
+            jsonObject.put("resolved_date", notificationItem.resolvedDate == null? "null": JSONObject.escape(notificationItem.resolvedDate.format(DATE_TIME_FORMATTER)));
             jsonObject.put("content", notificationItem.content);
             jsonArray.add(jsonObject);
         }
