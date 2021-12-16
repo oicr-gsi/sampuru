@@ -128,7 +128,8 @@ public class ChangelogService extends Service<ChangelogEntry> {
                         .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
                                 .from(USER_ACCESS)
-                                .where(USER_ACCESS.USERNAME.eq(username))))))));
+                                .where(USER_ACCESS.USERNAME.eq(username))))))
+            .orderBy(CHANGELOG.CHANGE_DATE.desc())));
     }
 
     public JSONArray getChangelogsByCase(String caseId, String username) throws SQLException {
@@ -143,7 +144,8 @@ public class ChangelogService extends Service<ChangelogEntry> {
                                 .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                         .select(USER_ACCESS.PROJECT)
                                         .from(USER_ACCESS)
-                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))
+            .orderBy(CHANGELOG.CHANGE_DATE.desc())));
     }
 
     public JSONArray getChangelogsByQcable(String qcableId, String username) throws SQLException {
@@ -158,7 +160,8 @@ public class ChangelogService extends Service<ChangelogEntry> {
                                 .or(DBConnector.ADMIN_ROLE.in(PostgresDSL
                                         .select(USER_ACCESS.PROJECT)
                                         .from(USER_ACCESS)
-                                        .where(USER_ACCESS.USERNAME.eq(username))))))));
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))
+            .orderBy(CHANGELOG.CHANGE_DATE.desc())));
     }
 
     private JSONArray buildChangelogsTable(Result<Record> result) {
