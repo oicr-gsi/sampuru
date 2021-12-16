@@ -14,7 +14,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -29,8 +28,6 @@ public class DeliverableService extends Service<Deliverable> {
     public DeliverableService(){
         super(Deliverable.class);
     }
-
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static void getIdParams(HttpServerExchange hse) throws Exception {
         getIdParams(new DeliverableService(), hse);
@@ -81,7 +78,7 @@ public class DeliverableService extends Service<Deliverable> {
             deliverableObject.put("case_ids", Arrays.stream((String[])deliverableResult.get(CASE_IDS)).collect(Collectors.toSet()).toString());
             deliverableObject.put("location", deliverableResult.get(DELIVERABLE_FILE.LOCATION));
             deliverableObject.put("notes", deliverableResult.get(DELIVERABLE_FILE.NOTES));
-            deliverableObject.put("expiry_date", deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE) == null? "null": JSONObject.escape(deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE).format(DATE_TIME_FORMATTER)));
+            deliverableObject.put("expiry_date", deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE) == null? "null": JSONObject.escape(deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE).format(ServiceUtils.DATE_TIME_FORMATTER)));
             deliverablesArray.add(deliverableObject);
         }
         jsonObject.put("deliverables", deliverablesArray);
@@ -154,7 +151,7 @@ public class DeliverableService extends Service<Deliverable> {
             jsonObject.put("id", deliverable.id);
             jsonObject.put("location", deliverable.location);
             jsonObject.put("notes", deliverable.notes);
-            jsonObject.put("expiry_date", JSONObject.escape(deliverable.expiryDate.format(DATE_TIME_FORMATTER)));
+            jsonObject.put("expiry_date", JSONObject.escape(deliverable.expiryDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
 
             jsonArray.add(jsonObject);
         }

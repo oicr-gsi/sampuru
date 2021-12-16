@@ -13,7 +13,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,8 +25,6 @@ public class CaseService extends Service<Case> {
     public CaseService(){
         super(Case.class);
     }
-
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public Case get(String name){
         throw new UnsupportedOperationException("Not implemented yet");
@@ -164,7 +161,7 @@ public class CaseService extends Service<Case> {
             JSONObject changelogEntry = new JSONObject();
 
             changelogEntry.put("id", result.get(CHANGELOG.ID));
-            changelogEntry.put("change_date", result.get(CHANGELOG.CHANGE_DATE).format(DATE_TIME_FORMATTER));
+            changelogEntry.put("change_date", result.get(CHANGELOG.CHANGE_DATE).format(ServiceUtils.DATE_TIME_FORMATTER));
             changelogEntry.put("content", result.get(CHANGELOG.CONTENT));
 
             currentChangelog.add(changelogEntry);

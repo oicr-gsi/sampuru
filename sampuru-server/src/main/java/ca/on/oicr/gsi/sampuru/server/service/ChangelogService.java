@@ -13,7 +13,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,8 +24,6 @@ public class ChangelogService extends Service<ChangelogEntry> {
     public ChangelogService(){
         super(ChangelogEntry.class);
     }
-
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static void getIdParams(HttpServerExchange hse) throws Exception {
         getIdParams(new ChangelogService(), hse);
@@ -87,7 +84,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
 
             jsonObject.put("id", changelogEntry.id);
             jsonObject.put("content", changelogEntry.content);
-            jsonObject.put("change_date", JSONObject.escape(changelogEntry.changeDate.format(DATE_TIME_FORMATTER)));
+            jsonObject.put("change_date", JSONObject.escape(changelogEntry.changeDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
 
             jsonArray.add(jsonObject);
         }
@@ -172,7 +169,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
             jsonObject.put("project_id", row.get(CHANGELOG.PROJECT_ID));
             jsonObject.put("case_id", row.get(CHANGELOG.CASE_ID));
             jsonObject.put("qcable_id", row.get(CHANGELOG.QCABLE_ID) == null ? "null": row.get(CHANGELOG.QCABLE_ID));
-            jsonObject.put("change_date", row.get(CHANGELOG.CHANGE_DATE).format(DATE_TIME_FORMATTER));
+            jsonObject.put("change_date", row.get(CHANGELOG.CHANGE_DATE).format(ServiceUtils.DATE_TIME_FORMATTER));
             jsonObject.put("content", row.get(CHANGELOG.CONTENT));
 
             jsonArray.add(jsonObject);
