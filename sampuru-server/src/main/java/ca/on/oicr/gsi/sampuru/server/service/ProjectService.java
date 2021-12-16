@@ -88,7 +88,7 @@ public class ProjectService extends Service<Project> {
             JSONObject projectObject = new JSONObject();
             projectObject.put("id", completedProject.id);
             projectObject.put("name", completedProject.name);
-            projectObject.put("completion_date", completedProject.completionDate == null? "null": JSONObject.escape(completedProject.completionDate.toString()));
+            projectObject.put("completion_date", completedProject.completionDate == null? "null": JSONObject.escape(completedProject.completionDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
             jsonArray.add(projectObject);
         }
         return jsonArray.toJSONString();
@@ -179,7 +179,7 @@ public class ProjectService extends Service<Project> {
             JSONObject projectObject = new JSONObject();
             projectObject.put("id", activeProject.id);
             projectObject.put("name", activeProject.name);
-            projectObject.put("last_update", activeProject.lastUpdate == null? "null": JSONObject.escape(activeProject.lastUpdate.toString()));
+            projectObject.put("last_update", activeProject.lastUpdate == null? "null": JSONObject.escape(activeProject.lastUpdate.format(ServiceUtils.DATE_TIME_FORMATTER)));
             projectObject.put("cases_total", activeProject.casesTotal);
             projectObject.put("cases_completed", activeProject.casesCompleted);
             projectObject.put("qcables_total", activeProject.qcablesTotal);
@@ -311,8 +311,8 @@ public class ProjectService extends Service<Project> {
             jsonObject.put("pipeline", project.pipeline == null? "null": project.pipeline);
             jsonObject.put("reference_genome", project.referenceGenome == null? "null": project.referenceGenome);
             jsonObject.put("kits", project.kits == null? "[]": Arrays.stream(project.kits.toArray()).collect(Collectors.toSet()).toString());
-            jsonObject.put("created_date", project.createdDate == null? "null": JSONObject.escape(project.createdDate.toString()));
-            jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.toString()));
+            jsonObject.put("created_date", project.createdDate == null? "null": JSONObject.escape(project.createdDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
+            jsonObject.put("completion_date", project.completionDate == null? "null": JSONObject.escape(project.completionDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
 
             if(expand){
                 JSONArray infoItemsArray = new JSONArray();
@@ -351,8 +351,8 @@ public class ProjectService extends Service<Project> {
         jsonObject.put("pipeline", subject.pipeline == null? "null": subject.pipeline);
         jsonObject.put("reference_genome", subject.referenceGenome == null? "null": subject.referenceGenome);
         jsonObject.put("kits", Arrays.stream(subject.kits.toArray()).collect(Collectors.toSet()).toString());
-        jsonObject.put("created_date", subject.createdDate == null? "null": JSONObject.escape(subject.createdDate.toString()));
-        jsonObject.put("completion_date", subject.completionDate  == null? "null": JSONObject.escape(subject.completionDate.toString()));
+        jsonObject.put("created_date", subject.createdDate == null? "null": JSONObject.escape(subject.createdDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
+        jsonObject.put("completion_date", subject.completionDate  == null? "null": JSONObject.escape(subject.completionDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
         jsonObject.put("cases_total", subject.casesTotal);
         jsonObject.put("cases_completed", subject.casesCompleted);
         jsonObject.put("qcables_total", subject.qcablesTotal);
@@ -375,7 +375,7 @@ public class ProjectService extends Service<Project> {
         for (Deliverable deliverable: subject.getDeliverables(username)){
             JSONObject deliverableObj = new JSONObject();
             deliverableObj.put("id", deliverable.id);
-            deliverableObj.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
+            deliverableObj.put("expiry_date", JSONObject.escape(deliverable.expiryDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
             deliverableObj.put("location", deliverable.location);
             deliverableObj.put("notes", deliverable.notes);
             deliverablesArray.add(deliverableObj);

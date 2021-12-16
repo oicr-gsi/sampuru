@@ -78,7 +78,7 @@ public class DeliverableService extends Service<Deliverable> {
             deliverableObject.put("case_ids", Arrays.stream((String[])deliverableResult.get(CASE_IDS)).collect(Collectors.toSet()).toString());
             deliverableObject.put("location", deliverableResult.get(DELIVERABLE_FILE.LOCATION));
             deliverableObject.put("notes", deliverableResult.get(DELIVERABLE_FILE.NOTES));
-            deliverableObject.put("expiry_date", deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE) == null? "null": JSONObject.escape(deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE).toString()));
+            deliverableObject.put("expiry_date", deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE) == null? "null": JSONObject.escape(deliverableResult.get(DELIVERABLE_FILE.EXPIRY_DATE).format(ServiceUtils.DATE_TIME_FORMATTER)));
             deliverablesArray.add(deliverableObject);
         }
         jsonObject.put("deliverables", deliverablesArray);
@@ -151,7 +151,7 @@ public class DeliverableService extends Service<Deliverable> {
             jsonObject.put("id", deliverable.id);
             jsonObject.put("location", deliverable.location);
             jsonObject.put("notes", deliverable.notes);
-            jsonObject.put("expiry_date", JSONObject.escape(deliverable.expiryDate.toString()));
+            jsonObject.put("expiry_date", JSONObject.escape(deliverable.expiryDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
 
             jsonArray.add(jsonObject);
         }

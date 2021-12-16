@@ -84,7 +84,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
 
             jsonObject.put("id", changelogEntry.id);
             jsonObject.put("content", changelogEntry.content);
-            jsonObject.put("change_date", JSONObject.escape(changelogEntry.changeDate.toString()));
+            jsonObject.put("change_date", JSONObject.escape(changelogEntry.changeDate.format(ServiceUtils.DATE_TIME_FORMATTER)));
 
             jsonArray.add(jsonObject);
         }
@@ -169,7 +169,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
             jsonObject.put("project_id", row.get(CHANGELOG.PROJECT_ID));
             jsonObject.put("case_id", row.get(CHANGELOG.CASE_ID));
             jsonObject.put("qcable_id", row.get(CHANGELOG.QCABLE_ID) == null ? "null": row.get(CHANGELOG.QCABLE_ID));
-            jsonObject.put("change_date", row.get(CHANGELOG.CHANGE_DATE).toString());
+            jsonObject.put("change_date", row.get(CHANGELOG.CHANGE_DATE).format(ServiceUtils.DATE_TIME_FORMATTER));
             jsonObject.put("content", row.get(CHANGELOG.CONTENT));
 
             jsonArray.add(jsonObject);
