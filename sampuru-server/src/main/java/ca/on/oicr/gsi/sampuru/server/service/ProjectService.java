@@ -159,7 +159,8 @@ public class ProjectService extends Service<Project> {
                                 .in(PostgresDSL
                                         .select(USER_ACCESS.PROJECT)
                                         .from(USER_ACCESS)
-                                        .where(USER_ACCESS.USERNAME.eq(username)))))));
+                                        .where(USER_ACCESS.USERNAME.eq(username))))))
+                    .orderBy(PROJECT.NAME.asc()));
         for (Record result: results) {
             newList.add(new Project(result));
         }

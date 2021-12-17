@@ -59,6 +59,12 @@ public class DBConnector {
         }
     }
 
+    public <T> Result fetch(SelectSeekStep1<Record, T> select) throws SQLException {
+        try(final Connection connection = getConnection()) {
+            return getContext(connection).fetch(select);
+        }
+    }
+
     //TODO: filter by username, probably by removing me
     public Record getUniqueRow(TableField field, Object toMatch) throws Exception {
         String tableName = field.getTable().getName();
