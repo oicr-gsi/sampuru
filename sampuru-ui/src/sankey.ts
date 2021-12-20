@@ -28,13 +28,15 @@ export function linkSetup(key: keyof SankeyTransition, sankey: SankeyTransition)
     case "extraction":
       return { source: "Extraction", target: "Library Preparation", value: sankey[key].library_preparation, color: "#437bbf" };
     case "library_preparation":
-      return { source: "Library Preparation", target: "Library Qualification", value: sankey[key].low_pass_sequencing, color: "#437bbf" };
-    case "low_pass_sequencing":
+      return { source: "Library Preparation", target: "Library Qualification", value: sankey[key].library_qualification, color: "#437bbf" };
+    case "library_qualification":
       return { source: "Library Qualification", target: "Full-Depth Sequencing", value: sankey[key].full_depth_sequencing, color: "#437bbf" };
     case "full_depth_sequencing":
       return { source: "Full-Depth Sequencing", target: "Informatics & Interpretation", value: sankey[key].informatics_interpretation, color: "#437bbf" };
     case "informatics_interpretation":
-      return { source: "Informatics & Interpretation", target: "Final Report", value: sankey[key].final_report, color: "#437bbf" };
+      return { source: "Informatics & Interpretation", target: "Draft Report", value: sankey[key].draft_report, color: "#437bbf" };
+    case "draft_report":
+      return { source: "Draft Report", target: "Final Report", value: sankey[key].final_report, color: "#437bbf" };
     case "final_report":
       return { source: "Final Report", target: "Passed", value: sankey[key].passed, color: "#437bbf" };
   }

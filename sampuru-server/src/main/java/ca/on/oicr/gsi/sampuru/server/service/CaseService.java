@@ -83,9 +83,10 @@ public class CaseService extends Service<Case> {
             JSONObject receiptStep = new JSONObject(),
                     extractionStep = new JSONObject(),
                     libraryPrepStep = new JSONObject(),
-                    lowPassStep = new JSONObject(),
+                    libraryQualStep = new JSONObject(),
                     fullDepthStep = new JSONObject(),
                     informaticsStep = new JSONObject(),
+                    draftReportStep = new JSONObject(),
                     finalReportStep = new JSONObject();
 
             receiptStep.put("type", "receipt");
@@ -106,11 +107,11 @@ public class CaseService extends Service<Case> {
             libraryPrepStep.put("status", determineStepStatus((Long)libraryPrepStep.get("completed"), (Long)libraryPrepStep.get("total")));
             steps.add(libraryPrepStep);
 
-            lowPassStep.put("type", "low_pass");
-            lowPassStep.put("total", result.get(CASE_CARD.LOW_PASS_SEQUENCING_TOTAL));
-            lowPassStep.put("completed", result.get(CASE_CARD.LOW_PASS_SEQUENCING_COMPLETED));
-            lowPassStep.put("status", determineStepStatus((Long)lowPassStep.get("completed"), (Long)lowPassStep.get("total")));
-            steps.add(lowPassStep);
+            libraryQualStep.put("type", "library_qual");
+            libraryQualStep.put("total", result.get(CASE_CARD.LIBRARY_QUALIFICATION_TOTAL));
+            libraryQualStep.put("completed", result.get(CASE_CARD.LIBRARY_QUALIFICATION_COMPLETED));
+            libraryQualStep.put("status", determineStepStatus((Long)libraryQualStep.get("completed"), (Long)libraryQualStep.get("total")));
+            steps.add(libraryQualStep);
 
             fullDepthStep.put("type", "full_depth");
             fullDepthStep.put("total", result.get(CASE_CARD.FULL_DEPTH_SEQUENCING_TOTAL));
@@ -123,6 +124,12 @@ public class CaseService extends Service<Case> {
             informaticsStep.put("completed", result.get(CASE_CARD.INFORMATICS_INTERPRETATION_COMPLETED));
             informaticsStep.put("status", determineStepStatus((Long)informaticsStep.get("completed"), (Long)informaticsStep.get("total")));
             steps.add(informaticsStep);
+
+            draftReportStep.put("type", "draft_report");
+            draftReportStep.put("total", result.get(CASE_CARD.DRAFT_REPORT_TOTAL));
+            draftReportStep.put("completed", result.get(CASE_CARD.DRAFT_REPORT_COMPLETED));
+            draftReportStep.put("status", determineStepStatus((Long)draftReportStep.get("completed"), (Long)draftReportStep.get("total")));
+            steps.add(draftReportStep);
 
             finalReportStep.put("type", "final_report");
             finalReportStep.put("total", result.get(CASE_CARD.FINAL_REPORT_TOTAL));
