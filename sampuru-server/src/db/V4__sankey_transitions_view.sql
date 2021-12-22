@@ -1,4 +1,4 @@
-CREATE VIEW sankey_transition AS
+CREATE OR REPLACE VIEW sankey_transition AS
 SELECT
 project_id,
 

@@ -1,4 +1,4 @@
-CREATE VIEW case_card AS
+CREATE OR REPLACE VIEW case_card AS
 SELECT
 case_id,
 (SELECT donor_case.name FROM donor_case WHERE donor_case.id = case_id) AS case_name,

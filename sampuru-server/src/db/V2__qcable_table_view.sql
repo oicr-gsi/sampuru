@@ -1,4 +1,4 @@
-CREATE VIEW qcable_table AS
+CREATE OR REPLACE VIEW qcable_table AS
 SELECT
 receipt_inspection_qcable.project_id       AS project_id,
 receipt_inspection_qcable.case_id          AS case_id,
