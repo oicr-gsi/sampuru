@@ -85,7 +85,6 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
       const link = linkSetup(key, sankey);
 
       if (link && link.value > 0) {
-        console.log(link);
         data.push(
           {
             source: link.source,
