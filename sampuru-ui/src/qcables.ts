@@ -93,9 +93,9 @@ export function qcablesTable(
           title: qcable.library_preparation_qcable_status? toSentenceCase(qcable.library_preparation_qcable_status) : titleUnknown
         },
         {
-          contents: qcable.low_pass_sequencing_qcable_alias ? qcable.low_pass_sequencing_qcable_alias: "",
-          className: statusToClassName(qcable.low_pass_sequencing_qcable_status),
-          title: qcable.low_pass_sequencing_qcable_status? toSentenceCase(qcable.low_pass_sequencing_qcable_status) : titleUnknown
+          contents: qcable.library_qualification_qcable_alias ? qcable.library_qualification_qcable_alias: "",
+          className: statusToClassName(qcable.library_qualification_qcable_status),
+          title: qcable.library_qualification_qcable_status? toSentenceCase(qcable.library_qualification_qcable_status) : titleUnknown
         },
         {
           contents: qcable.full_depth_sequencing_qcable_alias ? qcable.full_depth_sequencing_qcable_alias: "",
@@ -106,6 +106,11 @@ export function qcablesTable(
           contents: qcable.informatics_interpretation_qcable_alias ? qcable.informatics_interpretation_qcable_alias: "",
           className: statusToClassName(qcable.informatics_interpretation_qcable_status),
           title: qcable.informatics_interpretation_qcable_status? toSentenceCase(qcable.informatics_interpretation_qcable_status) : titleUnknown
+        },
+        {
+          contents: qcable.draft_report_qcable_alias ? qcable.draft_report_qcable_alias: "",
+          className: statusToClassName(qcable.draft_report_qcable_status),
+          title: qcable.draft_report_qcable_status? toSentenceCase(qcable.draft_report_qcable_status) : titleUnknown
         },
         {
           contents: qcable.final_report_qcable_alias ? qcable.final_report_qcable_alias: "",
@@ -122,9 +127,10 @@ export function qcablesTable(
     ["tissue_qcable_alias", "Receipt/Inspection"],
     ["extraction_qcable_alias", "Extraction"],
     ["library_preparation_qcable_alias", "Library Preparation"],
-    ["low_pass_sequencing_qcable_alias", "Library Qualification"],
+    ["library_qualification_qcable_alias", "Library Qualification"],
     ["full_depth_sequencing_qcable_alias", "Full-Depth Sequencing"],
     ["informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
+    ["draft_report_qcable_alias", "Draft Report"],
     ["final_report_qcable_alias", "Final Report"]])
 
   const sort = new Map();

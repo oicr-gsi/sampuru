@@ -315,21 +315,21 @@ public class DBConnector {
         extractionObject.put("pending", result.get(SANKEY_TRANSITION.EXTRACTION_PENDING));
         jsonObject.put("extraction", extractionObject);
 
-        // LIBRARY PREPARATION -> LOW PASS SEQUENCING
+        // LIBRARY PREPARATION -> LIBRARY QUALIFICATION
         JSONObject libPrepObject = new JSONObject();
         libPrepObject.put("total", result.get(SANKEY_TRANSITION.LIBRARY_PREPARATION_TOTAL));
-        libPrepObject.put("low_pass_sequencing", result.get(SANKEY_TRANSITION.LIBRARY_PREPARATION_LOW_PASS_SEQUENCING));
+        libPrepObject.put("library_qualification", result.get(SANKEY_TRANSITION.LIBRARY_PREPARATION_LIBRARY_QUALIFICATION));
         libPrepObject.put("failed", result.get(SANKEY_TRANSITION.LIBRARY_PREPARATION_FAILED));
         libPrepObject.put("pending", result.get(SANKEY_TRANSITION.LIBRARY_PREPARATION_PENDING));
         jsonObject.put("library_preparation", libPrepObject);
 
-        // LOW PASS SEQUENCING -> FULL DEPTH SEQUENCING
-        JSONObject lowPassObject = new JSONObject();
-        lowPassObject.put("total", result.get(SANKEY_TRANSITION.LOW_PASS_SEQUENCING_TOTAL));
-        lowPassObject.put("full_depth_sequencing", result.get(SANKEY_TRANSITION.LOW_PASS_SEQUENCING_FULL_DEPTH_SEQUENCING));
-        lowPassObject.put("failed", result.get(SANKEY_TRANSITION.LOW_PASS_SEQUENCING_FAILED));
-        lowPassObject.put("pending", result.get(SANKEY_TRANSITION.LOW_PASS_SEQUENCING_PENDING));
-        jsonObject.put("low_pass_sequencing", lowPassObject);
+        // LIBRARY QUALIFICATION -> FULL DEPTH SEQUENCING
+        JSONObject libQualObject = new JSONObject();
+        libQualObject.put("total", result.get(SANKEY_TRANSITION.LIBRARY_QUALIFICATION_TOTAL));
+        libQualObject.put("full_depth_sequencing", result.get(SANKEY_TRANSITION.LIBRARY_QUALIFICATION_FULL_DEPTH_SEQUENCING));
+        libQualObject.put("failed", result.get(SANKEY_TRANSITION.LIBRARY_QUALIFICATION_FAILED));
+        libQualObject.put("pending", result.get(SANKEY_TRANSITION.LIBRARY_QUALIFICATION_PENDING));
+        jsonObject.put("library_qualification", libQualObject);
 
         // FULL DEPTH SEQUENCING -> INFORMATICS INTERPRETATION
         JSONObject fullDepthObject = new JSONObject();
@@ -339,13 +339,21 @@ public class DBConnector {
         fullDepthObject.put("pending", result.get(SANKEY_TRANSITION.FULL_DEPTH_SEQUENCING_PENDING));
         jsonObject.put("full_depth_sequencing", fullDepthObject);
 
-        // INFORMATICS INTERPRETATION -> FINAL REPORT
+        // INFORMATICS INTERPRETATION -> DRAFT REPORT
         JSONObject informaticsInterpretationObject = new JSONObject();
         informaticsInterpretationObject.put("total", result.get(SANKEY_TRANSITION.INFORMATICS_INTERPRETATION_TOTAL));
-        informaticsInterpretationObject.put("final_report", result.get(SANKEY_TRANSITION.INFORMATICS_INTERPRETATION_FINAL_REPORT));
+        informaticsInterpretationObject.put("draft_report", result.get(SANKEY_TRANSITION.INFORMATICS_INTERPRETATION_DRAFT_REPORT));
         informaticsInterpretationObject.put("failed", result.get(SANKEY_TRANSITION.INFORMATICS_INTERPRETATION_FAILED));
         informaticsInterpretationObject.put("pending", result.get(SANKEY_TRANSITION.INFORMATICS_INTERPRETATION_PENDING));
         jsonObject.put("informatics_interpretation", informaticsInterpretationObject);
+
+        // DRAFT REPORT -> FINAL REPORT
+        JSONObject draftReportObject = new JSONObject();
+        draftReportObject.put("total", result.get(SANKEY_TRANSITION.DRAFT_REPORT_TOTAL));
+        draftReportObject.put("final_report", result.get(SANKEY_TRANSITION.DRAFT_REPORT_FINAL_REPORT));
+        draftReportObject.put("failed", result.get(SANKEY_TRANSITION.DRAFT_REPORT_FAILED));
+        draftReportObject.put("pending", result.get(SANKEY_TRANSITION.DRAFT_REPORT_PENDING));
+        jsonObject.put("draft_report", draftReportObject);
 
         // FINAL REPORT -> COMPLETION
         JSONObject finalReportObject = new JSONObject();

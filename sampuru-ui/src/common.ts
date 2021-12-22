@@ -12,9 +12,9 @@ export function formatQualityGateNames(name: string) {
     case "library_prep":
     case "library_preparation":
       return "Library Preparation";
-    case "low_pass":
+    case "library_qual":
       return "Library Qualification";
-    case "low_pass_sequencing":
+    case "library_qualification":
       return "Library Qualification";
     case "full_depth":
       return "Full-Depth";
@@ -23,6 +23,8 @@ export function formatQualityGateNames(name: string) {
     case "informatics":
     case "informatics_interpretation":
       return "Informatics + Interpretation";
+    case "draft_report":
+      return "Draft Report";
     case "final_report":
       return "Final Report";
     default:
