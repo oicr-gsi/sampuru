@@ -29,7 +29,7 @@ final_report_qcable.oicr_alias AS final_report_qcable_alias,
 final_report_qcable.external_name AS final_report_qcable_external_name,
 final_report_qcable.status AS final_report_qcable_status
 FROM (SELECT * FROM qcable WHERE qcable_type = 'receipt_inspection') AS receipt_inspection_qcable
-LEFT JOIN (SELECT * FROM donor_case) AS donor_case ON receipt_inspection_qcable.case_id = donor_case.id
+LEFT JOIN donor_case ON receipt_inspection_qcable.case_id = donor_case.id
 LEFT JOIN (SELECT * FROM qcable WHERE qcable_type = 'extraction') AS extraction_qcable ON receipt_inspection_qcable.id = extraction_qcable.parent_id
 LEFT JOIN (SELECT * FROM qcable WHERE qcable_type = 'library_preparation') AS library_preparation_qcable ON receipt_inspection_qcable.id = library_preparation_qcable.parent_id
 LEFT JOIN (SELECT * FROM qcable WHERE qcable_type = 'library_qualification') AS library_qualification_qcable ON receipt_inspection_qcable.id = library_qualification_qcable.parent_id
