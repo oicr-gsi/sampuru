@@ -19,17 +19,46 @@ export interface Node {
 }
 
 /**
+ * Receipt level is not always tissue - may be tissue, tissue processing, stock or library.
+ * Since receipt qcable can be stock or library, extraction and library prep gates may not have any samples
+ * e.g. If a library is received, we'll jump from receipt to library qualification (no extraction or library prep)
+ * For this reason, we want to consider alternate flows between gates
+ *
  * Return formatted source and target node names, and value
  * */
-export function linkSetup(key: keyof SankeyTransition, sankey: SankeyTransition): SankeyData {
+export function linkSetup(key: keyof SankeyTransition, sankey: SankeyTransition): SankeyData | undefined {
   switch(key) {
     case "receipt":
+      // Receipt level is stock => no extraction qcable
+      if (sankey["receipt"].extraction == 0 && sankey["extraction"].library_preparation > 0) {
+        return { source: "Receipt", target: "Library Preparation", value: sankey["extraction"].library_preparation, color: "#437bbf" };
+      }
+      // Receipt level is library => no extraction or library preparation qcable
+      else if (sankey["receipt"].extraction == 0 && sankey["extraction"].library_preparation == 0 && sankey["library_preparation"].library_qualification > 0) {
+        return { source: "Receipt", target: "Library Qualification", value: sankey["library_preparation"].library_qualification, color: "#437bbf" };
+      }
       return { source: "Receipt", target: "Extraction", value: sankey[key].extraction, color: "#437bbf" };
     case "extraction":
+      // Receipt level is stock => no extraction qcable
+      if (sankey["receipt"].extraction == 0 && sankey["extraction"].library_preparation > 0) {
+        return undefined;
+      }
       return { source: "Extraction", target: "Library Preparation", value: sankey[key].library_preparation, color: "#437bbf" };
     case "library_preparation":
+      // Receipt level is library => no library preparation qcable
+      if (sankey["receipt"].extraction == 0 && sankey["extraction"].library_preparation == 0 && sankey["library_preparation"].library_qualification > 0) {
+        return undefined;
+      }
+      // For WG/WT assays, miseq run doesn't exist or for TS assays, QC hasn't been set but full_depth_sequencing qcables exist => skip gate
+      else if (sankey["library_preparation"].library_qualification == 0 && sankey["library_qualification"].full_depth_sequencing > 0) {
+        return { source: "Library Preparation", target: "Full-Depth Sequencing", value: sankey["library_qualification"].full_depth_sequencing, color: "#437bbf" };
+      }
       return { source: "Library Preparation", target: "Library Qualification", value: sankey[key].library_qualification, color: "#437bbf" };
     case "library_qualification":
+      // For WG/WT assays, miseq run doesn't exist or for TS assays, QC hasn't been set but full_depth_sequencing qcables exist => skip gate
+      if (sankey["library_preparation"].library_qualification == 0 && sankey["library_qualification"].full_depth_sequencing > 0) {
+        return undefined;
+      }
       return { source: "Library Qualification", target: "Full-Depth Sequencing", value: sankey[key].full_depth_sequencing, color: "#437bbf" };
     case "full_depth_sequencing":
       return { source: "Full-Depth Sequencing", target: "Informatics & Interpretation", value: sankey[key].informatics_interpretation, color: "#437bbf" };
@@ -55,7 +84,8 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
     (key, index, keyArray) => {
       const link = linkSetup(key, sankey);
 
-      if (link.value > 0) {
+      if (link && link.value > 0) {
+        console.log(link);
         data.push(
           {
             source: link.source,
@@ -65,7 +95,7 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
           });
       }
 
-      if (sankey[key].pending > 0) {
+      if (link && sankey[key].pending > 0) {
         // Target has "link.target" to ensure the nodes are considered distinct
         data.push(
           {
@@ -76,7 +106,7 @@ export function preprocess(sankey: SankeyTransition): SankeyData[] {
           });
       }
 
-      if (sankey[key].failed > 0) {
+      if (link && sankey[key].failed > 0) {
         data.push(
           {
             source: link.source,
