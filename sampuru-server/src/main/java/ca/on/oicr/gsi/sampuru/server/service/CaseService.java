@@ -90,8 +90,8 @@ public class CaseService extends Service<Case> {
                     finalReportStep = new JSONObject();
 
             receiptStep.put("type", "receipt");
-            receiptStep.put("total", result.get(CASE_CARD.TISSUE_TOTAL));
-            receiptStep.put("completed", result.get(CASE_CARD.TISSUE_COMPLETED));
+            receiptStep.put("total", result.get(CASE_CARD.RECEIPT_INSPECTION_TOTAL));
+            receiptStep.put("completed", result.get(CASE_CARD.RECEIPT_INSPECTION_COMPLETED));
             receiptStep.put("status", determineStepStatus((Long)receiptStep.get("completed"), (Long)receiptStep.get("total")));
             steps.add(receiptStep);
 

@@ -184,9 +184,9 @@ public class QCableService extends Service<QCable> {
             jsonObject.put("case_id", row.get(QCABLE_TABLE.CASE_ID));
             jsonObject.put("case_external_name", row.get(QCABLE_TABLE.CASE_EXTERNAL_NAME));
             jsonObject.put("library_design", row.get(QCABLE_TABLE.LIBRARY_DESIGN));
-            jsonObject.put("tissue_qcable_alias", row.get(QCABLE_TABLE.TISSUE_QCABLE_ALIAS));
-            jsonObject.put("tissue_qcable_external_name", row.get(QCABLE_TABLE.TISSUE_QCABLE_EXTERNAL_NAME));
-            jsonObject.put("tissue_qcable_status", row.get(QCABLE_TABLE.TISSUE_QCABLE_STATUS));
+            jsonObject.put("receipt_inspection_qcable_alias", row.get(QCABLE_TABLE.RECEIPT_INSPECTION_QCABLE_ALIAS));
+            jsonObject.put("receipt_inspection_qcable_external_name", row.get(QCABLE_TABLE.RECEIPT_INSPECTION_QCABLE_EXTERNAL_NAME));
+            jsonObject.put("receipt_inspection_qcable_status", row.get(QCABLE_TABLE.RECEIPT_INSPECTION_QCABLE_STATUS));
             jsonObject.put("extraction_qcable_alias", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_ALIAS));
             jsonObject.put("extraction_qcable_external_name", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_EXTERNAL_NAME));
             jsonObject.put("extraction_qcable_status", row.get(QCABLE_TABLE.EXTRACTION_QCABLE_STATUS));
