@@ -619,7 +619,7 @@ export function projectCard(
 
   const qcablesTitle = createLinkElement(
     qcables.className,
-    "QCables",
+    "QC-ables",
     null,
     null,
     urlConstructor("qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", project.id])

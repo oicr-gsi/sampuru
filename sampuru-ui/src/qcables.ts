@@ -36,7 +36,7 @@ function statusToClassName(status: string | null) {
     case null:
       return "table-secondary";
     default:
-      throw new Error("Unknown QCable status");
+      throw new Error("Unknown QC-able status");
   }
 }
 
@@ -60,9 +60,9 @@ export function qcablesTable(
   const titleUnknown = "Hasn't started yet";
   if(filterType === "case") {
     const caseExtName = qcables[0].case_external_name;
-    pageHeader.innerText = "QCables (" + caseExtName + ")";
+    pageHeader.innerText = "QC-ables (" + caseExtName + ")";
   } else {
-    pageHeader.innerText = "QCables (" + filterId + ")";
+    pageHeader.innerText = "QC-ables (" + filterId + ")";
   }
 
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
@@ -148,7 +148,7 @@ export function qcablesTable(
   $(function () {
     $('#table').bootstrapTable({
       formatSearch: function() {
-        return 'Search QCables';
+        return 'Search QC-ables';
       }
     });
   });

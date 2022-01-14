@@ -134,7 +134,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
   const qcablesLink = createLinkElement(
     null,
-    "QCables",
+    "QC-ables",
     null,
     null,
     urlConstructor("qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", projectInfo.name])
@@ -167,8 +167,8 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
   const sankeyContainer = document.createElement("div");
   sankeyContainer.id = "sankey";
-  const qcablesCard: Card = {contents: sankeyContainer, header: "QCables",
-    title: projectInfo.name + " QCables", cardId: projectInfo.name + "-qcables"};
+  const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
+    title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
   const table = elementFromTag("div", null, changelogTable(changelogs));
   const changelogsCard: Card = {contents: table.element, header: "Changelogs",
