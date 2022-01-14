@@ -125,12 +125,12 @@ public class Server {
 
     public static void sendHTTPResponse(HttpServerExchange hse, int status, String body){
         hse.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), "Isa");
+        hse.getResponseHeaders().put(HttpString.tryFromString("X-Common-Name"), hse.getRequestHeaders().get("X-Common-Name").element());
         hse.setStatusCode(status);
         hse.getResponseSender().send(body);
     }
 
     public static String getUsername(HttpServerExchange hse){
-        return "imohideen";
+        return hse.getRequestHeaders().get("X-Remote-User").element();
     }
 }
