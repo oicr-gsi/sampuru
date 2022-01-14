@@ -26,7 +26,6 @@ import {
   formatQualityGateNames
 } from "./common.js";
 
-
 const urlParams = new URLSearchParams(window.location.search);
 const search = urlParams.get("search");
 

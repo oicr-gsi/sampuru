@@ -213,4 +213,5 @@ export function initialiseQCables(filterType: string, filterId: string) {
       qcablesTable(qcables, changelogs, filterType, filterId);
     })
     .finally(closeBusy);
+
 }

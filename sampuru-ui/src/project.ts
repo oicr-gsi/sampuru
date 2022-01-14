@@ -23,7 +23,6 @@ if(projectId) {
   initialiseProjectOverview(projectId);
 }
 
-
 export function failedChangelog(changelogContent: string): string {
   if(changelogContent.includes("fail")) {
     return "table-danger";
