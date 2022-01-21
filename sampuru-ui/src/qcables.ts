@@ -5,7 +5,7 @@
 import {
   bootstrapTable,
   busyDialog,
-  ComplexElement, DOMElement, elementFromTag,
+  ComplexElement, createLinkElement, DOMElement, elementFromTag,
   navbar,
   tableBodyFromRows,
   tableRow,
@@ -13,6 +13,7 @@ import {
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 import {commonName, formatLibraryDesigns} from "./common.js";
+import {urlConstructor} from "./io.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const filterType = urlParams.get("qcables-filter-type");
@@ -60,9 +61,17 @@ export function qcablesTable(
   const titleUnknown = "Hasn't started yet";
   if(filterType === "case") {
     const caseExtName = qcables[0].case_external_name;
-    pageHeader.innerText = "QC-ables (" + caseExtName + ")";
+    pageHeader.innerText = "QC-ables (" + caseExtName.replace(':', '\t') + ")";
   } else {
-    pageHeader.innerText = "QC-ables (" + filterId + ")";
+    pageHeader.innerText = "QC-ables (";
+    const projectLink = createLinkElement(
+      null,
+      filterId,
+      null,
+      null,
+      urlConstructor("project.html", ["project-overview-id"], [filterId]));
+    pageHeader.appendChild(projectLink);
+    pageHeader.innerHTML += ")";
   }
 
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
