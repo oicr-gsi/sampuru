@@ -27,7 +27,7 @@ export function activeProjects(projects: ActiveProject[]): HTMLElement {
    )
    );
   const welcomeCard: Card = {contents: welcomeText.element, header: "Welcome to Sampuru! Click here for help", title: "Help banner", cardId: "welcome-text"};
-  cards.push(collapsibleCard("welcome-text", null, welcomeCard, false))
+  cards.push(collapsibleCard("welcome-text", null, welcomeCard, false));
   projects
     .forEach((project) => {
       const cardContent = projectCard(project);
