@@ -65,7 +65,7 @@ public class QCable extends SampuruType {
 
     @Override
     public String toString(){
-        return "QCable id: " + id
+        return "QC-able id: " + id
                 + "\n OICRAlias: " + OICRAlias
                 + "\n status: " + status
                 + "\n failureReason: " + failureReason

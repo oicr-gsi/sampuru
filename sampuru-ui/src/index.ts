@@ -26,7 +26,6 @@ import {
   formatQualityGateNames
 } from "./common.js";
 
-
 const urlParams = new URLSearchParams(window.location.search);
 const search = urlParams.get("search");
 
@@ -151,7 +150,7 @@ export function defaultSearchResults(
           urlConstructor("qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["case", x.id])
         )}
       }],
-      ["QCables", (x) => {
+      ["QC-ables", (x) => {
       return elementFromTag("div", null,
         x.qcables.map((qcable) => {
           return elementFromTag("div", null, qcable, null);
@@ -174,7 +173,7 @@ export function defaultSearchResults(
       ["Parent ID", (x) => x.parent_id == "null" ? "None" : x.parent_id]);
 
     const qcablesTable = elementFromTag("div", "container generic-tables", table);
-    const caseCard: Card = {contents: qcablesTable.element, header: "QCables" , title: "QCables", cardId: "all-qcables"}
+    const caseCard: Card = {contents: qcablesTable.element, header: "QC-ables" , title: "QC-ables", cardId: "all-qcables"}
     cards.push(collapsibleCard("qcables", null, caseCard, false));
   }
 

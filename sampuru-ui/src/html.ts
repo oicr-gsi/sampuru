@@ -2,7 +2,6 @@ import {CaseCard, ActiveProject} from "./data-transfer-objects.js";
 import {formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
 import {urlConstructor} from "./io.js";
 
-
 /**
  * The callback for handling mouse events
  */
@@ -619,7 +618,7 @@ export function projectCard(
 
   const qcablesTitle = createLinkElement(
     qcables.className,
-    "QCables",
+    "QC-ables",
     null,
     null,
     urlConstructor("qcables.html", ["qcables-filter-type", "qcables-filter-id"], ["project", project.id])
