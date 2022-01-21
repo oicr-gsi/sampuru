@@ -1,6 +1,7 @@
-import {busyDialog, Card, caseCard, collapsibleCard, navbar} from "./html.js";
+import {busyDialog, Card, caseCard, collapsibleCard, createLinkElement, navbar} from "./html.js";
 import {CaseCard} from "./data-transfer-objects.js";
 import {commonName} from "./common.js";
+import {urlConstructor} from "./io.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("cases-project-id");
@@ -9,12 +10,20 @@ if (projectId) {
   initialiseCases(projectId);
 }
 
-export function casesPage(cases: CaseCard[]): HTMLElement {
+export function casesPage(cases: CaseCard[], project: string): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
   const header = document.createElement("h3");
-  header.innerText = "Cases";
+  header.innerText = "Cases (";
+  const projectLink = createLinkElement(
+    null,
+    project,
+    null,
+    null,
+    urlConstructor("project.html", ["project-overview-id"], [project]));
+  header.appendChild(projectLink);
+  header.innerHTML += ")";
   cardContainer.appendChild(header);
 
   const cards: HTMLElement[] = [];
@@ -52,6 +61,6 @@ export function initialiseCases(projectId: string) {
     })
     .then((response) => response as CaseCard[])
     .then((data) => {
-      document.body.appendChild(casesPage(data));
+      document.body.appendChild(casesPage(data, projectId));
     }).finally(closeBusy);
 }
