@@ -153,6 +153,7 @@ export function drawSankey(sankey: SankeyTransition) {
     return (d.includes("Pending") ? "Pending": (d.includes("Failed") ? "Failed" : d));
   }
 
+  // This acts as a type guard -> performs a runtime check guareenting that type is Node in this scope
   const getNodeName = function(node: Node) {
     return node.name;
   }
