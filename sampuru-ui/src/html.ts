@@ -106,6 +106,59 @@ export type DOMElement =
   | ComplexElement<HTMLElement>
   | DOMElement[]
 
+export function createSingleLineLabeledInput(
+    labelName: string,
+    inputType: string,
+    id: string,
+    className: string | null
+): HTMLInputElement{
+  const formGroup = document.createElement("div");
+  formGroup.classList.add("form-group");
+
+  const label = document.createElement("label");
+  label.innerText = labelName;
+  formGroup.appendChild(label);
+
+  const textBox = document.createElement("input");
+  textBox.classList.add("form-control");
+  textBox.setAttribute("type", inputType);
+  textBox.setAttribute("id", id);
+  formGroup.appendChild(textBox);
+
+  document.body.appendChild(formGroup);
+
+  formGroup.style.padding = "15px";
+
+  return <HTMLInputElement>formGroup;
+}
+
+export function createMultiLineLabeledInput(
+    labelName: string,
+    numRows: string,
+    id: string,
+    className: string | null
+): HTMLInputElement{
+  const formGroup = document.createElement("div");
+  formGroup.classList.add("form-group");
+
+  const label = document.createElement("label");
+  label.innerText = labelName;
+  formGroup.appendChild(label);
+
+  const textArea = document.createElement("textarea");
+  textArea.classList.add("form-control");
+  textArea.setAttribute("rows", numRows);
+  textArea.setAttribute("id",id);
+  formGroup.appendChild(textArea);
+
+  document.body.appendChild(formGroup);
+
+  formGroup.style.padding = "0px 15px 15px";
+
+  return <HTMLInputElement>formGroup;
+
+}
+
 function addElements(
   target: HTMLElement,
   ...elements: DOMElement[]
