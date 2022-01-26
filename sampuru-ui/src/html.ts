@@ -127,8 +127,6 @@ export function createSingleLineLabeledInput(
 
   document.body.appendChild(formGroup);
 
-  formGroup.style.padding = "15px";
-
   return <HTMLInputElement>formGroup;
 }
 
@@ -153,10 +151,7 @@ export function createMultiLineLabeledInput(
 
   document.body.appendChild(formGroup);
 
-  formGroup.style.padding = "0px 15px 15px";
-
   return <HTMLInputElement>formGroup;
-
 }
 
 function addElements(
