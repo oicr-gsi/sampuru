@@ -153,8 +153,8 @@ export function drawSankey(sankey: SankeyTransition) {
     return (d.includes("Pending") ? "Pending": (d.includes("Failed") ? "Failed" : d));
   }
 
-  const getLinkTitle = function(d: Node) {
-    return d.name;
+  const getNodeName = function(node: Node) {
+    return node.name;
   }
 
   // set up nodes for graph
@@ -223,7 +223,7 @@ export function drawSankey(sankey: SankeyTransition) {
   // add titles to link
   link.append("title")
     .text(d => (typeof d.target === "object" && typeof d.source === "object") ?
-      `${getLinkTitle(d.source)} → ${getLinkTitle(d.target)}\n${format(d.value)}` : "")
+      `${getNodeName(d.source)} → ${getNodeName(d.target)}\n${format(d.value)}` : "")
 
   // add title for nodes
   svg.append("g")
