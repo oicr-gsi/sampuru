@@ -106,52 +106,60 @@ export type DOMElement =
   | ComplexElement<HTMLElement>
   | DOMElement[]
 
-export function createSingleLineLabeledInput(
+export function createLabeledInput(
     labelName: string,
     inputType: string,
     id: string,
-    className: string | null
-): HTMLInputElement{
+    required: boolean,
+    className: string | null,
+    placeHolder: string | null,
+): HTMLElement{
   const formGroup = document.createElement("div");
   formGroup.classList.add("form-group");
 
   const label = document.createElement("label");
   label.innerText = labelName;
+  label.setAttribute("for", id);
   formGroup.appendChild(label);
 
-  const textBox = document.createElement("input");
-  textBox.classList.add("form-control");
-  textBox.setAttribute("type", inputType);
-  textBox.setAttribute("id", id);
-  formGroup.appendChild(textBox);
+  const input = document.createElement("input");
+  input.setAttribute("type", inputType);
+  input.setAttribute("id", id);
+  input.setAttribute("name", id);
+  input.required = required;
+  typeof className === "string" ? input.classList.add(className) : null;
+  typeof placeHolder === "string" ? input.placeholder = placeHolder : null;
+  formGroup.appendChild(input);
 
-  document.body.appendChild(formGroup);
-
-  return <HTMLInputElement>formGroup;
+  return formGroup;
 }
 
-export function createMultiLineLabeledInput(
+export function createLabeledTextarea(
     labelName: string,
     numRows: string,
     id: string,
-    className: string | null
-): HTMLInputElement{
+    required: boolean,
+    className: string | null,
+    placeHolder: string | null
+): HTMLElement{
   const formGroup = document.createElement("div");
   formGroup.classList.add("form-group");
 
   const label = document.createElement("label");
   label.innerText = labelName;
+  label.setAttribute("for", id);
   formGroup.appendChild(label);
 
   const textArea = document.createElement("textarea");
-  textArea.classList.add("form-control");
   textArea.setAttribute("rows", numRows);
-  textArea.setAttribute("id",id);
+  textArea.setAttribute("id", id);
+  textArea.setAttribute("name", id);
+  textArea.required = required;
+  typeof className === "string" ? textArea.classList.add(className) : null;
+  typeof placeHolder === "string" ? textArea.placeholder = placeHolder : null;
   formGroup.appendChild(textArea);
 
-  document.body.appendChild(formGroup);
-
-  return <HTMLInputElement>formGroup;
+  return formGroup;
 }
 
 function addElements(
