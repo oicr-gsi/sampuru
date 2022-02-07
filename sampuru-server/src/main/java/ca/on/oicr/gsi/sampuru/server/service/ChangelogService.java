@@ -147,7 +147,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
                                 .where(USER_ACCESS.USERNAME.eq(username))))))
             .orderBy(CHANGELOG.CHANGE_DATE.desc())));
     }
-// receipt_inspection:CAPPT:SAM221641 CAPPT:SAM221609
+
     public JSONArray getChangelogsByCase(String caseId, String username) throws SQLException {
         return buildChangelogsTable(new DBConnector().fetch(PostgresDSL
                 .select(
