@@ -191,7 +191,7 @@ export function qcablesTable(
   externalTable.append(externalTableBody);
 
   const externalButton = constructButton("external-button", "External Identifiers", "identifier");
-  const internalButton = constructButton("internal-button", "Internal Identifiers", "identifier");
+  const internalButton = constructButton("internal-button", "OICR Identifiers", "identifier");
 
   pageContainer.appendChild(pageHeader);
   pageContainer.appendChild(externalButton);

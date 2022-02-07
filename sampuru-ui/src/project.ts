@@ -187,7 +187,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
     title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
-  const internalButton = constructButton('internal-toggle', "Internal Identifiers", "identifier");
+  const internalButton = constructButton('internal-toggle', "OICR Identifiers", "identifier");
   const externalButton = constructButton('external-toggle', "External Identifiers", "identifier")
   const changelogTables = elementFromTag("div", null,
     {type: "complex", element: internalButton},

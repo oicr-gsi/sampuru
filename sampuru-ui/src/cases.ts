@@ -36,7 +36,7 @@ export function casesPage(cases: CaseCard[], project: string, identifier: string
   header.innerHTML += ")";
   cardContainer.appendChild(header);
 
-  const internalButton = constructButton("internal-case", "Internal Identifiers", "case-identifier");
+  const internalButton = constructButton("internal-case", "OICR Identifiers", "case-identifier");
   const externalButton = constructButton("external-case", "External Identifiers", "case-identifier");
 
   internalButton.onclick = function() {
