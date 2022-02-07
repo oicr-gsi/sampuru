@@ -125,7 +125,10 @@ export interface BaseChangelog {
 export interface Changelog extends BaseChangelog {
   project_id: string,
   case_id: string,
-  qcable_id: string
+  qcable_id: string,
+  qcable_type: string,
+  qcable_oicr_alias: string,
+  external_name: string
 }
 
 export interface Step {

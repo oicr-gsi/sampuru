@@ -113,7 +113,7 @@ h2, h3 {
     padding: 15px;
 }
 
-#table {
+#internal-table, #external-table {
     font-size: 13px !important;
 }
 
@@ -131,13 +131,25 @@ h2, h3 {
     font-size: 14px !important;
 }
 
-#table td {
+#internal-table td,
+#external-table td {
     cursor: pointer;
     font-size: 0;
     border-radius: 4px;
 }
 
-#table .card .card-body {
+#internal-table .card .card-body,
+#external-table .card .card-body {
     font-size: 12px !important;
     padding: 0 !important;
+}
+
+.identifier {
+    margin: 10px;
+    float: right;
+    display: inline-block;
+}
+
+.case-identifier {
+    margin: 10px;
 }

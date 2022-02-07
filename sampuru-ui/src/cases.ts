@@ -1,16 +1,26 @@
-import {busyDialog, Card, caseCard, collapsibleCard, createLinkElement, navbar} from "./html.js";
+import {busyDialog, Card, caseCard, collapsibleCard, createLinkElement, navbar, constructButton} from "./html.js";
 import {CaseCard} from "./data-transfer-objects.js";
 import {commonName} from "./common.js";
 import {urlConstructor} from "./io.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("cases-project-id");
+const identifier = urlParams.get("identifier");
 
-if (projectId) {
-  initialiseCases(projectId);
+if (projectId && identifier) {
+  initialiseCases(projectId, identifier);
 }
 
-export function casesPage(cases: CaseCard[], project: string): HTMLElement {
+function formatCardHeader(caseItem: CaseCard, identifier: string): string {
+  if (identifier == "external") {
+    return caseItem.name.replace(':','\t');
+  } else {
+    return caseItem.id.replace(':', '\t');
+  }
+
+}
+
+export function casesPage(cases: CaseCard[], project: string, identifier: string): HTMLElement {
   const cardContainer = document.createElement("div");
   cardContainer.className = "container";
 
@@ -26,11 +36,25 @@ export function casesPage(cases: CaseCard[], project: string): HTMLElement {
   header.innerHTML += ")";
   cardContainer.appendChild(header);
 
+  const internalButton = constructButton("internal-case", "Internal Identifiers", "case-identifier");
+  const externalButton = constructButton("external-case", "External Identifiers", "case-identifier");
+
+  internalButton.onclick = function() {
+    window.location.href = urlConstructor("cases.html", ["cases-project-id", "identifier"], [project, "internal"])
+  }
+
+  externalButton.onclick = function() {
+    window.location.href = urlConstructor("cases.html", ["cases-project-id", "identifier"], [project, "external"])
+  }
+
+  cardContainer.appendChild(internalButton);
+  cardContainer.appendChild(externalButton);
+
   const cards: HTMLElement[] = [];
   cases
     .forEach((caseItem) => {
       const cardContent = caseCard(caseItem);
-      const card: Card = {contents: cardContent, header: caseItem.name.replace(':','\t'), title: caseItem.name, cardId: caseItem.id};
+      const card: Card = {contents: cardContent, header: formatCardHeader(caseItem, identifier), title: caseItem.name, cardId: caseItem.id};
       cards.push(collapsibleCard("cases", null, card, true));
     });
 
@@ -44,7 +68,7 @@ export function casesPage(cases: CaseCard[], project: string): HTMLElement {
   return cardContainer;
 }
 
-export function initialiseCases(projectId: string) {
+export function initialiseCases(projectId: string, identifier: string) {
   const closeBusy = busyDialog();
   fetch("api/cases_cards/" + projectId, {body: null})
     .then(response => {
@@ -61,6 +85,6 @@ export function initialiseCases(projectId: string) {
     })
     .then((response) => response as CaseCard[])
     .then((data) => {
-      document.body.appendChild(casesPage(data, projectId));
+      document.body.appendChild(casesPage(data, projectId, identifier));
     }).finally(closeBusy);
 }

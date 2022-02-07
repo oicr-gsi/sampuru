@@ -129,7 +129,7 @@ export function defaultSearchResults(
 
         infoItems.push(elementFromTag("div", "row",
           elementFromTag("b", null, "Cases: "),
-          {type: "a", href: urlConstructor("cases.html", ["cases-project-id"], [project.name]),
+          {type: "a", href: urlConstructor("cases.html", ["cases-project-id", "identifier"], [project.name, "external"]),
           innerText: "All", className: "", title: "All Cases for " + project.name}))
 
         const info = elementFromTag("div", "container project-overview", infoItems);

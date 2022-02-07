@@ -313,6 +313,19 @@ export function bootstrapTable(
   return table;
 }
 
+export function constructButton(
+  id: string,
+  displayText: string,
+  className: string | null): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.classList.add("btn", "btn-primary");
+  typeof className === "string" ? button.classList.add(className) : null;
+  button.id = id;
+  button.innerText = displayText;
+  button.setAttribute("type", "button");
+  return button;
+}
+
 export function caseCard(caseContent: CaseCard): HTMLElement {
   const formattedId = caseContent.id.replace(/[:]+/g, '');
 
@@ -607,7 +620,7 @@ export function projectCard(
     "Cases",
     null,
     null,
-    urlConstructor("cases.html", ["cases-project-id"], [project.id])
+    urlConstructor("cases.html", ["cases-project-id", "identifier"], [project.id, "external"])
   );
 
   cases.appendChild(casesTitle);

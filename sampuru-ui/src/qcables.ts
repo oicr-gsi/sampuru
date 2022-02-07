@@ -5,11 +5,15 @@
 import {
   bootstrapTable,
   busyDialog,
-  ComplexElement, createLinkElement, DOMElement, elementFromTag,
+  ComplexElement,
+  createLinkElement,
+  DOMElement,
+  elementFromTag,
   navbar,
   tableBodyFromRows,
   tableRow,
-  toSentenceCase
+  toSentenceCase,
+  constructButton
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 import {commonName, formatLibraryDesigns} from "./common.js";
@@ -127,7 +131,7 @@ function constructTableRows(external: boolean, qcables: QCable[]): ComplexElemen
 }
 
 function constructTableHeaders(external: boolean) {
-  const tableHeaders = new Map([
+  return new Map([
     [external ? "case_external_name" : "case_id", "Project:Case"],
     ["library_design", "Library Design"],
     [external ? "receipt_inspection_qcable_external_name" : "receipt_inspection_qcable_alias", "Receipt/Inspection"],
@@ -138,16 +142,6 @@ function constructTableHeaders(external: boolean) {
     [external ? "informatics_interpretation_qcable_external_name" : "informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
     [external ? "draft_report_qcable_external_name" : "draft_report_qcable_alias", "Draft Report"],
     [external ? "final_report_qcable_external_name" : "final_report_qcable_alias", "Final Report"]]);
-  return tableHeaders;
-}
-
-function constructButton(id: string, displayText: string): HTMLButtonElement {
-  const button = document.createElement("button");
-  button.className = "btn btn-primary";
-  button.id = id;
-  button.innerText = displayText;
-  button.setAttribute("type", "button");
-  return button;
 }
 
 export function qcablesTable(
@@ -173,9 +167,6 @@ export function qcablesTable(
     pageHeader.innerHTML += ")";
   }
 
-  const toggleInternalExternal = document.createElement("button");
-  toggleInternalExternal.innerText = "Toggle Identifiers";
-
   const tableRowsInternal = constructTableRows(false, qcables);
   const tableRowsExternal = constructTableRows(true, qcables);
 
@@ -195,30 +186,18 @@ export function qcablesTable(
 
   internalTable.setAttribute("data-sort-name", "case_id");
   internalTable.appendChild(internalTableBody);
-  internalTable.style.display = "none"; // Default to show external table
 
   externalTable.setAttribute("data-sort-name", "case-external-name");
   externalTable.append(externalTableBody);
-  externalTable.style.display = "table";
 
-  const externalButton = constructButton("external", "External Identifiers");
-  const internalButton = constructButton("internal", "Internal Identifiers");
-
-  externalButton.onclick = function() {
-    externalTable.style.display = "table";
-    internalTable.style.display = "none";
-  }
-
-  internalButton.onclick = function() {
-    externalTable.style.display = "none";
-    internalTable.style.display = "table";
-  }
+  const externalButton = constructButton("external-button", "External Identifiers", "identifier");
+  const internalButton = constructButton("internal-button", "Internal Identifiers", "identifier");
 
   pageContainer.appendChild(pageHeader);
   pageContainer.appendChild(externalButton);
   pageContainer.appendChild(internalButton);
-  pageContainer.appendChild(internalTable);
   pageContainer.appendChild(externalTable);
+  pageContainer.appendChild(internalTable);
   document.body.appendChild(pageContainer);
 
   $(function () {
@@ -227,10 +206,26 @@ export function qcablesTable(
         return 'Search QC-ables';
       }
     });
+
+    // Default to show external table and hide internal table
+    $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed
+    $('#internal-table').parents().hide();
+    $('#external-table').parents().show();
+
+    // Show appropriate table on button click
+    $('#external-button').on('click', function() {
+      $('#internal-table').parents().hide();
+      $('#external-table').parents().show();
+    });
+
+    $('#internal-button').on('click', function() {
+      $('#external-table').parents().hide();
+      $('#internal-table').parents().show();
+    });
   });
 
 
-  $('#internal-#table,#external-table').on('click-cell.bs.table', function(event, field, value, row, $element) {
+  $('#internal-table,#external-table').on('click-cell.bs.table', function(event, field, value, row, $element) {
     const filteredChangelogs = changelogs.filter((item) => {
       return item.qcable_id === value
     });
@@ -267,8 +262,6 @@ export function qcablesTable(
         }
       }
     }
-
-
   });
 }
 
