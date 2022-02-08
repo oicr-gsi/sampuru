@@ -313,7 +313,7 @@ export function bootstrapTable(
   return table;
 }
 
-export function constructButton(
+export function createButton(
   id: string,
   displayText: string,
   className: string | null): HTMLButtonElement {

@@ -13,7 +13,7 @@ import {
   tableBodyFromRows,
   tableRow,
   toSentenceCase,
-  constructButton
+  createButton
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 import {commonName, formatLibraryDesigns} from "./common.js";
@@ -190,12 +190,10 @@ export function qcablesTable(
   externalTable.setAttribute("data-sort-name", "case-external-name");
   externalTable.append(externalTableBody);
 
-  const externalButton = constructButton("external-button", "External Identifiers", "identifier");
-  const internalButton = constructButton("internal-button", "OICR Identifiers", "identifier");
+  const toggleIds = createButton("qcable-id-toggle", "OICR Identifiers", "identifier");
 
   pageContainer.appendChild(pageHeader);
-  pageContainer.appendChild(externalButton);
-  pageContainer.appendChild(internalButton);
+  pageContainer.appendChild(toggleIds);
   pageContainer.appendChild(externalTable);
   pageContainer.appendChild(internalTable);
   document.body.appendChild(pageContainer);
@@ -213,14 +211,19 @@ export function qcablesTable(
     $('#external-table').parents().show();
 
     // Show appropriate table on button click
-    $('#external-button').on('click', function() {
-      $('#internal-table').parents().hide();
-      $('#external-table').parents().show();
-    });
-
-    $('#internal-button').on('click', function() {
-      $('#external-table').parents().hide();
-      $('#internal-table').parents().show();
+    // If user clicks on "OICR Identifiers" button, hide external table and change button text to "External identifiers"
+    $('#qcable-id-toggle').on('click', function() {
+      $(this).text(function(i, text) {
+        if(text === "OICR Identifiers") {
+          $('#external-table').parents().hide();
+          $('#internal-table').parents().show();
+          return "External Identifiers";
+        } else {
+          $('#internal-table').parents().hide();
+          $('#external-table').parents().show();
+          return "OICR Identifiers";
+        }
+      });
     });
   });
 

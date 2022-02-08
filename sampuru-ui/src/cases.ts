@@ -1,4 +1,4 @@
-import {busyDialog, Card, caseCard, collapsibleCard, createLinkElement, navbar, constructButton} from "./html.js";
+import {busyDialog, Card, caseCard, collapsibleCard, createLinkElement, navbar, createButton} from "./html.js";
 import {CaseCard} from "./data-transfer-objects.js";
 import {commonName} from "./common.js";
 import {urlConstructor} from "./io.js";
@@ -36,19 +36,17 @@ export function casesPage(cases: CaseCard[], project: string, identifier: string
   header.innerHTML += ")";
   cardContainer.appendChild(header);
 
-  const internalButton = constructButton("internal-case", "OICR Identifiers", "case-identifier");
-  const externalButton = constructButton("external-case", "External Identifiers", "case-identifier");
+  const toggleIds = createButton('toggle-case-ids', "Toggle Case IDs", "case-identifier");
 
-  internalButton.onclick = function() {
-    window.location.href = urlConstructor("cases.html", ["cases-project-id", "identifier"], [project, "internal"])
+  toggleIds.onclick = function() {
+    if(identifier === "external") {
+      window.location.href = urlConstructor("cases.html", ["cases-project-id", "identifier"], [project, "internal"]);
+    } else {
+      window.location.href = urlConstructor("cases.html", ["cases-project-id", "identifier"], [project, "external"]);
+    }
   }
 
-  externalButton.onclick = function() {
-    window.location.href = urlConstructor("cases.html", ["cases-project-id", "identifier"], [project, "external"])
-  }
-
-  cardContainer.appendChild(internalButton);
-  cardContainer.appendChild(externalButton);
+  cardContainer.appendChild(toggleIds);
 
   const cards: HTMLElement[] = [];
   cases

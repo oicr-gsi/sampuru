@@ -33,18 +33,24 @@ public class ChangelogService extends Service<ChangelogEntry> {
         getAllParams(new ChangelogService(), hse);
     }
 
+    public org.jooq.SelectOnConditionStep<org.jooq.Record> baseChangelogQuery() {
+        return PostgresDSL
+            .select(
+                CHANGELOG.asterisk(),
+                QCABLE.QCABLE_TYPE,
+                QCABLE.OICR_ALIAS,
+                DONOR_CASE.NAME)
+            .from(CHANGELOG)
+            .leftJoin(QCABLE).on(QCABLE.ID.eq(CHANGELOG.QCABLE_ID))
+            .join(DONOR_CASE).on(DONOR_CASE.ID.eq(CHANGELOG.CASE_ID));
+    }
+
     @Override
     public List<ChangelogEntry> getAll(String username) throws Exception {
         List<ChangelogEntry> changelogs = new LinkedList<>();
 
         Result<Record> results = new DBConnector().fetch(
-                PostgresDSL.select(
-                    CHANGELOG.asterisk(),
-                    QCABLE.QCABLE_TYPE,
-                    QCABLE.OICR_ALIAS,
-                    QCABLE.EXTERNAL_NAME)
-                .from(CHANGELOG)
-                    .join(QCABLE).on(CHANGELOG.QCABLE_ID.eq(QCABLE.ID)));
+                baseChangelogQuery());
 
         for (Record result: results){
             changelogs.add(new ChangelogEntry(result));
@@ -56,14 +62,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
     public List<ChangelogEntry> search(String term, String username) throws SQLException {
         List<ChangelogEntry> changelogEntries = new LinkedList<>();
         DBConnector dbConnector = new DBConnector();
-        Result<Record> results = dbConnector.fetch(PostgresDSL
-                .select(
-                    CHANGELOG.asterisk(),
-                    QCABLE.QCABLE_TYPE,
-                    QCABLE.OICR_ALIAS,
-                    QCABLE.EXTERNAL_NAME)
-                .from(CHANGELOG)
-                .join(QCABLE).on(CHANGELOG.QCABLE_ID.eq(QCABLE.ID))
+        Result<Record> results = dbConnector.fetch(baseChangelogQuery()
                 .where(CHANGELOG.CONTENT.like("%"+term+"%")
                         .and(CHANGELOG.CASE_ID.in(PostgresDSL
                                 .select(DONOR_CASE.ID)
@@ -127,15 +126,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     public JSONArray getChangelogsByProject(String projectId, String username) throws SQLException {
-        return buildChangelogsTable(new DBConnector().fetch(PostgresDSL
-                .select(
-                    CHANGELOG.asterisk(),
-                    QCABLE.QCABLE_TYPE,
-                    QCABLE.OICR_ALIAS,
-                    DONOR_CASE.NAME)
-                .from(CHANGELOG)
-                .leftJoin(QCABLE).on(QCABLE.ID.eq(CHANGELOG.QCABLE_ID))
-                .join(DONOR_CASE).on(DONOR_CASE.ID.eq(CHANGELOG.CASE_ID))
+        return buildChangelogsTable(new DBConnector().fetch(baseChangelogQuery()
                 .where(CHANGELOG.PROJECT_ID.eq(projectId)
                         .and(CHANGELOG.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
@@ -149,15 +140,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     public JSONArray getChangelogsByCase(String caseId, String username) throws SQLException {
-        return buildChangelogsTable(new DBConnector().fetch(PostgresDSL
-                .select(
-                    CHANGELOG.asterisk(),
-                    QCABLE.QCABLE_TYPE,
-                    QCABLE.OICR_ALIAS,
-                    DONOR_CASE.NAME)
-                .from(CHANGELOG)
-                .leftJoin(QCABLE).on(QCABLE.ID.eq(CHANGELOG.QCABLE_ID))
-                .join(DONOR_CASE).on(DONOR_CASE.ID.eq(CHANGELOG.CASE_ID))
+        return buildChangelogsTable(new DBConnector().fetch(baseChangelogQuery()
                 .where(CHANGELOG.CASE_ID.eq(caseId)
                         .and(CHANGELOG.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)
@@ -171,15 +154,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
     }
 
     public JSONArray getChangelogsByQcable(String qcableId, String username) throws SQLException {
-        return buildChangelogsTable(new DBConnector().fetch(PostgresDSL
-                .select(
-                    CHANGELOG.asterisk(),
-                    QCABLE.QCABLE_TYPE,
-                    QCABLE.OICR_ALIAS,
-                    DONOR_CASE.NAME)
-                .from(CHANGELOG)
-                .leftJoin(QCABLE).on(QCABLE.ID.eq(CHANGELOG.QCABLE_ID))
-                .join(DONOR_CASE).on(DONOR_CASE.ID.eq(CHANGELOG.CASE_ID))
+        return buildChangelogsTable(new DBConnector().fetch(baseChangelogQuery()
                 .where(CHANGELOG.QCABLE_ID.eq(qcableId)
                         .and(CHANGELOG.PROJECT_ID.in(PostgresDSL
                                 .select(USER_ACCESS.PROJECT)

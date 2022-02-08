@@ -15,7 +15,7 @@ import {
   tableRow,
   bootstrapTable,
   tableBodyFromRows,
-  constructButton
+  createButton
 } from "./html.js";
 import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
@@ -187,11 +187,9 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
     title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
-  const internalButton = constructButton('internal-toggle', "OICR Identifiers", "identifier");
-  const externalButton = constructButton('external-toggle', "External Identifiers", "identifier")
+  const toggleIds = createButton('toggle-changelog-ids', "OICR Identifiers", "identifier");
   const changelogTables = elementFromTag("div", null,
-    {type: "complex", element: internalButton},
-    {type: "complex", element: externalButton},
+    {type: "complex", element: toggleIds},
     changelogTable(changelogs, true),
     changelogTable(changelogs, false));
 
@@ -247,19 +245,25 @@ export function initialiseProjectOverview(projectId: string) {
       $(function () {
         $('#external-changelog,#internal-changelog').bootstrapTable({});
 
+        // Default to show external table and hide internal table
         $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed
         $('#internal-changelog').parents().hide();
         $('#external-changelog').parents().show();
 
         // Show appropriate table on button click
-        $('#external-toggle').on('click', function() {
-          $('#internal-changelog').parents().hide();
-          $('#external-changelog').parents().show();
-        });
-
-        $('#internal-toggle').on('click', function() {
-          $('#external-changelog').parents().hide();
-          $('#internal-changelog').parents().show();
+        // i.e. If user clicks "OICR Identifiers" button, hide external table and change button text to "External identifiers"
+        $('#toggle-changelog-ids').on('click', function() {
+          $(this).text(function(i, text) {
+            if(text === "OICR Identifiers") {
+              $('#external-changelog').parents().hide();
+              $('#internal-changelog').parents().show();
+              return "External Identifiers";
+            } else {
+              $('#internal-changelog').parents().hide();
+              $('#external-changelog').parents().show();
+              return "OICR Identifiers";
+            }
+          });
         });
       });
     })
