@@ -8,6 +8,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.PathTemplateMatch;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.SelectOnConditionStep;
 import org.jooq.util.postgres.PostgresDSL;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -33,7 +34,7 @@ public class ChangelogService extends Service<ChangelogEntry> {
         getAllParams(new ChangelogService(), hse);
     }
 
-    public org.jooq.SelectOnConditionStep<org.jooq.Record> baseChangelogQuery() {
+    public SelectOnConditionStep<Record> baseChangelogQuery() {
         return PostgresDSL
             .select(
                 CHANGELOG.asterisk(),
