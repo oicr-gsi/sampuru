@@ -5,11 +5,15 @@
 import {
   bootstrapTable,
   busyDialog,
-  ComplexElement, createLinkElement, DOMElement, elementFromTag,
+  ComplexElement,
+  createLinkElement,
+  DOMElement,
+  elementFromTag,
   navbar,
   tableBodyFromRows,
   tableRow,
-  toSentenceCase
+  toSentenceCase,
+  createButton
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 import {commonName, formatLibraryDesigns} from "./common.js";
@@ -51,6 +55,95 @@ function alphaNumSort(a: string, b: string) {
   return 0;
 }
 
+function constructTableRows(external: boolean, qcables: QCable[]): ComplexElement<HTMLTableRowElement>[] {
+  const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
+  const titleUnknown = "Hasn't started yet";
+  qcables
+    .forEach((qcable) => {
+      tableRows.push(tableRow(null,
+        {
+          contents: external ? qcable.case_external_name : qcable.case_id,
+          className: "qcable-table-donor-case"
+        },
+        {
+          contents: formatLibraryDesigns(qcable.library_design),
+          className: "qcable-table-donor-case"
+        },
+        {
+          contents: external ?
+            (qcable.receipt_inspection_qcable_external_name ? qcable.receipt_inspection_qcable_external_name: "") :
+            (qcable.receipt_inspection_qcable_alias ? qcable.receipt_inspection_qcable_alias: ""),
+          className: statusToClassName(qcable.receipt_inspection_qcable_status),
+          title: qcable.receipt_inspection_qcable_status? toSentenceCase(qcable.receipt_inspection_qcable_status) : titleUnknown
+        },
+        {
+          contents: external ?
+            (qcable.extraction_qcable_external_name ? qcable.extraction_qcable_external_name: "") :
+            (qcable.extraction_qcable_alias ? qcable.extraction_qcable_alias: ""),
+          className: statusToClassName(qcable.extraction_qcable_status),
+          title: qcable.extraction_qcable_status? toSentenceCase(qcable.extraction_qcable_status) : titleUnknown
+        },
+        {
+          contents: external ?
+            (qcable.library_preparation_qcable_external_name ? qcable.library_preparation_qcable_external_name: "") :
+            (qcable.library_preparation_qcable_alias ? qcable.library_preparation_qcable_alias: ""),
+          className: statusToClassName(qcable.library_preparation_qcable_status),
+          title: qcable.library_preparation_qcable_status? toSentenceCase(qcable.library_preparation_qcable_status) : titleUnknown
+        },
+        {
+          contents: external ?
+            (qcable.library_qualification_qcable_external_name ? qcable.library_qualification_qcable_external_name: "") :
+            (qcable.library_qualification_qcable_alias ? qcable.library_qualification_qcable_alias: ""),
+          className: statusToClassName(qcable.library_qualification_qcable_status),
+          title: qcable.library_qualification_qcable_status? toSentenceCase(qcable.library_qualification_qcable_status) : titleUnknown
+        },
+        {
+          contents: external ?
+            (qcable.full_depth_sequencing_qcable_external_name ? qcable.full_depth_sequencing_qcable_external_name: "") :
+            (qcable.full_depth_sequencing_qcable_alias ? qcable.full_depth_sequencing_qcable_alias: ""),
+          className: statusToClassName(qcable.full_depth_sequencing_qcable_status),
+          title: qcable.full_depth_sequencing_qcable_status? toSentenceCase(qcable.full_depth_sequencing_qcable_status) : titleUnknown
+        },
+        {
+          contents: external ?
+            (qcable.informatics_interpretation_qcable_external_name ? qcable.informatics_interpretation_qcable_external_name: "") :
+            (qcable.informatics_interpretation_qcable_alias ? qcable.informatics_interpretation_qcable_alias: ""),
+          className: statusToClassName(qcable.informatics_interpretation_qcable_status),
+          title: qcable.informatics_interpretation_qcable_status? toSentenceCase(qcable.informatics_interpretation_qcable_status) : titleUnknown
+        },
+        {
+          contents: external ?
+            (qcable.draft_report_qcable_external_name ? qcable.draft_report_qcable_external_name: "") :
+            (qcable.draft_report_qcable_alias ? qcable.draft_report_qcable_alias: ""),
+          className: statusToClassName(qcable.draft_report_qcable_status),
+          title: qcable.draft_report_qcable_status? toSentenceCase(qcable.draft_report_qcable_status) : titleUnknown
+        },
+        {
+          contents: external ?
+            (qcable.final_report_qcable_external_name ? qcable.final_report_qcable_external_name: "") :
+            (qcable.final_report_qcable_alias ? qcable.final_report_qcable_alias: ""),
+          className: statusToClassName(qcable.final_report_qcable_status),
+          title: qcable.final_report_qcable_status? toSentenceCase(qcable.final_report_qcable_status) : titleUnknown
+        }
+      ));
+    });
+  return tableRows;
+}
+
+function constructTableHeaders(external: boolean) {
+  return new Map([
+    [external ? "case_external_name" : "case_id", "Project:Case"],
+    ["library_design", "Library Design"],
+    [external ? "receipt_inspection_qcable_external_name" : "receipt_inspection_qcable_alias", "Receipt/Inspection"],
+    [external ? "extraction_qcable_external_name" : "extraction_qcable_alias", "Extraction"],
+    [external ? "library_preparation_qcable_external_name" : "library_preparation_qcable_alias", "Library Preparation"],
+    [external ? "library_qualification_qcable_external_name" : "library_qualification_qcable_alias", "Library Qualification"],
+    [external ? "full_depth_sequencing_qcable_external_name" : "full_depth_sequencing_qcable_alias", "Full-Depth Sequencing"],
+    [external ? "informatics_interpretation_qcable_external_name" : "informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
+    [external ? "draft_report_qcable_external_name" : "draft_report_qcable_alias", "Draft Report"],
+    [external ? "final_report_qcable_external_name" : "final_report_qcable_alias", "Final Report"]]);
+}
+
 export function qcablesTable(
   qcables: QCable[],
   changelogs: Changelog[],
@@ -74,96 +167,68 @@ export function qcablesTable(
     pageHeader.innerHTML += ")";
   }
 
-  const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
-  qcables
-    .forEach((qcable) => {
-      tableRows.push(tableRow(null,
-        {
-          contents: qcable.case_external_name,
-          className: "qcable-table-donor-case"
-        },
-        {
-          contents: formatLibraryDesigns(qcable.library_design),
-          className: "qcable-table-donor-case"
-        },
-        {
-          contents: qcable.receipt_inspection_qcable_alias ? qcable.receipt_inspection_qcable_alias: "",
-          className: statusToClassName(qcable.receipt_inspection_qcable_status),
-          title: qcable.receipt_inspection_qcable_status? toSentenceCase(qcable.receipt_inspection_qcable_status) : titleUnknown
-        },
-        {
-          contents: qcable.extraction_qcable_alias ? qcable.extraction_qcable_alias: "",
-          className: statusToClassName(qcable.extraction_qcable_status),
-          title: qcable.extraction_qcable_status? toSentenceCase(qcable.extraction_qcable_status) : titleUnknown
-        },
-        {
-          contents: qcable.library_preparation_qcable_alias ? qcable.library_preparation_qcable_alias: "",
-          className: statusToClassName(qcable.library_preparation_qcable_status),
-          title: qcable.library_preparation_qcable_status? toSentenceCase(qcable.library_preparation_qcable_status) : titleUnknown
-        },
-        {
-          contents: qcable.library_qualification_qcable_alias ? qcable.library_qualification_qcable_alias: "",
-          className: statusToClassName(qcable.library_qualification_qcable_status),
-          title: qcable.library_qualification_qcable_status? toSentenceCase(qcable.library_qualification_qcable_status) : titleUnknown
-        },
-        {
-          contents: qcable.full_depth_sequencing_qcable_alias ? qcable.full_depth_sequencing_qcable_alias: "",
-          className: statusToClassName(qcable.full_depth_sequencing_qcable_status),
-          title: qcable.full_depth_sequencing_qcable_status? toSentenceCase(qcable.full_depth_sequencing_qcable_status) : titleUnknown
-        },
-        {
-          contents: qcable.informatics_interpretation_qcable_alias ? qcable.informatics_interpretation_qcable_alias: "",
-          className: statusToClassName(qcable.informatics_interpretation_qcable_status),
-          title: qcable.informatics_interpretation_qcable_status? toSentenceCase(qcable.informatics_interpretation_qcable_status) : titleUnknown
-        },
-        {
-          contents: qcable.draft_report_qcable_alias ? qcable.draft_report_qcable_alias: "",
-          className: statusToClassName(qcable.draft_report_qcable_status),
-          title: qcable.draft_report_qcable_status? toSentenceCase(qcable.draft_report_qcable_status) : titleUnknown
-        },
-        {
-          contents: qcable.final_report_qcable_alias ? qcable.final_report_qcable_alias: "",
-          className: statusToClassName(qcable.final_report_qcable_status),
-          title: qcable.final_report_qcable_status? toSentenceCase(qcable.final_report_qcable_status) : titleUnknown
-        }
-      ));
+  const tableRowsInternal = constructTableRows(false, qcables);
+  const tableRowsExternal = constructTableRows(true, qcables);
 
-    });
+  const tableHeadersInternal = constructTableHeaders(false);
+  const tableHeadersExternal = constructTableHeaders(true);
 
-  const tableHeaders = new Map([
-    ["case_external_name", "Project:Case"],
-    ["library_design", "Library Design"],
-    ["receipt_inspection_qcable_alias", "Receipt/Inspection"],
-    ["extraction_qcable_alias", "Extraction"],
-    ["library_preparation_qcable_alias", "Library Preparation"],
-    ["library_qualification_qcable_alias", "Library Qualification"],
-    ["full_depth_sequencing_qcable_alias", "Full-Depth Sequencing"],
-    ["informatics_interpretation_qcable_alias", "Informatics Pipeline + Variant Interpretation"],
-    ["draft_report_qcable_alias", "Draft Report"],
-    ["final_report_qcable_alias", "Final Report"]])
+  const sortInternal = new Map();
+  const sortExternal = new Map();
+  sortInternal.set("case_id", "alphaNumSort");
+  sortExternal.set("case_external_name", "alphaNumSort");
 
-  const sort = new Map();
-  sort.set("case_external_name", "alphaNumSort");
-  const table = bootstrapTable(tableHeaders, true, true, sort, "table");
-  const tableBody = tableBodyFromRows(null, tableRows);
+  const internalTable = bootstrapTable(tableHeadersInternal, true, true, sortInternal, "internal-table");
+  const internalTableBody = tableBodyFromRows(null, tableRowsInternal);
 
-  table.setAttribute("data-sort-name", "case_external_name");
-  table.appendChild(tableBody);
+  const externalTable = bootstrapTable(tableHeadersExternal, true, true, sortExternal, "external-table");
+  const externalTableBody = tableBodyFromRows(null, tableRowsExternal);
+
+  internalTable.setAttribute("data-sort-name", "case_id");
+  internalTable.appendChild(internalTableBody);
+
+  externalTable.setAttribute("data-sort-name", "case-external-name");
+  externalTable.append(externalTableBody);
+
+  const toggleIds = createButton("qcable-id-toggle", "Switch to OICR Identifiers", "identifier");
 
   pageContainer.appendChild(pageHeader);
-  pageContainer.appendChild(table);
+  pageContainer.appendChild(toggleIds);
+  pageContainer.appendChild(externalTable);
+  pageContainer.appendChild(internalTable);
   document.body.appendChild(pageContainer);
 
   $(function () {
-    $('#table').bootstrapTable({
+    $('#internal-table,#external-table').bootstrapTable({
       formatSearch: function() {
         return 'Search QC-ables';
       }
     });
+
+    // Default to show external table and hide internal table
+    $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed
+    $('#internal-table').parents().hide();
+    $('#external-table').parents().show();
+
+    // Show appropriate table on button click
+    // If user clicks on "OICR Identifiers" button, hide external table and change button text to "External identifiers"
+    $('#qcable-id-toggle').on('click', function() {
+      $(this).text(function(i, text) {
+        if(text === "Switch to OICR Identifiers") {
+          $('#external-table').parents().hide();
+          $('#internal-table').parents().show();
+          return "Switch to External Identifiers";
+        } else {
+          $('#internal-table').parents().hide();
+          $('#external-table').parents().show();
+          return "Switch to OICR Identifiers";
+        }
+      });
+    });
   });
 
 
-  $('#table').on('click-cell.bs.table', function(event, field, value, row, $element) {
+  $('#internal-table,#external-table').on('click-cell.bs.table', function(event, field, value, row, $element) {
     const filteredChangelogs = changelogs.filter((item) => {
       return item.qcable_id === value
     });
@@ -190,9 +255,9 @@ export function qcablesTable(
       if (childNodes.length) {
         childNodes.remove();
       } else {
-        if(value != "" && field != "case_external_name" && field != "library_design") {
+        if(value != "" && field != "case_external_name" && field != "case_id" && field != "library_design") {
           $element.attr('id', value).append(cellValue.element);
-        } else if (field != "case_external_name" && field != "library_design") {
+        } else if (field != "case_external_name" && field != "case_id" && field != "library_design") {
           // Let user know QCable hasn't been created yet
           const emptyNotifier = elementFromTag("div", "card",
             elementFromTag("div", "card-body", "Hasn't yet started"));
@@ -200,8 +265,6 @@ export function qcablesTable(
         }
       }
     }
-
-
   });
 }
 

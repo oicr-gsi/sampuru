@@ -8,13 +8,19 @@ import {
   elementFromTag,
   staticCard,
   navbar,
-  DOMElement, progressBar,
-  createLinkElement, ComplexElement, tableRow, bootstrapTable, tableBodyFromRows
+  DOMElement,
+  progressBar,
+  createLinkElement,
+  ComplexElement,
+  tableRow,
+  bootstrapTable,
+  tableBodyFromRows,
+  createButton
 } from "./html.js";
 import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
-import {commonName} from "./common.js";
+import {commonName, formatQualityGateNames} from "./common.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
@@ -31,14 +37,24 @@ export function failedChangelog(changelogContent: string): string {
   }
 }
 
-export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElement> {
+export function changelogTable(changelogs: Changelog[], external: boolean): ComplexElement<HTMLElement> {
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
 
   changelogs
     .forEach((changelog) => {
       tableRows.push(tableRow(null,
         {
-          contents: changelog.case_id,
+          contents: external ? changelog.external_name : changelog.case_id,
+          className: failedChangelog(changelog.content)
+        },
+        {
+          contents: changelog.qcable_type == "null" ? "N/A" : formatQualityGateNames(changelog.qcable_type),
+          className: failedChangelog(changelog.content)
+        },
+        {
+          contents: external ?
+            (changelog.external_name == "null" ? "N/A" : changelog.external_name) :
+            (changelog.qcable_oicr_alias == "null" ? "N/A" : changelog.qcable_oicr_alias),
           className: failedChangelog(changelog.content)
         },
         {
@@ -53,11 +69,13 @@ export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElem
 
   const tableHeaders = new Map([
     ["donor_case_name", "Case"],
+    ["qcable_type", "Quality Gate"],
+    [external ? "oicr_alias" : "external_name", "QC-able"],
     ["content", "Content"],
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, null, "project-changelog");
+  const table = bootstrapTable(tableHeaders, true, true, null, external ? "external-changelog" : "internal-changelog");
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
@@ -149,7 +167,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
     "Cases",
     null,
     null,
-    urlConstructor("cases.html", ["cases-project-id"], [projectInfo.name])
+    urlConstructor("cases.html", ["cases-project-id", "identifier"], [projectInfo.name, "external"])
   );
 
   const cases = elementFromTag("div", null,
@@ -169,8 +187,13 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
     title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
-  const table = elementFromTag("div", null, changelogTable(changelogs));
-  const changelogsCard: Card = {contents: table.element, header: "Changelogs",
+  const toggleIds = createButton('toggle-changelog-ids', "Switch to OICR Identifiers", "identifier");
+  const changelogTables = elementFromTag("div", null,
+    {type: "complex", element: toggleIds},
+    changelogTable(changelogs, true),
+    changelogTable(changelogs, false));
+
+  const changelogsCard: Card = {contents: changelogTables.element, header: "Changelogs",
     title: projectInfo.name + " Changelogs", cardId: projectInfo.name + "-changelogs"};
 
   /* TODO: Uncomment once deliverable portal is developed and there is data to display. GR-1334
@@ -212,7 +235,6 @@ export function initialiseProjectOverview(projectId: string) {
       const projectInfo = responses[0] as ProjectInfo
       const changelogs = responses[1] as Changelog[]
 
-      
       document.body.appendChild(project(projectInfo, changelogs));
       return projectInfo;
     })
@@ -221,7 +243,28 @@ export function initialiseProjectOverview(projectId: string) {
     })
     .then(() => {
       $(function () {
-        $('#project-changelog').bootstrapTable({});
+        $('#external-changelog,#internal-changelog').bootstrapTable({});
+
+        // Default to show external table and hide internal table
+        $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed
+        $('#internal-changelog').parents().hide();
+        $('#external-changelog').parents().show();
+
+        // Show appropriate table on button click
+        // i.e. If user clicks "OICR Identifiers" button, hide external table and change button text to "External identifiers"
+        $('#toggle-changelog-ids').on('click', function() {
+          $(this).text(function(i, text) {
+            if(text === "Switch to OICR Identifiers") {
+              $('#external-changelog').parents().hide();
+              $('#internal-changelog').parents().show();
+              return "Switch to External Identifiers";
+            } else {
+              $('#internal-changelog').parents().hide();
+              $('#external-changelog').parents().show();
+              return "Switch to OICR Identifiers";
+            }
+          });
+        });
       });
     })
     .catch((error) => {
