@@ -36,7 +36,9 @@ export function casesPage(cases: CaseCard[], project: string, identifier: string
   header.innerHTML += ")";
   cardContainer.appendChild(header);
 
-  const toggleIds = createButton('toggle-case-ids', "Toggle Case IDs", "case-identifier");
+  const toggleIds = createButton('toggle-case-ids',
+    identifier === "external" ? "Switch to OICR Identifiers" : "Switch to External Identifiers",
+    "case-identifier");
 
   toggleIds.onclick = function() {
     if(identifier === "external") {

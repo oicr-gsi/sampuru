@@ -146,10 +146,10 @@ h2, h3 {
 
 .identifier {
     margin: 10px;
-    float: right;
+    float: left;
     display: inline-block;
 }
 
 .case-identifier {
-    margin: 10px;
+    margin-bottom: 10px;
 }

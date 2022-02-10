@@ -187,7 +187,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
     title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
-  const toggleIds = createButton('toggle-changelog-ids', "OICR Identifiers", "identifier");
+  const toggleIds = createButton('toggle-changelog-ids', "Switch to OICR Identifiers", "identifier");
   const changelogTables = elementFromTag("div", null,
     {type: "complex", element: toggleIds},
     changelogTable(changelogs, true),
@@ -254,14 +254,14 @@ export function initialiseProjectOverview(projectId: string) {
         // i.e. If user clicks "OICR Identifiers" button, hide external table and change button text to "External identifiers"
         $('#toggle-changelog-ids').on('click', function() {
           $(this).text(function(i, text) {
-            if(text === "OICR Identifiers") {
+            if(text === "Switch to OICR Identifiers") {
               $('#external-changelog').parents().hide();
               $('#internal-changelog').parents().show();
-              return "External Identifiers";
+              return "Switch to External Identifiers";
             } else {
               $('#internal-changelog').parents().hide();
               $('#external-changelog').parents().show();
-              return "OICR Identifiers";
+              return "Switch to OICR Identifiers";
             }
           });
         });

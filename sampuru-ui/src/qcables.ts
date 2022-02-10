@@ -190,7 +190,7 @@ export function qcablesTable(
   externalTable.setAttribute("data-sort-name", "case-external-name");
   externalTable.append(externalTableBody);
 
-  const toggleIds = createButton("qcable-id-toggle", "OICR Identifiers", "identifier");
+  const toggleIds = createButton("qcable-id-toggle", "Switch to OICR Identifiers", "identifier");
 
   pageContainer.appendChild(pageHeader);
   pageContainer.appendChild(toggleIds);
@@ -214,14 +214,14 @@ export function qcablesTable(
     // If user clicks on "OICR Identifiers" button, hide external table and change button text to "External identifiers"
     $('#qcable-id-toggle').on('click', function() {
       $(this).text(function(i, text) {
-        if(text === "OICR Identifiers") {
+        if(text === "Switch to OICR Identifiers") {
           $('#external-table').parents().hide();
           $('#internal-table').parents().show();
-          return "External Identifiers";
+          return "Switch to External Identifiers";
         } else {
           $('#internal-table').parents().hide();
           $('#external-table').parents().show();
-          return "OICR Identifiers";
+          return "Switch to OICR Identifiers";
         }
       });
     });
