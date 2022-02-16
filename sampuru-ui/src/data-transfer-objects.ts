@@ -170,8 +170,9 @@ export interface Notification {
 }
 
 export interface DeliverableFile {
-  id: number,
+  id?: number,
   project_id: string,
+  case_id?: string[],
   location: string,
   notes: string,
   expiry_date: string
