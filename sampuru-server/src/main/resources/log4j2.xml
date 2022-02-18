@@ -10,15 +10,15 @@
     </Appenders>
 
     <Loggers>
-        <!-- SQL execution logging is logged to the LoggerListener logger at DEBUG level -->
-        <Logger name="org.jooq.tools.LoggerListener" level="debug" additivity="false">
+        <!-- SQL execution logging is logged to the LoggerListener logger at INFO level -->
+        <Logger name="org.jooq.tools.LoggerListener" level="info" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
         </Logger>
 
-        <!-- Other jOOQ related debug log output -->
+        <!-- Other jOOQ related info log output -->
         <!-- This has the giant jOOQ logo in it so i'm not putting it in the file -->
-        <Logger name="org.jooq" level="debug" additivity="false">
+        <Logger name="org.jooq" level="info" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
 
