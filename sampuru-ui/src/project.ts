@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
-/// <reference types="bootstrap-table" />
+/// <reference types="bootstrap-table"
 
 import {
   busyDialog,
@@ -21,6 +21,7 @@ import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 import {commonName, formatQualityGateNames} from "./common.js";
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
@@ -75,7 +76,7 @@ export function changelogTable(changelogs: Changelog[], external: boolean): Comp
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, null, external ? "external-changelog" : "internal-changelog");
+  const table = bootstrapTable(tableHeaders, true, true, null, external ? "external-changelog" : "internal-changelog", true);
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
