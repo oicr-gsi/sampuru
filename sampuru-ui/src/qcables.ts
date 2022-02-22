@@ -144,7 +144,7 @@ export function qcablesTable(
 
   const sort = new Map();
   sort.set("case_external_name", "alphaNumSort");
-  const table = bootstrapTable(tableHeaders, true, true, sort, "table");
+  const table = bootstrapTable(tableHeaders, true, true, sort, "table", true);
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.setAttribute("data-sort-name", "case_external_name");

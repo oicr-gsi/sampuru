@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
-/// <reference types="bootstrap-table" />
+/// <reference types="bootstrap-table"
 
 import {
   busyDialog,
@@ -15,6 +15,7 @@ import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 import {commonName} from "./common.js";
+import {TableExport} from "tableexport";
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
@@ -57,7 +58,31 @@ export function changelogTable(changelogs: Changelog[]): ComplexElement<HTMLElem
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, null, "project-changelog");
+  /*const toolbar = document.createElement("div");
+  toolbar.id = "toolbar";
+  toolbar.classList.add("select");
+
+  const select = document.createElement("select");
+  select.classList.add("form-control");
+
+  const exportBasic = document.createElement("option");
+  exportBasic.value = "";
+  exportBasic.innerText = "Export Basic";
+  select.appendChild(exportBasic);
+
+  const exportAll = document.createElement("option");
+  exportAll.value = "all";
+  exportAll.innerText = "Export All";
+  select.appendChild(exportAll);
+
+  const exportSelected = document.createElement("option");
+  exportSelected.value = "selected";
+  exportSelected.innerText = "Export Selected";
+  select.appendChild(exportSelected);
+
+  toolbar.appendChild(select); */
+
+  const table = bootstrapTable(tableHeaders, true, true, null, "project-changelog", true);
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
