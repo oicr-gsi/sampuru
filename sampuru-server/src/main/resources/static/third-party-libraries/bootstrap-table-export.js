@@ -115,7 +115,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
                 <div class="export ${this.constants.classes.buttonsDropdown}">
                 <button class="${this.constants.buttonsClass} dropdown-toggle"
                 aria-label="Export"
-                ${this.constants.dataToggle}="dropdown"
+                ${this.constants.buttonsClass} data-toggle="dropdown"
                 type="button"
                 title="${o.formatExport()}">
                 ${o.showButtonIcons ? Utils.sprintf(this.constants.html.icon, o.iconsPrefix, o.icons.export) : ''}

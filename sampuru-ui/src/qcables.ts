@@ -1,6 +1,7 @@
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
 /// <reference types="bootstrap-table" />
+/// <reference types="file-saver" />
 
 import {
   bootstrapTable,
@@ -178,10 +179,10 @@ export function qcablesTable(
   sortInternal.set("case_id", "alphaNumSort");
   sortExternal.set("case_external_name", "alphaNumSort");
 
-  const internalTable = bootstrapTable(tableHeadersInternal, true, true, sortInternal, "internal-table",true);
+  const internalTable = bootstrapTable(tableHeadersInternal, true, true, sortInternal, "internal-table",true, true);
   const internalTableBody = tableBodyFromRows(null, tableRowsInternal);
 
-  const externalTable = bootstrapTable(tableHeadersExternal, true, true, sortExternal, "external-table", true);
+  const externalTable = bootstrapTable(tableHeadersExternal, true, true, sortExternal, "external-table", true, true);
   const externalTableBody = tableBodyFromRows(null, tableRowsExternal);
 
   internalTable.setAttribute("data-sort-name", "case_id");
@@ -227,6 +228,17 @@ export function qcablesTable(
     });
   });
 
+  const $table = $("#table");
+
+  $(function() {
+    $("#toolbar")
+        .find("select")
+        .change(function() {
+          $table.bootstrapTable("refreshOptions", {
+            exportDataType: $(this).val()
+          });
+        });
+  });
 
   $('#internal-table,#external-table').on('click-cell.bs.table', function(event, field, value, row, $element) {
     const filteredChangelogs = changelogs.filter((item) => {

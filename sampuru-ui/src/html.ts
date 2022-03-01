@@ -1,7 +1,6 @@
 import {CaseCard, ActiveProject} from "./data-transfer-objects.js";
 import {formatLibraryDesigns, formatQualityGateNames, libDesignSort} from "./common.js";
 import {urlConstructor} from "./io.js";
-import { TableExport } from "tableexport";
 
 /**
  * The callback for handling mouse events
@@ -263,6 +262,34 @@ export function tableRow(
   return row;
 }
 
+export function exportToolbar(){
+  const toolbar = document.createElement("div");
+  toolbar.id = "toolbar";
+  toolbar.classList.add("select");
+
+  const select = document.createElement("select");
+  select.classList.add("form-control");
+
+  const exportBasic = document.createElement("option");
+  exportBasic.value = "";
+  exportBasic.innerText = "Export Basic";
+  select.appendChild(exportBasic);
+
+  const exportAll = document.createElement("option");
+  exportAll.value = "all";
+  exportAll.innerText = "Export All";
+  select.appendChild(exportAll);
+
+  const exportSelected = document.createElement("option");
+  exportSelected.value = "selected";
+  exportSelected.innerText = "Export Selected";
+  select.appendChild(exportSelected);
+
+  toolbar.appendChild(select);
+
+  return toolbar;
+}
+
 /**
  * Instantiate Bootstrap table
  * @param headers -> map of data-field to header innerText
@@ -271,6 +298,7 @@ export function tableRow(
  * @param sort -> map of column name to sort function that needs to be applied to it
  * @param tableId -> id to associate with table for jQuery to apply bootstrapTable styling and js to the right objects
  * @param showExport -> boolean to show the export button
+ * @param clickToSelect
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
@@ -279,6 +307,7 @@ export function bootstrapTable(
   sort: Map<string, string> | null,
   tableId: string,
   showExport: boolean,
+  clickToSelect: boolean
 ): HTMLElement {
 
   const table = document.createElement("table");
@@ -297,18 +326,11 @@ export function bootstrapTable(
     table.setAttribute("data-show-export", "true");
   }
 
-  /* table.setAttribute("data-toolbar", "toolbar");
+  if (clickToSelect) {
+    table.setAttribute("data-click-to-select", "true");
+  }
 
-  const $table = $('#table');
-
-  $(function() {
-    $('#toolbar').find('select').change(function () {
-      $table.bootstrapTable('destroy').bootstrapTable({
-        exportDataType: $(this).val(),
-        exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf']
-      })
-    })
-  }) */
+  table.setAttribute("data-toolbar", "toolbar");
 
   const thead = document.createElement("thead");
   const tr = document.createElement("tr");

@@ -1,6 +1,7 @@
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
-/// <reference types="bootstrap-table"
+/// <reference types="bootstrap-table" />
+/// <reference types="file-saver" />
 
 import {
   busyDialog,
@@ -68,6 +69,7 @@ export function changelogTable(changelogs: Changelog[], external: boolean): Comp
         }))
     });
 
+
   const tableHeaders = new Map([
     ["donor_case_name", "Case"],
     ["qcable_type", "Quality Gate"],
@@ -76,11 +78,23 @@ export function changelogTable(changelogs: Changelog[], external: boolean): Comp
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, null, external ? "external-changelog" : "internal-changelog", true);
+  const table = bootstrapTable(tableHeaders, true, true, null, "project-changelog", true, true);
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
   table.className = "changelog-table";
+
+  const $table = $("#table"); // "table" accordingly
+
+  $(function() {
+    $("#toolbar")
+        .find("select")
+        .change(function() {
+          $table.bootstrapTable("refreshOptions", {
+            exportDataType: $(this).val()
+          });
+        });
+  });
 
   return {type: "complex", element: table};
 }
