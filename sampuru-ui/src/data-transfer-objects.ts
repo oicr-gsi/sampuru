@@ -26,8 +26,6 @@ export interface SankeyTransition {
   final_report: {total: number, pending: number, passed: number, failed: number},
 }
 
-/*
-*  todo: can it be null?*/
 /**
  * Data returned from api/project_overview
  */
