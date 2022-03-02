@@ -16,7 +16,7 @@ import {
   tableRow,
   bootstrapTable,
   tableBodyFromRows,
-  createButton
+  createButton, exportToolbar
 } from "./html.js";
 import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
@@ -78,7 +78,7 @@ export function changelogTable(changelogs: Changelog[], external: boolean): Comp
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, null, "project-changelog", true, true);
+  const table = bootstrapTable(tableHeaders, true, true, null, external ? "external-changelog" : "internal-changelog", true, true);
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
@@ -202,9 +202,14 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
     title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
+  const toolbar = exportToolbar();
+  toolbar.classList.add("toolbar");
+  toolbar.className = "toolbar";
+
   const toggleIds = createButton('toggle-changelog-ids', "Switch to OICR Identifiers", "identifier");
   const changelogTables = elementFromTag("div", null,
     {type: "complex", element: toggleIds},
+      {type: "complex", element: toolbar},
     changelogTable(changelogs, true),
     changelogTable(changelogs, false));
 

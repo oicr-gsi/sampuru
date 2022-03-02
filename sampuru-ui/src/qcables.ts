@@ -14,7 +14,7 @@ import {
   tableBodyFromRows,
   tableRow,
   toSentenceCase,
-  createButton
+  createButton, exportToolbar
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 import {commonName, formatLibraryDesigns} from "./common.js";
@@ -191,10 +191,15 @@ export function qcablesTable(
   externalTable.setAttribute("data-sort-name", "case-external-name");
   externalTable.append(externalTableBody);
 
+  const toolbar = exportToolbar();
+  toolbar.classList.add("toolbar");
+  toolbar.className = "toolbar";
+
   const toggleIds = createButton("qcable-id-toggle", "Switch to OICR Identifiers", "identifier");
 
   pageContainer.appendChild(pageHeader);
   pageContainer.appendChild(toggleIds);
+  pageContainer.appendChild(toolbar);
   pageContainer.appendChild(externalTable);
   pageContainer.appendChild(internalTable);
   document.body.appendChild(pageContainer);

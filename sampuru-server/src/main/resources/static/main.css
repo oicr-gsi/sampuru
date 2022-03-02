@@ -153,3 +153,9 @@ h2, h3 {
 .case-identifier {
     margin-bottom: 10px;
 }
+
+.toolbar {
+    float: right; !important;
+    width: 300px; !important;
+    padding: 10px; !important;
+}
