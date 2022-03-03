@@ -222,7 +222,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
     title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
-  const casesPerQcGateCard = {contents: casesPerQcGateTable(projectInfo.cases_per_qc_gate), header: "Number of Cases Per QC Gate",
+  const casesPerQcGateCard = {contents: casesPerQcGateTable(projectInfo.cases_per_qc_gate), header: "Number of Cases At Each QC Gate",
   title: projectInfo.name + " # Cases Per QC Gate", cardId: projectInfo.name + "-cases-per-qc-gate"};
 
   const toggleIds = createButton('toggle-changelog-ids', "Switch to OICR Identifiers", "identifier");
