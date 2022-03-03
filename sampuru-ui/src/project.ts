@@ -87,18 +87,25 @@ function changelogTable(changelogs: Changelog[], external: boolean): ComplexElem
 function casesPerQcGateTable(casesPerQcGate: CasesPerQcGate): HTMLElement {
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
 
-  tableRows.push(tableRow(null, {contents: "Receipt/Inspection"}, {contents: casesPerQcGate.receipt}));
-  tableRows.push(tableRow(null, {contents: "Extraction"}, {contents: casesPerQcGate.extraction}));
-  tableRows.push(tableRow(null, {contents: "Library Preparation"}, {contents: casesPerQcGate.library_preparation}));
-  tableRows.push(tableRow(null, {contents: "Library Qualification"}, {contents: casesPerQcGate.library_qualification}));
-  tableRows.push(tableRow(null, {contents: "Full-Depth Sequencing"}, {contents: casesPerQcGate.full_depth_sequencing}));
-  tableRows.push(tableRow(null, {contents: "Informatics + Interpretation"}, {contents: casesPerQcGate.informatics_interpretation}));
-  tableRows.push(tableRow(null, {contents: "Draft Report"}, {contents: casesPerQcGate.draft_report}));
-  tableRows.push(tableRow(null, {contents: "Final Report"}, {contents: casesPerQcGate.final_report}));
+  tableRows.push(tableRow(null,
+    {contents: casesPerQcGate.receipt},
+    {contents: casesPerQcGate.extraction},
+    {contents: casesPerQcGate.library_preparation},
+    {contents: casesPerQcGate.library_qualification},
+    {contents: casesPerQcGate.full_depth_sequencing},
+    {contents: casesPerQcGate.informatics_interpretation},
+    {contents: casesPerQcGate.draft_report},
+    {contents: casesPerQcGate.final_report}));
 
   const tableHeaders = new Map([
-    ["quality_gate", "Quality Gate"],
-    ["cases_per_qc_gate", "# of Completed Cases"]
+    ["receipt", "Receipt/Inspection"],
+    ["extraction", "Extraction"],
+    ["library_preparation", "Library Preparation"],
+    ["library_qualification", "Library Qualification"],
+    ["full_depth_sequencing", "Full-Depth Sequencing"],
+    ["informatics_interpretation", "Informatics + Interpretation"],
+    ["draft_report", "Draft Report"],
+    ["final_report", "Final Report"]
   ]);
 
   const table = bootstrapTable(tableHeaders, false, false, null, "cases-per-qc-gate");
