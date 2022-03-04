@@ -78,23 +78,11 @@ export function changelogTable(changelogs: Changelog[], external: boolean): Comp
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, null, external ? "external-changelog" : "internal-changelog", true, true);
+  const table = bootstrapTable(tableHeaders, null, external ? "external-changelog" : "internal-changelog", true, true, true, true);
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
   table.className = "changelog-table";
-
-  const $table = $("#table"); // "table" accordingly
-
-  $(function() {
-    $("#toolbar")
-        .find("select")
-        .change(function() {
-          $table.bootstrapTable("refreshOptions", {
-            exportDataType: $(this).val()
-          });
-        });
-  });
 
   return {type: "complex", element: table};
 }
@@ -204,12 +192,11 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
   const toolbar = exportToolbar();
   toolbar.classList.add("toolbar");
-  toolbar.className = "toolbar";
 
   const toggleIds = createButton('toggle-changelog-ids', "Switch to OICR Identifiers", "identifier");
   const changelogTables = elementFromTag("div", null,
     {type: "complex", element: toggleIds},
-      {type: "complex", element: toolbar},
+    {type: "complex", element: toolbar},
     changelogTable(changelogs, true),
     changelogTable(changelogs, false));
 
@@ -262,6 +249,32 @@ export function initialiseProjectOverview(projectId: string) {
       drawSankey(data.sankey_transitions);
     })
     .then(() => {
+
+      $(function () {
+        $('#toolbar').find('select').change(function () {
+          $('#external-changelog, #internal-changelog').bootstrapTable('destroy').bootstrapTable({
+            exportDataType: $(this).val()
+          });
+          $('div').removeClass('clearfix');
+          $('#internal-changelog').parents().hide();
+          $('#external-changelog').parents().show();
+
+          $('#toggle-changelog-ids').on('click', function () {
+            $(this).text(function (i, text) {
+              if (text === "Switch to OICR Identifiers") {
+                $('#external-changelog').parents().hide();
+                $('#internal-changelog').parents().show();
+                return "Switch to External Identifiers";
+              } else {
+                $('#internal-changelog').parents().hide();
+                $('#external-changelog').parents().show();
+                return "Switch to OICR Identifiers";
+              }
+            });
+          });
+        });
+      });
+
       $(function () {
         $('#external-changelog,#internal-changelog').bootstrapTable({});
 

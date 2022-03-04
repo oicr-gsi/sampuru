@@ -155,7 +155,11 @@ h2, h3 {
 }
 
 .toolbar {
-    float: right; !important;
-    width: 300px; !important;
+    float: left; !important;
+    width: 150px; !important;
     padding: 10px; !important;
+}
+
+.export.btn-group {
+    float: left; !important;
 }

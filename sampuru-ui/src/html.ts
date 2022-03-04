@@ -280,11 +280,6 @@ export function exportToolbar(){
   exportAll.innerText = "Export All";
   select.appendChild(exportAll);
 
-  const exportSelected = document.createElement("option");
-  exportSelected.value = "selected";
-  exportSelected.innerText = "Export Selected";
-  select.appendChild(exportSelected);
-
   toolbar.appendChild(select);
 
   return toolbar;
@@ -302,10 +297,10 @@ export function exportToolbar(){
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
-  pagination: boolean,
-  search: boolean,
   sort: Map<string, string> | null,
   tableId: string,
+  pagination: boolean,
+  search: boolean,
   showExport: boolean,
   clickToSelect: boolean
 ): HTMLElement {
@@ -324,13 +319,12 @@ export function bootstrapTable(
 
   if (showExport) {
     table.setAttribute("data-show-export", "true");
+    table.setAttribute("data-toolbar", "toolbar");
   }
 
   if (clickToSelect) {
     table.setAttribute("data-click-to-select", "true");
   }
-
-  table.setAttribute("data-toolbar", "toolbar");
 
   const thead = document.createElement("thead");
   const tr = document.createElement("tr");

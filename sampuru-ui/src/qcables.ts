@@ -153,17 +153,17 @@ export function qcablesTable(
   const pageContainer = document.createElement("div");
   const pageHeader = document.createElement("h3");
   const titleUnknown = "Hasn't started yet";
-  if(filterType === "case") {
+  if (filterType === "case") {
     const caseExtName = qcables[0].case_external_name;
     pageHeader.innerText = "QC-ables (" + caseExtName.replace(':', '\t') + ")";
   } else {
     pageHeader.innerText = "QC-ables (";
     const projectLink = createLinkElement(
-      null,
-      filterId,
-      null,
-      null,
-      urlConstructor("project.html", ["project-overview-id"], [filterId]));
+        null,
+        filterId,
+        null,
+        null,
+        urlConstructor("project.html", ["project-overview-id"], [filterId]));
     pageHeader.appendChild(projectLink);
     pageHeader.innerHTML += ")";
   }
@@ -179,10 +179,10 @@ export function qcablesTable(
   sortInternal.set("case_id", "alphaNumSort");
   sortExternal.set("case_external_name", "alphaNumSort");
 
-  const internalTable = bootstrapTable(tableHeadersInternal, true, true, sortInternal, "internal-table",true, true);
+  const internalTable = bootstrapTable(tableHeadersInternal, sortInternal, "internal-table", true, true, true, true);
   const internalTableBody = tableBodyFromRows(null, tableRowsInternal);
 
-  const externalTable = bootstrapTable(tableHeadersExternal, true, true, sortExternal, "external-table", true, true);
+  const externalTable = bootstrapTable(tableHeadersExternal, sortExternal, "external-table", true, true, true, true);
   const externalTableBody = tableBodyFromRows(null, tableRowsExternal);
 
   internalTable.setAttribute("data-sort-name", "case_id");
@@ -193,7 +193,6 @@ export function qcablesTable(
 
   const toolbar = exportToolbar();
   toolbar.classList.add("toolbar");
-  toolbar.className = "toolbar";
 
   const toggleIds = createButton("qcable-id-toggle", "Switch to OICR Identifiers", "identifier");
 
@@ -205,8 +204,33 @@ export function qcablesTable(
   document.body.appendChild(pageContainer);
 
   $(function () {
+    $('#toolbar').find('select').change(function (){
+      $('#internal-table, #external-table').bootstrapTable('refreshOptions', {
+        exportDataType: $(this).val()
+      });
+      $('div').removeClass("clearfix");
+      $('#internal-table').parents().hide();
+      $('#external-table').parents().show();
+
+      $('#qcable-id-toggle').on('click', function () {
+        $(this).text(function (i, text) {
+          if (text === "Switch to OICR Identifiers") {
+            $('#external-table').parents().hide();
+            $('#internal-table').parents().show();
+            return "Switch to External Identifiers";
+          } else {
+            $('#internal-table').parents().hide();
+            $('#external-table').parents().show();
+            return "Switch to OICR Identifiers";
+          }
+        });
+      });
+    });
+  });
+
+  $(function () {
     $('#internal-table,#external-table').bootstrapTable({
-      formatSearch: function() {
+      formatSearch: function () {
         return 'Search QC-ables';
       }
     });
@@ -218,9 +242,9 @@ export function qcablesTable(
 
     // Show appropriate table on button click
     // If user clicks on "OICR Identifiers" button, hide external table and change button text to "External identifiers"
-    $('#qcable-id-toggle').on('click', function() {
-      $(this).text(function(i, text) {
-        if(text === "Switch to OICR Identifiers") {
+    $('#qcable-id-toggle').on('click', function () {
+      $(this).text(function (i, text) {
+        if (text === "Switch to OICR Identifiers") {
           $('#external-table').parents().hide();
           $('#internal-table').parents().show();
           return "Switch to External Identifiers";
@@ -233,51 +257,39 @@ export function qcablesTable(
     });
   });
 
-  const $table = $("#table");
-
-  $(function() {
-    $("#toolbar")
-        .find("select")
-        .change(function() {
-          $table.bootstrapTable("refreshOptions", {
-            exportDataType: $(this).val()
-          });
-        });
-  });
-
-  $('#internal-table,#external-table').on('click-cell.bs.table', function(event, field, value, row, $element) {
+  $('#internal-table,#external-table').on('click-cell.bs.table', function (event, field, value, row, $element) {
     const filteredChangelogs = changelogs.filter((item) => {
       return item.qcable_id === value
     });
 
     const displayChangelogs: DOMElement[] = [];
-    if(filteredChangelogs.length) {
+    if (filteredChangelogs.length) {
       displayChangelogs.push(elementFromTag("b", null,
-        elementFromTag("br", null), "Changelogs:"));
+          elementFromTag("br", null), "Changelogs:"));
     }
 
     filteredChangelogs.map((item) => {
-        displayChangelogs.push(elementFromTag("p", null, item.content, null));
+      displayChangelogs.push(elementFromTag("p", null, item.content, null));
     });
 
     const cellValue = elementFromTag("div", "card",
-      elementFromTag("div", "card-body", value, displayChangelogs));
+        elementFromTag("div", "card-body", value, displayChangelogs));
 
     const selection = window.getSelection();
     const isEmpty = (selection != null) ? selection.toString() : "";
     // Don't register click events when user is selecting text
-    if(isEmpty.length <= 0) {
+    if (isEmpty.length <= 0) {
       const childNodes = $element.children();
 
       if (childNodes.length) {
         childNodes.remove();
       } else {
-        if(value != "" && field != "case_external_name" && field != "case_id" && field != "library_design") {
+        if (value != "" && field != "case_external_name" && field != "case_id" && field != "library_design") {
           $element.attr('id', value).append(cellValue.element);
         } else if (field != "case_external_name" && field != "case_id" && field != "library_design") {
           // Let user know QCable hasn't been created yet
           const emptyNotifier = elementFromTag("div", "card",
-            elementFromTag("div", "card-body", "Hasn't yet started"));
+              elementFromTag("div", "card-body", "Hasn't yet started"));
           $element.attr('id', field).append(emptyNotifier.element);
         }
       }
