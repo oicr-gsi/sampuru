@@ -19,7 +19,7 @@ import {
   createButton, exportToolbar
 } from "./html.js";
 import {urlConstructor} from "./io.js";
-import {ProjectInfo, Changelog} from "./data-transfer-objects.js";
+import {ProjectInfo, Changelog, CasesPerQcGate} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 import {commonName, formatQualityGateNames} from "./common.js";
 
@@ -39,7 +39,7 @@ export function failedChangelog(changelogContent: string): string {
   }
 }
 
-export function changelogTable(changelogs: Changelog[], external: boolean): ComplexElement<HTMLElement> {
+function changelogTable(changelogs: Changelog[], external: boolean): ComplexElement<HTMLElement> {
   const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
 
   changelogs
@@ -87,6 +87,41 @@ export function changelogTable(changelogs: Changelog[], external: boolean): Comp
   return {type: "complex", element: table};
 }
 
+function casesPerQcGateTable(casesPerQcGate: CasesPerQcGate): HTMLElement {
+  const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
+
+  tableRows.push(tableRow(null,
+    {contents: casesPerQcGate.receipt},
+    {contents: casesPerQcGate.extraction},
+    {contents: casesPerQcGate.library_preparation},
+    {contents: casesPerQcGate.library_qualification},
+    {contents: casesPerQcGate.full_depth_sequencing},
+    {contents: casesPerQcGate.informatics_interpretation},
+    {contents: casesPerQcGate.draft_report},
+    {contents: casesPerQcGate.final_report}));
+
+  const tableHeaders = new Map([
+    ["receipt", "Receipt/Inspection"],
+    ["extraction", "Extraction"],
+    ["library_preparation", "Library Preparation"],
+    ["library_qualification", "Library Qualification"],
+    ["full_depth_sequencing", "Full-Depth Sequencing"],
+    ["informatics_interpretation", "Informatics + Interpretation"],
+    ["draft_report", "Draft Report"],
+    ["final_report", "Final Report"]
+  ]);
+
+  const table = bootstrapTable(tableHeaders, false, false, null, "cases-per-qc-gate");
+  const tableBody = tableBodyFromRows(null, tableRows);
+
+  table.appendChild(tableBody);
+  table.classList.add("generic-tables");
+
+  const container = document.createElement("div");
+  container.appendChild(table);
+
+  return container;
+}
 
 export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTMLElement {
   const pageContainer = document.createElement("div");
@@ -190,6 +225,9 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
   const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
     title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
+  const casesPerQcGateCard = {contents: casesPerQcGateTable(projectInfo.cases_per_qc_gate), header: "Number of Cases At Each QC Gate",
+  title: projectInfo.name + " # Cases Per QC Gate", cardId: projectInfo.name + "-cases-per-qc-gate"};
+  
   const toolbar = exportToolbar();
   toolbar.classList.add("toolbar");
 
@@ -211,6 +249,7 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
   cards.push(projectSummary.element);
   cards.push(staticCard(qcablesCard));
+  cards.push(staticCard(casesPerQcGateCard));
   cards.push(staticCard(changelogsCard));
   //cards.push(staticCard(deliverablesCard)); END TODO
 
@@ -276,6 +315,7 @@ export function initialiseProjectOverview(projectId: string) {
       });
 
       $(function () {
+        $('#cases-per-qc-gate').bootstrapTable({});
         $('#external-changelog,#internal-changelog').bootstrapTable({});
 
         // Default to show external table and hide internal table

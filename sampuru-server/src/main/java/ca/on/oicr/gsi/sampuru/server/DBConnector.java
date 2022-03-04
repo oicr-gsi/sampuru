@@ -366,6 +366,31 @@ public class DBConnector {
         return jsonObject;
     }
 
+    public JSONObject getCasesPerQcGate(String projectId, String username) throws SQLException {
+        JSONObject jsonObject = new JSONObject();
+        Result<Record> shouldBeSingularResult = fetch(PostgresDSL
+            .select()
+            .from(CASES_PER_QUALITY_GATE)
+            .where(CASES_PER_QUALITY_GATE.PROJECT_ID.eq(projectId))
+            .and(CASES_PER_QUALITY_GATE.PROJECT_ID.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))
+                .or(DBConnector.ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))))));
+
+        if(shouldBeSingularResult.isEmpty()) return jsonObject;
+        if(shouldBeSingularResult.size() > 1) throw new SQLException(">1 row retrieved for cases per qc gate for project ID " + projectId);
+        Record result = shouldBeSingularResult.get(0);
+
+        jsonObject.put("receipt", result.get(CASES_PER_QUALITY_GATE.RECEIPT_INSPECTION_COMPLETED_CASES));
+        jsonObject.put("extraction", result.get(CASES_PER_QUALITY_GATE.EXTRACTION_COMPLETED_CASES));
+        jsonObject.put("library_preparation", result.get(CASES_PER_QUALITY_GATE.LIBRARY_PREPARATION_COMPLETED_CASES));
+        jsonObject.put("library_qualification", result.get(CASES_PER_QUALITY_GATE.LIBRARY_QUALIFICATION_COMPLETED_CASES));
+        jsonObject.put("full_depth_sequencing", result.get(CASES_PER_QUALITY_GATE.FULL_DEPTH_SEQUENCING_COMPLETED_CASES));
+        jsonObject.put("informatics_interpretation", result.get(CASES_PER_QUALITY_GATE.INFORMATICS_INTERPRETATION_COMPLETED_CASES));
+        jsonObject.put("draft_report", result.get(CASES_PER_QUALITY_GATE.DRAFT_REPORT_COMPLETED_CASES));
+        jsonObject.put("final_report", result.get(CASES_PER_QUALITY_GATE.FINAL_REPORT_COMPLETED_CASES));
+
+        return jsonObject;
+    }
+
     public static class JSONArrayMap extends HashMap<String, JSONArray>{
         @Override
         public JSONArray get(Object key) {
