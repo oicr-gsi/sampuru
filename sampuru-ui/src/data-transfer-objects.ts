@@ -26,6 +26,20 @@ export interface SankeyTransition {
   final_report: {total: number, pending: number, passed: number, failed: number},
 }
 
+/**
+ * Data returned from api/project_overview
+ */
+export interface CasesPerQcGate {
+  receipt: number,
+  extraction: number,
+  library_preparation: number,
+  library_qualification: number,
+  full_depth_sequencing: number,
+  informatics_interpretation: number,
+  draft_report: number,
+  final_report: number
+}
+
 export interface InfoItem {
   id: number,
   entry_type: string,
@@ -55,6 +69,7 @@ export interface BaseProject<I> {
 export interface ProjectInfo extends BaseProject<InfoItem> {
   failures: string[],
   sankey_transitions: SankeyTransition,
+  cases_per_qc_gate: CasesPerQcGate,
   qcables_total: number,
   qcables_completed: number,
   cases_total: number,
