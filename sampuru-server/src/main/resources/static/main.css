@@ -154,12 +154,6 @@ h2, h3 {
     margin-bottom: 10px;
 }
 
-.toolbar {
-    float: left; !important;
-    width: 150px; !important;
-    padding: 10px; !important;
-}
-
 .export.btn-group {
     float: left; !important;
 }

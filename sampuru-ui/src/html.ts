@@ -262,29 +262,6 @@ export function tableRow(
   return row;
 }
 
-export function exportToolbar(){
-  const toolbar = document.createElement("div");
-  toolbar.id = "toolbar";
-  toolbar.classList.add("select");
-
-  const select = document.createElement("select");
-  select.classList.add("form-control");
-
-  const exportBasic = document.createElement("option");
-  exportBasic.value = "";
-  exportBasic.innerText = "Export Basic";
-  select.appendChild(exportBasic);
-
-  const exportAll = document.createElement("option");
-  exportAll.value = "all";
-  exportAll.innerText = "Export All";
-  select.appendChild(exportAll);
-
-  toolbar.appendChild(select);
-
-  return toolbar;
-}
-
 /**
  * Instantiate Bootstrap table
  * @param headers -> map of data-field to header innerText
@@ -319,7 +296,6 @@ export function bootstrapTable(
 
   if (showExport) {
     table.setAttribute("data-show-export", "true");
-    table.setAttribute("data-toolbar", "toolbar");
   }
 
   if (clickToSelect) {

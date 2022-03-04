@@ -16,7 +16,7 @@ import {
   tableRow,
   bootstrapTable,
   tableBodyFromRows,
-  createButton, exportToolbar
+  createButton
 } from "./html.js";
 import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog, CasesPerQcGate} from "./data-transfer-objects.js";
@@ -111,7 +111,7 @@ function casesPerQcGateTable(casesPerQcGate: CasesPerQcGate): HTMLElement {
     ["final_report", "Final Report"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, false, false, null, "cases-per-qc-gate");
+  const table = bootstrapTable(tableHeaders, null, "cases-per-qc-gate", false, false, false, false) ;
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
@@ -227,14 +227,10 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
 
   const casesPerQcGateCard = {contents: casesPerQcGateTable(projectInfo.cases_per_qc_gate), header: "Number of Cases At Each QC Gate",
   title: projectInfo.name + " # Cases Per QC Gate", cardId: projectInfo.name + "-cases-per-qc-gate"};
-  
-  const toolbar = exportToolbar();
-  toolbar.classList.add("toolbar");
 
   const toggleIds = createButton('toggle-changelog-ids', "Switch to OICR Identifiers", "identifier");
   const changelogTables = elementFromTag("div", null,
     {type: "complex", element: toggleIds},
-    {type: "complex", element: toolbar},
     changelogTable(changelogs, true),
     changelogTable(changelogs, false));
 
@@ -290,33 +286,10 @@ export function initialiseProjectOverview(projectId: string) {
     .then(() => {
 
       $(function () {
-        $('#toolbar').find('select').change(function () {
-          $('#external-changelog, #internal-changelog').bootstrapTable('destroy').bootstrapTable({
-            exportDataType: $(this).val()
-          });
-          $('div').removeClass('clearfix');
-          $('#internal-changelog').parents().hide();
-          $('#external-changelog').parents().show();
-
-          $('#toggle-changelog-ids').on('click', function () {
-            $(this).text(function (i, text) {
-              if (text === "Switch to OICR Identifiers") {
-                $('#external-changelog').parents().hide();
-                $('#internal-changelog').parents().show();
-                return "Switch to External Identifiers";
-              } else {
-                $('#internal-changelog').parents().hide();
-                $('#external-changelog').parents().show();
-                return "Switch to OICR Identifiers";
-              }
-            });
-          });
-        });
-      });
-
-      $(function () {
         $('#cases-per-qc-gate').bootstrapTable({});
-        $('#external-changelog,#internal-changelog').bootstrapTable({});
+        $('#external-changelog,#internal-changelog').bootstrapTable({
+          exportDataType: 'all'
+        });
 
         // Default to show external table and hide internal table
         $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed

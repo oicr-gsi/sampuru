@@ -14,7 +14,7 @@ import {
   tableBodyFromRows,
   tableRow,
   toSentenceCase,
-  createButton, exportToolbar
+  createButton
 } from "./html.js";
 import {Changelog, QCable} from "./data-transfer-objects.js";
 import {commonName, formatLibraryDesigns} from "./common.js";
@@ -191,48 +191,20 @@ export function qcablesTable(
   externalTable.setAttribute("data-sort-name", "case-external-name");
   externalTable.append(externalTableBody);
 
-  const toolbar = exportToolbar();
-  toolbar.classList.add("toolbar");
-
   const toggleIds = createButton("qcable-id-toggle", "Switch to OICR Identifiers", "identifier");
 
   pageContainer.appendChild(pageHeader);
   pageContainer.appendChild(toggleIds);
-  pageContainer.appendChild(toolbar);
   pageContainer.appendChild(externalTable);
   pageContainer.appendChild(internalTable);
   document.body.appendChild(pageContainer);
 
   $(function () {
-    $('#toolbar').find('select').change(function (){
-      $('#internal-table, #external-table').bootstrapTable('refreshOptions', {
-        exportDataType: $(this).val()
-      });
-      $('div').removeClass("clearfix");
-      $('#internal-table').parents().hide();
-      $('#external-table').parents().show();
-
-      $('#qcable-id-toggle').on('click', function () {
-        $(this).text(function (i, text) {
-          if (text === "Switch to OICR Identifiers") {
-            $('#external-table').parents().hide();
-            $('#internal-table').parents().show();
-            return "Switch to External Identifiers";
-          } else {
-            $('#internal-table').parents().hide();
-            $('#external-table').parents().show();
-            return "Switch to OICR Identifiers";
-          }
-        });
-      });
-    });
-  });
-
-  $(function () {
     $('#internal-table,#external-table').bootstrapTable({
       formatSearch: function () {
         return 'Search QC-ables';
-      }
+      },
+      exportDataType: 'all'
     });
 
     // Default to show external table and hide internal table
