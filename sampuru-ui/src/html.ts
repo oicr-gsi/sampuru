@@ -262,7 +262,6 @@ export function tableRow(
   return row;
 }
 
-
 /**
  * Instantiate Bootstrap table
  * @param headers -> map of data-field to header innerText
@@ -270,15 +269,19 @@ export function tableRow(
  * @param search -> boolean for adding a search to table
  * @param sort -> map of column name to sort function that needs to be applied to it
  * @param tableId -> id to associate with table for jQuery to apply bootstrapTable styling and js to the right objects
+ * @param showExport -> boolean to show the export button
+ * @param clickToSelect
  * */
 export function bootstrapTable(
   headers: Map<string, string>,
+  sort: Map<string, string> | null,
+  tableId: string,
   pagination: boolean,
   search: boolean,
-  sort: Map<string, string> | null,
-  tableId: string
+  showExport: boolean,
+  clickToSelect: boolean
 ): HTMLElement {
-  
+
   const table = document.createElement("table");
   table.id = tableId;
   table.setAttribute("data-toggle", "table");
@@ -291,22 +294,30 @@ export function bootstrapTable(
     table.setAttribute("data-search", "true");
   }
 
+  if (showExport) {
+    table.setAttribute("data-show-export", "true");
+  }
+
+  if (clickToSelect) {
+    table.setAttribute("data-click-to-select", "true");
+  }
+
   const thead = document.createElement("thead");
   const tr = document.createElement("tr");
 
   headers
-    .forEach((header, data, map) => {
-      const cell = document.createElement("th");
-      cell.setAttribute("data-field", data);
+      .forEach((header, data, map) => {
+        const cell = document.createElement("th");
+        cell.setAttribute("data-field", data);
 
-      if (sort && sort.has(data)) {
-        cell.setAttribute("data-sortable", "true");
-        cell.setAttribute("data-sorter", <string>sort.get(data));
-      }
+        if (sort && sort.has(data)) {
+          cell.setAttribute("data-sortable", "true");
+          cell.setAttribute("data-sorter", <string>sort.get(data));
+        }
 
-      cell.innerText = header;
-      tr.appendChild(cell);
-    });
+        cell.innerText = header;
+        tr.appendChild(cell);
+      });
 
   thead.appendChild(tr);
   table.appendChild(thead);
@@ -330,13 +341,13 @@ export function caseCard(caseContent: CaseCard): HTMLElement {
   const formattedId = caseContent.id.replace(/[:]+/g, '');
 
   const changelogs = createLinkElement(
-    null,
-    "Changelogs",
-    caseContent.name + "changelogs",
-    new Map([
-      ["data-toggle", "collapse"],
-      ["style", "float:right"]]),
-    "#" + formattedId + "-changelogs"
+      null,
+      "Changelogs",
+      caseContent.name + "changelogs",
+      new Map([
+        ["data-toggle", "collapse"],
+        ["style", "float:right"]]),
+      "#" + formattedId + "-changelogs"
   );
 
   const changelogRows: DOMElement[] = [];

@@ -1,6 +1,7 @@
 /// <reference types="jquery" />
 /// <reference types="bootstrap" />
 /// <reference types="bootstrap-table" />
+/// <reference types="file-saver" />
 
 import {
   busyDialog,
@@ -21,6 +22,7 @@ import {urlConstructor} from "./io.js";
 import {ProjectInfo, Changelog, CasesPerQcGate} from "./data-transfer-objects.js";
 import { drawSankey } from "./sankey.js";
 import {commonName, formatQualityGateNames} from "./common.js";
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const projectId = urlParams.get("project-overview-id");
@@ -67,6 +69,7 @@ function changelogTable(changelogs: Changelog[], external: boolean): ComplexElem
         }))
     });
 
+
   const tableHeaders = new Map([
     ["donor_case_name", "Case"],
     ["qcable_type", "Quality Gate"],
@@ -75,7 +78,7 @@ function changelogTable(changelogs: Changelog[], external: boolean): ComplexElem
     ["change_date", "Change Date"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, true, true, null, external ? "external-changelog" : "internal-changelog");
+  const table = bootstrapTable(tableHeaders, null, external ? "external-changelog" : "internal-changelog", true, true, true, true);
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
@@ -108,7 +111,7 @@ function casesPerQcGateTable(casesPerQcGate: CasesPerQcGate): HTMLElement {
     ["final_report", "Final Report"]
   ]);
 
-  const table = bootstrapTable(tableHeaders, false, false, null, "cases-per-qc-gate");
+  const table = bootstrapTable(tableHeaders, null, "cases-per-qc-gate", false, false, false, false) ;
   const tableBody = tableBodyFromRows(null, tableRows);
 
   table.appendChild(tableBody);
@@ -281,9 +284,12 @@ export function initialiseProjectOverview(projectId: string) {
       drawSankey(data.sankey_transitions);
     })
     .then(() => {
+
       $(function () {
         $('#cases-per-qc-gate').bootstrapTable({});
-        $('#external-changelog,#internal-changelog').bootstrapTable({});
+        $('#external-changelog,#internal-changelog').bootstrapTable({
+          exportDataType: 'all'
+        });
 
         // Default to show external table and hide internal table
         $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed

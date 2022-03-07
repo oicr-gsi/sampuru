@@ -153,3 +153,7 @@ h2, h3 {
 .case-identifier {
     margin-bottom: 10px;
 }
+
+.export.btn-group {
+    float: left; !important;
+}
