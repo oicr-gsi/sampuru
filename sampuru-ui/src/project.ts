@@ -220,13 +220,15 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
       {type: "complex", element: qcables.element},
       {type: "complex", element: cases.element}));
 
+  const emptyDisplay = elementFromTag("p", null, "No QC-ables have been created yet for this project.");
+
   const sankeyContainer = document.createElement("div");
   sankeyContainer.id = "sankey";
-  const qcablesCard: Card = {contents: sankeyContainer, header: "QC-ables",
-    title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
+  const qcablesCard: Card = {contents: projectInfo.qcables_total == 0 ? emptyDisplay.element : sankeyContainer,
+    header: "QC-ables", title: projectInfo.name + " QC-ables", cardId: projectInfo.name + "-qcables"};
 
-  const casesPerQcGateCard = {contents: casesPerQcGateTable(projectInfo.cases_per_qc_gate), header: "Number of Cases At Each QC Gate",
-  title: projectInfo.name + " # Cases Per QC Gate", cardId: projectInfo.name + "-cases-per-qc-gate"};
+  const casesPerQcGateCard = {contents: projectInfo.qcables_total == 0 ? emptyDisplay.element : casesPerQcGateTable(projectInfo.cases_per_qc_gate),
+    header: "Number of Cases At Each QC Gate", title: projectInfo.name + " # Cases Per QC Gate", cardId: projectInfo.name + "-cases-per-qc-gate"};
 
   const toggleIds = createButton('toggle-changelog-ids', "Switch to OICR Identifiers", "identifier");
   const changelogTables = elementFromTag("div", null,
@@ -234,8 +236,8 @@ export function project(projectInfo: ProjectInfo, changelogs: Changelog[]): HTML
     changelogTable(changelogs, true),
     changelogTable(changelogs, false));
 
-  const changelogsCard: Card = {contents: changelogTables.element, header: "Changelogs",
-    title: projectInfo.name + " Changelogs", cardId: projectInfo.name + "-changelogs"};
+  const changelogsCard: Card = {contents: projectInfo.qcables_total == 0 ? emptyDisplay.element : changelogTables.element,
+    header: "Changelogs", title: projectInfo.name + " Changelogs", cardId: projectInfo.name + "-changelogs"};
 
   /* TODO: Uncomment once deliverable portal is developed and there is data to display. GR-1334
   const deliverables = elementFromTag("div", null, projectInfo.deliverables.join("\n"));
