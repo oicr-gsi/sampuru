@@ -1,4 +1,13 @@
-import {busyDialog, Card, caseCard, collapsibleCard, createLinkElement, navbar, createButton} from "./html.js";
+import {
+  busyDialog,
+  Card,
+  caseCard,
+  collapsibleCard,
+  createLinkElement,
+  navbar,
+  createButton,
+  elementFromTag
+} from "./html.js";
 import {CaseCard} from "./data-transfer-objects.js";
 import {commonName} from "./common.js";
 import {urlConstructor} from "./io.js";
@@ -48,7 +57,13 @@ export function casesPage(cases: CaseCard[], project: string, identifier: string
     }
   }
 
-  cardContainer.appendChild(toggleIds);
+  // Display something to users if there aren't any cases and only add toggle IDs button when there are cases
+  if (cases === undefined || cases.length == 0) {
+    const emptyDisplay = elementFromTag("p", null, "No cases have been created yet for this project.");
+    cardContainer.appendChild(emptyDisplay.element);
+  } else {
+    cardContainer.appendChild(toggleIds);
+  }
 
   const cards: HTMLElement[] = [];
   cases
