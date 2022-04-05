@@ -2,6 +2,7 @@ package ca.on.oicr.gsi.sampuru.server;
 
 import ca.on.oicr.gsi.sampuru.server.service.*;
 import ca.on.oicr.gsi.sampuru.server.type.SampuruType;
+import ca.on.oicr.gsi.prometheus.LatencyHistogram;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -14,6 +15,10 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.PathTemplateMatch;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.exporter.common.TextFormat;
+import io.prometheus.client.hotspot.DefaultExports;
+import io.undertow.util.StatusCodes;
 
 import java.io.*;
 import java.util.*;
@@ -28,24 +33,29 @@ public class Server {
     private final static HttpHandler ROUTES = Handlers.path()
             .addPrefixPath("/api", new RoutingHandler()
                     // Special frontend endpoints. I've killed the normal REST endpoints
-                    .get("/active_projects", ProjectService::getActiveProjectsParams)
-                    .get("/completed_projects", ProjectService::getCompletedProjectsParams)
-                    .get("/cases_cards/{projectId}", CaseService::getCardsParams)
-                    .get("/qcables_table/{filterType}/{filterId}", QCableService::getFilteredQcablesTableParams)
-                    .get("/project_overview/{id}", ProjectService::getProjectOverviewParams)
-                    .get("/notifications-active", NotificationService::getActiveParams)
-                    .get("/notifications-historic", NotificationService::getAllParams) // This is the same as the all endpoint was, just want naming consistency
-                    .get("/changelogs/{filterType}/{filterId}", ChangelogService::getFilteredChangelogs)
-                    .get("/deliverables", DeliverableService::endpointDisplayParams)
-                    .get("/search/{type}/{term}", Server::doSearch)
+                    .get("/active_projects", monitor(ProjectService::getActiveProjectsParams))
+                    .get("/completed_projects", monitor(ProjectService::getCompletedProjectsParams))
+                    .get("/cases_cards/{projectId}", monitor(CaseService::getCardsParams))
+                    .get("/qcables_table/{filterType}/{filterId}", monitor(QCableService::getFilteredQcablesTableParams))
+                    .get("/project_overview/{id}", monitor(ProjectService::getProjectOverviewParams))
+                    .get("/notifications-active", monitor(NotificationService::getActiveParams))
+                    .get("/notifications-historic", monitor(NotificationService::getAllParams)) // This is the same as the all endpoint was, just want naming consistency
+                    .get("/changelogs/{filterType}/{filterId}", monitor(ChangelogService::getFilteredChangelogs))
+                    .get("/deliverables", monitor(DeliverableService::endpointDisplayParams))
+                    .get("/search/{type}/{term}", monitor(Server::doSearch))
                     .get("/home", Server::helloWorld)
-                    .post("/update_deliverable", new BlockingHandler(DeliverableService::postDeliverableParams))
+                    .post("/update_deliverable", monitor(new BlockingHandler(DeliverableService::postDeliverableParams)))
             )
             .addPrefixPath("/", new ResourceHandler(new ClassPathResourceManager(Server.class.getClassLoader(), "static"))
-                    .setWelcomeFiles("index.html"));
+                    .setWelcomeFiles("index.html"))
+            .addExactPath("/metrics", monitor(new BlockingHandler(Server::metrics)));
 
     private final static HttpHandler ROOT = Handlers.exceptionHandler(ROUTES)
             .addExceptionHandler(Exception.class, Server::handleException);
+
+    private static final LatencyHistogram RESPONSE_TIME =
+        new LatencyHistogram(
+            "sampuru_http_response_time", "The response time to serve a query", "url");
 
     // see https://stackoverflow.com/questions/39742014/routing-template-format-for-undertow
     private static void doSearch(HttpServerExchange hse) throws Exception {
@@ -84,12 +94,34 @@ public class Server {
 
     //TODO: No error handling for, eg, /qcable/10000000
     public static void main(String[] args){
+        DefaultExports.initialize();
         readProperties();
         server = Undertow.builder()
                 .addHttpListener(Integer.valueOf(properties.getProperty("hostPort")), properties.getProperty("hostAddress"))
                 .setHandler(ROOT)
                 .build();
         server.start();
+    }
+
+    private static void metrics(HttpServerExchange exchange) {
+        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, TextFormat.CONTENT_TYPE_004);
+        exchange.setStatusCode(StatusCodes.OK);
+        try (final var os = exchange.getOutputStream();
+             final var writer = new PrintWriter(os)) {
+            TextFormat.write004(writer, CollectorRegistry.defaultRegistry.metricFamilySamples());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static HttpHandler monitor(HttpHandler handler) {
+        return exchange -> {
+            final var url = exchange.getAttachment(PathTemplateMatch.ATTACHMENT_KEY);
+            try (final var ignored =
+                RESPONSE_TIME.start(url == null ? "unknown" : url.getMatchedTemplate())) {
+                handler.handleRequest(exchange);
+            }
+        };
     }
 
     private static void helloWorld(HttpServerExchange hse){

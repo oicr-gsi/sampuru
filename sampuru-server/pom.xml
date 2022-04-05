@@ -9,7 +9,6 @@
   <artifactId>sampuru-server</artifactId>
   <packaging>jar</packaging>
   <name>Sampuru</name>
-
   <!-- TODO: url, licence, developers -->
   <!-- Maven Filter Plugin corrupts binary font files, so includes and excludes are needed to avoid this -->
   <build>
@@ -177,6 +176,25 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.on.oicr.gsi</groupId>
+      <artifactId>server-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient</artifactId>
+      <version>0.15.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_common</artifactId>
+      <version>0.15.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_hotspot</artifactId>
+      <version>0.15.0</version>
     </dependency>
   </dependencies>
 </project>
