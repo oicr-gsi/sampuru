@@ -5,11 +5,47 @@
     <groupId>ca.on.oicr.gsi.sampuru</groupId>
     <artifactId>sampuru</artifactId>
     <packaging>pom</packaging>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.8-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.release>14</maven.compiler.release>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>release.gsi</id>
+            <name>GSI Releases Maven Repository</name>
+            <url>https://artifacts.oicr.on.ca/artifactory/gsi-release</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>snapshots.gsi</id>
+            <name>GSI Releases Maven Snapshot Repository</name>
+            <url>https://artifacts.oicr.on.ca/artifactory/gsi-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>dependencies.gsi</id>
+            <name>GSI Dependencies Maven Snapshot Repository</name>
+            <url>https://artifacts.oicr.on.ca/artifactory/gsi-dependencies</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -17,6 +53,11 @@
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
                 <version>2.4.7</version>
+            </dependency>
+            <dependency>
+                <groupId>ca.on.oicr.gsi</groupId>
+                <artifactId>server-utils</artifactId>
+                <version>1.0.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
