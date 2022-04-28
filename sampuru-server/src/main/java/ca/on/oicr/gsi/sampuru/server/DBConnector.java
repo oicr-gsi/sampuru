@@ -1,5 +1,6 @@
 package ca.on.oicr.gsi.sampuru.server;
 
+import ca.on.oicr.gsi.sampuru.server.service.ServiceUtils;
 import com.zaxxer.hikari.HikariConfig;
 import org.jooq.Record;
 import org.jooq.*;
@@ -11,7 +12,9 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static tables_generated.Tables.*;
 
@@ -100,76 +103,73 @@ public class DBConnector {
             }
         }
 
-        //TODO: Adding Collection of VALUEs to Insert is coming in jOOQ 3.15 apparently. They disapprove of this approach
         if(!unknownDeliverables.isEmpty()) {
             try(final Connection connection = getConnection()){
                 // Write the new deliverables to the database and get back the new SERIAL ids
                 // Wrapped in transaction to ensure rollback on bad case_id
                 getContext(connection).transaction(configuration -> {
-                    InsertSetStep deliverableInsertSetStep = PostgresDSL.using(configuration).insertInto(DELIVERABLE_FILE),
-                            deliverableCaseInsertSetStep = PostgresDSL.using(configuration).insertInto(DELIVERABLE_CASE);
-                    InsertValuesStepN deliverableInsertValuesStepN = null,
-                            deliverableCaseInsertValuesStepN = null;
-                    for(Object obj: unknownDeliverables){
+                    // Format JSONArray into a List of Rows so it can be passed to .valuesOfRows
+                    List<Row4<String, String, String, LocalDateTime>> formattedUnknownDeliverables = new ArrayList<>();
+                    for(Object obj: unknownDeliverables) {
                         JSONObject nextDeliverable = (JSONObject) obj;
-                        deliverableInsertValuesStepN = deliverableInsertSetStep.values(
-                                PostgresDSL.defaultValue(), // ID. DEFAULT can't be used in an expression, only as a replacement for an expression. The other not-nulls will still kill bad requests
-                                checkWritePermission(nextDeliverable.get("project_id"), username),
-                                checkWritePermission(nextDeliverable.get("location"), username),
-                                checkWritePermission(nextDeliverable.get("notes"), username),
-                                checkWritePermission(PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()), username)
-                        );
-
+                        Row4<String, String, String, LocalDateTime> row = DSL.row(nextDeliverable.get("project_id").toString(), nextDeliverable.get("location").toString(), nextDeliverable.get("notes").toString(), LocalDateTime.parse(nextDeliverable.get("expiry_date").toString(), ServiceUtils.DATE_TIME_FORMATTER));
+                        formattedUnknownDeliverables.add(row);
                     }
-                    Result<Record> ids = deliverableInsertValuesStepN.returningResult(DELIVERABLE_FILE.ID).fetch();
 
-                    // Associate the new ids with the appropriate case ids and write to deliverables_case table
-                    for(int i = 0; i < ids.size(); i++){
-                        Integer thisId = Integer.valueOf(ids.get(i).get("id").toString());
+                    // Jooq 3.15 introduced .valuesOfRows for adding collection of values to Insert statements safely
+                    Result<Record1<Integer>> deliverableIds = PostgresDSL.using(configuration).insertInto(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, DELIVERABLE_FILE.LOCATION, DELIVERABLE_FILE.NOTES, DELIVERABLE_FILE.EXPIRY_DATE)
+                        .valuesOfRows(formattedUnknownDeliverables)
+                        .returningResult(DELIVERABLE_FILE.ID).fetch();
+
+                    // Associate the new ids with the appropriate case ids and write to deliverable_case table
+                    List<Row2<String, Integer>> deliverableCase = new ArrayList<>();
+                    for(int i = 0; i < deliverableIds.size(); i++) {
+                        Integer deliverableId = Integer.valueOf(Objects.requireNonNull(deliverableIds.get(i).get("id")).toString());
                         JSONArray casesForId = ((JSONArray) ((JSONObject)unknownDeliverables.get(i)).get("case_id"));
-                        for(Object obj: casesForId){
-                            String strObject = (String) obj;
-                            deliverableCaseInsertValuesStepN = deliverableCaseInsertSetStep.values(
-                                    checkWritePermission(thisId, username),
-                                    checkWritePermission(strObject, username)
-                            );
+                        for(Object obj: casesForId) {
+                            String caseId = (String) obj;
+                            Row2<String, Integer> row = DSL.row(caseId, deliverableId);
+                            deliverableCase.add(row);
                         }
                     }
-                    deliverableCaseInsertValuesStepN.execute();
-                });
 
+                    PostgresDSL.using(configuration).insertInto(DELIVERABLE_CASE, DELIVERABLE_CASE.CASE_ID, DELIVERABLE_CASE.DELIVERABLE_ID)
+                        .valuesOfRows(deliverableCase)
+                        .execute();
+                });
             }
         }
 
         // Update the existing deliverables
-            try(final Connection connection = getConnection()){
+        if(!knownDeliverables.isEmpty()) {
+            try (final Connection connection = getConnection()) {
                 getContext(connection).transaction(configuration -> {
                     InsertSetStep deliverableCaseInsertSetStep = PostgresDSL.using(configuration).insertInto(DELIVERABLE_CASE);
                     InsertValuesStepN deliverableCaseInsertValuesStepN = null;
-                    for(Object obj: knownDeliverables){
+                    for (Object obj : knownDeliverables) {
                         JSONObject nextDeliverable = (JSONObject) obj;
-                        Integer deliverableId = Math.toIntExact((Long)nextDeliverable.get("id"));
+                        Integer deliverableId = Math.toIntExact((Long) nextDeliverable.get("id"));
                         PostgresDSL.using(configuration).update(DELIVERABLE_FILE)
-                                .set(DELIVERABLE_FILE.PROJECT_ID, (String)nextDeliverable.get("project_id"))
-                                .set(DELIVERABLE_FILE.LOCATION, (String)nextDeliverable.get("location"))
-                                .set(DELIVERABLE_FILE.NOTES, (String)nextDeliverable.get("notes"))
-                                .set(DELIVERABLE_FILE.EXPIRY_DATE, PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
-                                .where(DELIVERABLE_FILE.ID.eq(deliverableId)
-                                        .and(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))))
-                                .execute();
+                            .set(DELIVERABLE_FILE.PROJECT_ID, (String) nextDeliverable.get("project_id"))
+                            .set(DELIVERABLE_FILE.LOCATION, (String) nextDeliverable.get("location"))
+                            .set(DELIVERABLE_FILE.NOTES, (String) nextDeliverable.get("notes"))
+                            .set(DELIVERABLE_FILE.EXPIRY_DATE, PostgresDSL.localDateTime(nextDeliverable.get("expiry_date").toString()))
+                            .where(DELIVERABLE_FILE.ID.eq(deliverableId)
+                                .and(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))))
+                            .execute();
 
 
                         // drop the old deliverable-case associations and rebuild
                         PostgresDSL.using(configuration).delete(DELIVERABLE_CASE)
-                                .where(DELIVERABLE_CASE.DELIVERABLE_ID.eq(Math.toIntExact((Long)nextDeliverable.get("id")))
-                                        .and(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))))
-                                .execute();
+                            .where(DELIVERABLE_CASE.DELIVERABLE_ID.eq(Math.toIntExact((Long) nextDeliverable.get("id")))
+                                .and(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)))))
+                            .execute();
                         JSONArray casesForId = ((JSONArray) nextDeliverable.get("case_id"));
 
-                        for(Object caseObj: casesForId){
+                        for (Object caseObj : casesForId) {
                             String caseId = (String) caseObj;
-                            deliverableCaseInsertValuesStepN = 
-                                    deliverableCaseInsertSetStep.values(checkWritePermission(deliverableId, username),
+                            deliverableCaseInsertValuesStepN =
+                                deliverableCaseInsertSetStep.values(checkWritePermission(deliverableId, username),
                                     checkWritePermission(caseId, username));
                         }
                     }
@@ -177,6 +177,7 @@ public class DBConnector {
                 });
             }
         }
+    }
 
     private Object checkWritePermission(Object value, String username){
         return PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), value);
@@ -185,7 +186,7 @@ public class DBConnector {
     //TODO: filter by username, probably by rewrite
     public List<Integer> getAllIds(Table getFrom) throws SQLException {
         List<Integer> newList = new LinkedList<>();
-        Field<Integer> idField = getFrom.field("id");
+        Field<Integer> idField = (Field<Integer>) getFrom.field("id");
 
         try(final Connection connection = getConnection()){
             Result<Record1<Integer>> idsFromDb = getContext(connection).select(idField).from(getFrom).fetch();
