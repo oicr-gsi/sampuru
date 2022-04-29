@@ -13,6 +13,7 @@ module.exports = {
   // https://webpack.js.org/configuration/dev-server/
   devServer: {
     open: true,
+    host: 'local-ip',
     port: 8080,
     proxy: {
       '/api': {
