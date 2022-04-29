@@ -18,7 +18,92 @@ This portal was developed using the branch `GR-1376_front-end-deliverables-porta
 ### Sampuru Environment
 Below is a breakdown of some of the important files in the Sampuru code base that concern the deliverables portal, and the role that they each play:
 
-- **deliverables.ts**: TypeScript file where the code relevant to the elements on the deliverables page lives. This page is where the table itself is instantiated and populated with data from the /deliverables endpoint.
+- **deliverables.ts**: TypeScript file where the code relevant to the elements on the deliverables page lives. This page is where the table itself is instantiated and populated with data from the /deliverables endpoint. A brief rundown of the code within this file is as follows:
+
+1. Function to construct the table rows. This function takes `deliverablesObject` as a parameter, which is an object of `DeliverableObject[]` (a data-transfer object). This function essentially where the table rows are generated, and where the deliverables data is pushed into the rows. 
+````
+function constructTableRows(deliverableObjects: DeliverableObject[]): ComplexElement<HTMLTableRowElement>[]{
+const tableRows: ComplexElement<HTMLTableRowElement>[] = [];
+
+
+       Array.from(deliverableObjects).forEach((deliverable) => {
+            deliverable.project_cases.forEach((project_case) => {
+                project_case.cases.forEach((donor_case) => {
+                    deliverable.deliverables.forEach((deliverables) => {
+                        tableRows.push(tableRow(null,
+                            {contents: "testDummyData"},
+                            {contents: "testDummyData"},
+                            {contents: "testDummyData"},
+                            {contents: "testDummyData"},
+                            {contents: "testDummyData"}))
+                      })
+                })
+            })
+        }); 
+
+    return tableRows; 
+}
+````
+
+2. Function to instantiate the deliverables table, using the bootstrapTable function in `html.ts`. This function also takes the `deliverablesObject` as a parameter. This function is also where the table headers and rows are appended to the table itself.
+````
+export function deliverablesTable(deliverables: DeliverableObject[]): HTMLElement {
+    const pageContainer = document.createElement("div");
+    const pageHeader = document.createElement("h3");
+    pageHeader.innerText = "Deliverables Portal";
+
+    const tableHeaders = new Map([
+        ["project_id", "Project ID"],
+        ["case_id", "Case ID"],
+        ["location", "Location"],
+        ["notes", "Notes"],
+        ["expiry_date", "Expiry Date"]]);
+
+    const table = bootstrapTable(tableHeaders, null, "table", true, true, true, true);
+    const tableRows = constructTableRows(deliverables);
+    const tableBody = tableBodyFromRows(null, tableRows);
+    table.appendChild(tableBody);
+    table.className = "deliverables-table";
+    pageContainer.appendChild(pageHeader);
+    pageContainer.appendChild(table);
+    document.body.appendChild(pageContainer);
+
+    return pageContainer;
+}
+````
+
+3. Function to initialize the deliverables. This function is primarily made up of jQuery code and is where the deliverables data is fetched from the API. 
+````
+export function initialiseDeliverables() {
+    const closeBusy = busyDialog();
+
+    Promise.all([
+        fetch("api/deliverables")
+    ])
+        .then(responses => {
+            return Promise.all(responses.map(response => response.json()));
+        })
+        .then((responses) => {
+        const deliverables = responses[0] as DeliverableObject[]
+        document.body.appendChild(deliverablesTable(deliverables));
+        return deliverables;
+    })
+        .then(() => {
+
+            $(function () {
+                $('#deliverables').bootstrapTable({});
+                $('#table').bootstrapTable({
+                    exportDataType: 'all'
+                });
+            })
+        })
+        .catch((error) => {
+            console.log(error); //todo: write to actual logs
+        })
+        .finally(closeBusy);
+}
+````
+
 - **deliverables.js**: JavaScript file which is automatically updated with changes made to `deliverables.ts` by running `tsc -p sampuru-ui && PATH=$(npm bin):$PATH rollup -c`.
 - **deliverables.html**: HTML file associated with the deliverables portal. This is where third party libraries are referenced.
 - **DeliverableService.java**: Java file where the code relevant to the /deliverables data coming back from the endpoint lives. The current format of the data coming back may need to be tweaked to populate the table. The format of the data can be validated by curling the data from the endpoint (`curl localhost:8088/api/deliverables`).
@@ -42,4 +127,8 @@ As mentioned above, one of the key features of the deliverables table is the abi
 
 This extension hasn't currently been tested robustly given the lack of data issue with the table. To my understanding, as a next step, the bootstrapTable function in `html.ts` should be modified to take an additional parameter, which would be a boolean named editable.
 ## Next Steps
-In terms of next steps for this portal, the main priority would be to get a skeleton outline of the table populated with data from the /deliverables endpoint. This is a current limitation as there seems to be an issue with the format of the data (the table can be populated with dummy data, which indicates that there is an issue with the data from the endpoint). 
+The following are the next steps needed to complete this ticket and finish building the portal:
+1. The main priority would be to get a skeleton outline of the table populated with data from the /deliverables endpoint. This is a current limitation as there seems to be an issue with the format of the data (the table can be populated with dummy data, which indicates that there is an issue with the data from the endpoint). 
+2. Once the table has been populated with deliverables data, the editable-table extension would need to be tested by adding an 'editable' parameter to the bootstrapTable function in `html.ts`
+3. Another feature that needs to be added is the dropdown columns for the projectID and caseID columns. These resources may be helpful in achieving that: https://getbootstrap.com/docs/4.1/components/dropdowns/, https://bootstrap-table.com/docs/api/table-options/
+4. The next step would be to create a 'Submit' or 'Save Changes' button, and this button would need to be hooked up to the backend for the user to POST their changes to `/update_deliverables`. 
