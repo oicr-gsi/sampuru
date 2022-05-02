@@ -109,11 +109,15 @@ public class DBConnector {
                 getContext(connection).transaction(configuration -> {
                     // Format JSONArray into a List of Rows so it can be passed to .valuesOfRows
                     List<Row4<String, String, String, LocalDateTime>> formattedUnknownDeliverables = new ArrayList<>();
+                    boolean writePermission = checkWritePermission(username, configuration);
                     for(Object obj: unknownDeliverables) {
                         JSONObject nextDeliverable = (JSONObject) obj;
                         Row4<String, String, String, LocalDateTime> row = DSL.row(nextDeliverable.get("project_id").toString(), nextDeliverable.get("location").toString(), nextDeliverable.get("notes").toString(), LocalDateTime.parse(nextDeliverable.get("expiry_date").toString(), ServiceUtils.DATE_TIME_FORMATTER));
-                        formattedUnknownDeliverables.add(row);
+                        if(writePermission) {
+                            formattedUnknownDeliverables.add(row);
+                        }
                     }
+
 
                     // Jooq 3.15 introduced .valuesOfRows for adding collection of values to Insert statements safely
                     Result<Record1<Integer>> deliverableIds = PostgresDSL.using(configuration).insertInto(DELIVERABLE_FILE, DELIVERABLE_FILE.PROJECT_ID, DELIVERABLE_FILE.LOCATION, DELIVERABLE_FILE.NOTES, DELIVERABLE_FILE.EXPIRY_DATE)
@@ -128,7 +132,9 @@ public class DBConnector {
                         for(Object obj: casesForId) {
                             String caseId = (String) obj;
                             Row2<String, Integer> row = DSL.row(caseId, deliverableId);
-                            deliverableCase.add(row);
+                            if(writePermission) {
+                                deliverableCase.add(row);
+                            }
                         }
                     }
 
@@ -143,8 +149,8 @@ public class DBConnector {
         if(!knownDeliverables.isEmpty()) {
             try (final Connection connection = getConnection()) {
                 getContext(connection).transaction(configuration -> {
-                    InsertSetStep deliverableCaseInsertSetStep = PostgresDSL.using(configuration).insertInto(DELIVERABLE_CASE);
-                    InsertValuesStepN deliverableCaseInsertValuesStepN = null;
+                    List<Row2<String, Integer>> deliverableCase = new ArrayList<>();
+                    boolean writePermission = checkWritePermission(username, configuration);
                     for (Object obj : knownDeliverables) {
                         JSONObject nextDeliverable = (JSONObject) obj;
                         Integer deliverableId = Math.toIntExact((Long) nextDeliverable.get("id"));
@@ -167,19 +173,29 @@ public class DBConnector {
 
                         for (Object caseObj : casesForId) {
                             String caseId = (String) caseObj;
-                            deliverableCaseInsertValuesStepN =
-                                deliverableCaseInsertSetStep.values(checkWritePermission(deliverableId, username),
-                                    checkWritePermission(caseId, username));
+                            Row2<String, Integer> row = DSL.row(caseId, deliverableId);
+                            if(writePermission) {
+                                deliverableCase.add(row);
+                            }
                         }
                     }
-                    deliverableCaseInsertValuesStepN.execute();
+
+                    PostgresDSL.using(configuration).insertInto(DELIVERABLE_CASE, DELIVERABLE_CASE.CASE_ID, DELIVERABLE_CASE.DELIVERABLE_ID)
+                        .valuesOfRows(deliverableCase)
+                        .execute();
                 });
             }
         }
     }
 
-    private Object checkWritePermission(Object value, String username){
-        return PostgresDSL.when(ADMIN_ROLE.in(PostgresDSL.select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username))), value);
+    private boolean checkWritePermission(String username, Configuration configuration){
+        Result<Record1<String>> userProjects = PostgresDSL.using(configuration).select(USER_ACCESS.PROJECT).from(USER_ACCESS).where(USER_ACCESS.USERNAME.eq(username)).fetch();
+        for(Record1<String> record: userProjects){
+            if(record.value1().equals(ADMIN_ROLE.getValue())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //TODO: filter by username, probably by rewrite
