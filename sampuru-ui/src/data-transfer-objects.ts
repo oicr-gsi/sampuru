@@ -188,9 +188,26 @@ export interface Notification {
 }
 
 export interface DeliverableFile {
-  id: number,
+  id: string,
   project_id: string,
+  case_ids: string,
   location: string,
   notes: string,
   expiry_date: string
+}
+
+export interface DonorCase {
+  project_id: string,
+  name: string,
+  id: string
+}
+
+export interface ProjectCase {
+  project: string,
+  cases: DonorCase[]
+}
+
+export interface DeliverableObject {
+  deliverables: DeliverableFile[],
+  project_cases: ProjectCase[]
 }

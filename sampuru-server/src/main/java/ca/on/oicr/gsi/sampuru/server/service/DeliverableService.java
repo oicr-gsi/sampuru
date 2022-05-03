@@ -83,17 +83,24 @@ public class DeliverableService extends Service<Deliverable> {
         }
         jsonObject.put("deliverables", deliverablesArray);
 
-        DBConnector.JSONArrayMap projectCasesArray = new DBConnector.JSONArrayMap();
+        DBConnector.JSONArrayMap projectCasesMap = new DBConnector.JSONArrayMap();
         for(Record caseResult: projectCases){
             JSONObject caseObject = new JSONObject();
             caseObject.put("id", caseResult.get(DONOR_CASE.ID));
             caseObject.put("project_id", caseResult.get(DONOR_CASE.PROJECT_ID));
             caseObject.put("name", caseResult.get(DONOR_CASE.NAME));
-            JSONArray currentProjectArray = projectCasesArray.get(caseObject.get("project_id"));
+            JSONArray currentProjectArray = projectCasesMap.get(caseObject.get("project_id"));
             currentProjectArray.add(caseObject);
-            projectCasesArray.put((String)caseObject.get("project_id"), currentProjectArray);
+            projectCasesMap.put((String)caseObject.get("project_id"), currentProjectArray);
         }
-        jsonObject.put("project_cases", projectCasesArray.toJSONObject());
+        JSONArray projectCasesArray = new JSONArray();
+        for (String key: projectCasesMap.keySet()) {
+            JSONObject currentProjectObject = new JSONObject();
+            currentProjectObject.put("project", key);
+            currentProjectObject.put("cases", projectCasesMap.get(key));
+            projectCasesArray.add(currentProjectObject);
+        }
+        jsonObject.put("project_cases", projectCasesArray);
 
         return jsonObject.toJSONString();
     }

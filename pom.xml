@@ -5,7 +5,7 @@
     <groupId>ca.on.oicr.gsi.sampuru</groupId>
     <artifactId>sampuru</artifactId>
     <packaging>pom</packaging>
-    <version>1.8</version>
+    <version>1.9-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.release>14</maven.compiler.release>
@@ -53,6 +53,11 @@
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
                 <version>5.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>ca.on.oicr.gsi</groupId>
+                <artifactId>server-utils</artifactId>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>ca.on.oicr.gsi</groupId>
