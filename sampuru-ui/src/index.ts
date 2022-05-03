@@ -13,12 +13,11 @@ import {
 import {initialiseActiveProjects} from "./all-projects.js";
 import {urlConstructor} from "./io.js";
 import {
-  Changelog,
-  DeliverableFile,
-  Notification,
-  SearchedCase,
-  SearchedProject,
-  SearchedQCable
+    Changelog,
+    Notification,
+    SearchedCase,
+    SearchedProject,
+    SearchedQCable, DeliverableFile
 } from "./data-transfer-objects.js";
 import {
   commonName, 
