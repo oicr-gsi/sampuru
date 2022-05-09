@@ -64,14 +64,15 @@ CREATE TABLE case_test (
     tissue_type text,
     timepoint text,
     group_id text,
+    targeted_sequencing text,
     extraction_qcable_id text,
     library_preparation_qcable_id text,
     library_qualification_qcable_id text,
     full_depth_qcable_id text,
     CONSTRAINT case_test_case_match FOREIGN KEY (case_id) REFERENCES donor_case (id)
         ON DELETE CASCADE,
-    CONSTRAINT case_test_unique
-        UNIQUE (case_id, name, tissue_origin, tissue_type, timepoint, group_id),
+    CONSTRAINT case_test_unique UNIQUE (case_id, name, tissue_origin, tissue_type, timepoint,
+        group_id, targeted_sequencing),
     CONSTRAINT donor_case_extraction_match FOREIGN KEY (extraction_qcable_id)
         REFERENCES qcable (id),
     CONSTRAINT donor_case_library_preparation_match FOREIGN KEY (library_preparation_qcable_id)
