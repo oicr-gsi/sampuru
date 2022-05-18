@@ -4,7 +4,7 @@
   <parent>
     <groupId>ca.on.oicr.gsi.sampuru</groupId>
     <artifactId>sampuru</artifactId>
-    <version>1.9</version>
+    <version>1.10-SNAPSHOT</version>
   </parent>
   <artifactId>sampuru-server</artifactId>
   <packaging>jar</packaging>
