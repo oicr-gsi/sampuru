@@ -157,3 +157,11 @@ h2, h3 {
 .export.btn-group {
     float: left; !important;
 }
+
+.editable-click,
+td.editable-click,
+td.editable-click:hover {
+    text-decoration: none;
+    border-bottom: dashed 1px #0088cc !important;
+    cursor: pointer !important;
+}

@@ -53,6 +53,17 @@ export interface TableCell {
    * A tooltip for the cell
    */
   title?: string;
+
+
+  /**
+   * ID for the cell
+   * */
+  id?: string;
+
+  /**
+   * Primary key of record to be updated (ID in db)
+   * */
+  pk?: string;
 }
 
 export interface LinkElement {
@@ -235,11 +246,19 @@ export function tableRow(
   ...cells: TableCell[]
 ): ComplexElement<HTMLTableRowElement> {
   const row = elementFromTag("tr", null,
-    cells.map(({ className, click, contents, header, title }) => {
+    cells.map(({ className, click, contents, header, title , id, pk}) => {
       const cell = elementFromTag(
         header ? "th" : "td",
         (typeof className == "string") ? className : null,
         contents);
+
+      if (id) {
+        cell.element.id = id;
+      }
+
+      if (pk) {
+        cell.element.setAttribute("data-pk", pk);
+      }
 
       if (click) {
         cell.element.style.cursor = "pointer";
