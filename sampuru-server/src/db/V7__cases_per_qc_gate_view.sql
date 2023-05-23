@@ -1,3 +1,4 @@
+-- TODO: update or remove
 CREATE OR REPLACE VIEW cases_per_quality_gate AS
 SELECT project_id,
        COUNT(DISTINCT (CASE WHEN receipt_inspection_qcable_alias IS NOT NULL AND receipt_inspection_qcable_status = 'passed' AND case_id NOT IN (SELECT DISTINCT case_id FROM qcable WHERE qcable_type = 'receipt_inspection' AND status IN ('failed', 'pending')) THEN case_id END)) AS receipt_inspection_completed_cases, /*We only care about failed and pending cases at this gate*/

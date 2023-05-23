@@ -1,3 +1,4 @@
+-- TODO: update or remove
 CREATE OR REPLACE VIEW case_card AS
 SELECT
 case_id,

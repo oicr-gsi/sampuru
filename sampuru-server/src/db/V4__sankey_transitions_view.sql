@@ -1,3 +1,4 @@
+-- TODO: update or remove
 CREATE OR REPLACE VIEW sankey_transition AS
 SELECT
 project_id,

@@ -1,3 +1,4 @@
+-- TODO: update or remove
 CREATE OR REPLACE VIEW qcable_table AS
 SELECT
 receipt_inspection_qcable.project_id       AS project_id,
