@@ -22,7 +22,7 @@
     "@types/file-saver": "^2.0.5",
     "bootstrap": "^4.5.3",
     "bootstrap-table": "1.18.0",
-    "d3": "^6.2.0",
+    "d3": "^7.9.0",
     "d3-sankey": "^0.12.3",
     "express": "^4.19.2",
     "file-saver": "^2.0.5",
