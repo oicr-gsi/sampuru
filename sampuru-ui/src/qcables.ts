@@ -205,7 +205,7 @@ export function qcablesTable(
         return 'Search QC-ables';
       },
       exportDataType: 'all'
-    });
+    } as any);
 
     // Default to show external table and hide internal table
     $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed
