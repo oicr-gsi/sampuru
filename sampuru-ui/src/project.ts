@@ -291,7 +291,7 @@ export function initialiseProjectOverview(projectId: string) {
         $('#cases-per-qc-gate').bootstrapTable({});
         $('#external-changelog,#internal-changelog').bootstrapTable({
           exportDataType: 'all'
-        });
+      } as any);
 
         // Default to show external table and hide internal table
         $('div').removeClass('clearfix'); // This is a Bootstrap class that gets preset for all tables that isn't needed
