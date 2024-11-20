@@ -8,6 +8,7 @@
 
 ## Minimum version requirements
 * `Java 17`
-* `node >= 14`
-* `npm >= 6`
+* `node >= 18`
+* `npm >= 8`
 * `tsc >= 3` 
+

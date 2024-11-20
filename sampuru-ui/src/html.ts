@@ -110,7 +110,7 @@ function addElements(
   target: HTMLElement,
   ...elements: DOMElement[]
 ): void {
-  elements
+  (elements as any)
     .flat(Number.MAX_VALUE)
     .forEach((result: Exclude<DOMElement, DOMElement[]>) => {
       if (result === null) {
